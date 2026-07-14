@@ -507,12 +507,8 @@ function timeAgo(ts){const s=Math.floor((Date.now()-ts)/1000);if(s<60)return"jus
 const fmtJoinDate=ts=>{if(!ts)return"Unknown";const d=new Date(ts);return`${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`;};
 // ── Membership tier limits ────────────────────────────────────────────────────
 function getTierLimits(membershipType){
-  if(!membershipType)return{hiit:0,strength:0,wellness:0};
-  const mt=membershipType.toUpperCase();
-  if(mt.includes("SIGNATURE")||mt.includes("DUO"))return{hiit:null,strength:null,wellness:2};
-  if(mt.includes("CORE"))return{hiit:2,strength:1,wellness:1};
-  if(mt.includes("COMMUNITY")||mt.includes("ESSENTIAL"))return{hiit:3,strength:1,wellness:1};
-  return{hiit:3,strength:1,wellness:1}; // Foundation and any other tier
+  // Soul Fitness: no booking limits — every member can book unlimited classes & wellness.
+  return{hiit:null,strength:null,wellness:null};
 }
 // Tuesday=2, Thursday=4 are Strength days
 const isStrengthDay=dk=>{const d=new Date(dk+"T00:00:00");return d.getDay()===2||d.getDay()===4;};;
@@ -1939,7 +1935,7 @@ function InviteForm(props){
     setSending(true);setMsg("");
     if(p.appsScript){
       try{
-        const params=new URLSearchParams({action:p.action||"healthInvite",to:email.trim(),firstName:""});
+        const params=new URLSearchParams({action:p.action||"healthInvite",to:email.trim(),firstName:"",plan:p.plan||""});
         await fetch(url+"?"+params.toString(),{method:"GET",mode:"no-cors"});
         setMsg("✓ Sent to "+email.trim());setEmail("");
       }catch(e){setMsg("Error: "+e.message);}
@@ -2062,16 +2058,28 @@ function OnboardingPanel({id,title,children,openPanel,setOpenPanel}){
   );
 }
 function OnboardingView({showToast}){
-  const [openPanel,setOpenPanel]=useState("health");
+  const [openPanel,setOpenPanel]=useState("fitness");
   return React.createElement("div",{style:{marginTop:16}},
     React.createElement("div",{style:{fontSize:10,letterSpacing:"0.18em",color:"#555",fontWeight:600,marginBottom:16}},"ONBOARDING · ADMIN"),
-    React.createElement(OnboardingPanel,{id:"health",title:"SEND HEALTH SCREENING FORM",openPanel,setOpenPanel},
+    React.createElement("div",{style:{fontSize:11,color:"#666",letterSpacing:"0.04em",lineHeight:1.7,marginBottom:16}},"Both options send the same health screening form. The option you choose sets the member's starting access when they complete it — you can change it anytime from their profile."),
+    React.createElement(OnboardingPanel,{id:"fitness",title:"HEALTH FORM · FITNESS MEMBER",openPanel,setOpenPanel},
       React.createElement(InviteForm,{
         appsScript:true,
         endpoint:APPS_SCRIPT_URL,
         action:"healthInvite",
-        desc:"Enter a personal-training client's email address to send them the health screening form.",
-        btnLabel:"SEND HEALTH SCREENING FORM"
+        plan:"fitness",
+        desc:"They become a FITNESS member on completion — full access to every section that's turned on.",
+        btnLabel:"SEND FITNESS MEMBER FORM"
+      })
+    ),
+    React.createElement(OnboardingPanel,{id:"trial",title:"HEALTH FORM · TRIAL MEMBER",openPanel,setOpenPanel},
+      React.createElement(InviteForm,{
+        appsScript:true,
+        endpoint:APPS_SCRIPT_URL,
+        action:"healthInvite",
+        plan:"trial",
+        desc:"They become a TRIAL member on completion — Notice Board only. Upgrade them to Fitness anytime from their profile.",
+        btnLabel:"SEND TRIAL MEMBER FORM"
       })
     )
   );
@@ -4400,22 +4408,27 @@ function App(){
     else{await sbPost("class_limits",{time_slot:time,date_key:dateKey,max_spots:n});}
     setClassLimits(p=>({...p,[`${dateKey}:${time}`]:n}));
   }
+  async function ffSet(body){
+    const ex=await sbGet("feature_flags","id=eq.1&select=id");
+    if(ex&&ex.length)await sbPatch("feature_flags","id=eq.1",body);
+    else await sbPost("feature_flags",{id:1,...body});
+  }
   async function saveWellnessSetting(enabled){
-    await sbPatch("feature_flags","id=eq.1",{wellness_enabled:enabled});
+    await ffSet({wellness_enabled:enabled});
     setWellnessEnabled(enabled);
     if(!enabled&&tab==="wellness")setTab("community");
   }
   async function saveClassesSetting(enabled){
-    await sbPatch("feature_flags","id=eq.1",{classes_enabled:enabled});
+    await ffSet({classes_enabled:enabled});
     setClassesEnabled(enabled);
     if(!enabled&&tab==="book")setTab("community");
   }
   async function saveCalendarSetting(enabled){
-    await sbPatch("feature_flags","id=eq.1",{calendar_enabled:enabled});
+    await ffSet({calendar_enabled:enabled});
     setCalendarEnabled(enabled);
   }
   async function saveStrengthSetting(enabled){
-    await sbPatch("feature_flags","id=eq.1",{strength_enabled:enabled});
+    await ffSet({strength_enabled:enabled});
     setStrengthEnabled(enabled);
     if(!enabled&&tab==="strength")setTab("community");
   }
