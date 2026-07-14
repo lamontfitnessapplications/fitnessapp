@@ -1492,12 +1492,12 @@ function AdminView({bookings,setBookings,showToast,isAdmin,isMaster,mFlags,saveM
         ),
         React.createElement("button",{onClick:()=>saveMFlag("wk",!mFlags.wk),style:{background:!mFlags.wk?"#fff":"#222",color:!mFlags.wk?"#000":"#555",border:"1px solid "+(!mFlags.wk?"#fff":"#333"),padding:"6px 18px",fontSize:10,letterSpacing:"0.12em",fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}},!mFlags.wk?"HIDE":"OFF")
       ),
-      isMaster&&mFlags.wk&&React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",background:"#0b0b0b",border:"1px solid "+(mFlags.pasteai?"#3f6b1e":"#222"),borderTop:"none",padding:"10px 14px 10px 26px",marginBottom:10}},
+      isMaster&&mFlags.wk&&React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",background:"#0b0b0b",border:"1px solid "+(!mFlags.pasteai?"#3f6b1e":"#222"),borderTop:"none",padding:"10px 14px 10px 26px",marginBottom:10}},
         React.createElement("div",null,
           React.createElement("div",{style:{fontSize:10,fontWeight:600,letterSpacing:"0.08em",color:"#ccc"}},"⤵ PASTE FROM AI"),
-          React.createElement("div",{style:{fontSize:9,color:"#555",marginTop:2,letterSpacing:"0.04em"}},"Off = hidden from admins")
+          React.createElement("div",{style:{fontSize:9,color:"#555",marginTop:2,letterSpacing:"0.04em"}},"HIDE = ON hides it from admins")
         ),
-        React.createElement("button",{onClick:()=>saveMFlag("pasteai",!mFlags.pasteai),style:{background:mFlags.pasteai?"#fff":"#222",color:mFlags.pasteai?"#000":"#555",border:"1px solid "+(mFlags.pasteai?"#fff":"#333"),padding:"6px 18px",fontSize:10,letterSpacing:"0.12em",fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}},mFlags.pasteai?"ON":"OFF")
+        React.createElement("button",{onClick:()=>saveMFlag("pasteai",!mFlags.pasteai),style:{background:!mFlags.pasteai?"#fff":"#222",color:!mFlags.pasteai?"#000":"#555",border:"1px solid "+(!mFlags.pasteai?"#fff":"#333"),padding:"6px 18px",fontSize:10,letterSpacing:"0.12em",fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}},!mFlags.pasteai?"HIDE":"OFF")
       ),
       isMaster&&React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",background:"#0e0e0e",border:"1px solid "+(!mFlags.welladm?"#3f6b1e":"#222"),padding:"11px 14px",marginBottom:10}},
         React.createElement("div",null,
