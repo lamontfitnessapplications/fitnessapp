@@ -404,7 +404,7 @@ html,body{background:#080808;min-height:100vh}
 <script>
 const { useState, useEffect, useRef } = React;
 const ADMIN_EMAIL = "lamontfitnessapplications@gmail.com";
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx6ZLt0EiEsOANs67XTdpuP_mOWgcBGjCTJMPXSX4qaMONYHZ1hoTtDVl20cqy7BI0b/exec";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwNjMPu-sLin3TBQXGUdZzTaFHn_UrdOx9H2wNdFnBaresNMnMclTpVw7lWM-DQlTho/exec";
 async function notifyWellnessBooking(name, email, dateKey, time) {
   try {
     const d = new Date(dateKey + "T12:00:00");
@@ -932,7 +932,7 @@ function MemberProfileOverlay({member,bookings,onClose,currentUserIsAdmin,isMast
           disabled:resettingPw,
           onClick:async()=>{
             setResettingPw(true);setPwResetOk("");
-            const tmpPw="T365"+String(Math.floor(1000+Math.random()*9000));
+            const tmpPw="SF"+String(Math.floor(1000+Math.random()*9000));
             const hashed=hashPw(tmpPw);
             await sbPatch("members",`email=eq.${encodeURIComponent(member.email)}`,{password:hashed});
             const firstName=member.name?member.name.split(" ")[0]:"there";
