@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="theme-color" content="#080808"/>
-<title>Soul Fitness · Check In</title>
+<title>Soul Fitness · Check In Kiosk</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Syncopate:wght@700&display=swap" rel="stylesheet"/>
 <style>
@@ -16,36 +16,36 @@ body{font-family:'DM Sans',sans-serif;color:#fff}
   background-image:linear-gradient(rgba(8,8,8,0.72),rgba(8,8,8,0.88)),url("Soulbackground.jpg");
   background-size:cover;background-position:center top;
   padding:30px 28px 22px;text-align:center;display:flex;flex-direction:column;align-items:center;
-  border-bottom:1px solid #1a1a1a;
+  border-bottom:1px solid #444;
 }
 .hero-circle{width:70px;height:70px;border-radius:50%;border:2px solid #8cc63e;background:#111;overflow:hidden;margin-bottom:12px;display:flex;align-items:center;justify-content:center}
 .hero-circle img{width:100%;height:100%;object-fit:cover}
 .hero-name{font-family:'Syncopate',sans-serif;font-size:12px;font-weight:700;letter-spacing:0.18em;color:#fff;margin-bottom:5px}
 .hero-badge{font-size:9px;letter-spacing:0.18em;color:#8cc63e;background:#16280d;border:1px solid #3f6b1e;border-radius:0;padding:4px 14px}
 .wrap{max-width:520px;margin:0 auto;padding:22px 16px 60px}
-.date{font-size:10px;letter-spacing:0.16em;color:#666;font-weight:600;margin-bottom:16px;text-align:center}
+.date{font-size:10px;letter-spacing:0.16em;color:#888;font-weight:600;margin-bottom:16px;text-align:center}
 .sec-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.1em;color:#fff;margin-bottom:14px}
-.cls{background:#0e0e0e;border:1px solid #1e1e1e;border-radius:0;padding:16px 18px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;transition:border-color .15s}
+.cls{background:#0e0e0e;border:1px solid #666;border-radius:0;padding:16px 18px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;transition:border-color .15s}
 .cls:active{border-color:#8cc63e}
 .cls-time{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:0.05em;color:#fff;line-height:1}
-.cls-name{font-size:10px;letter-spacing:0.1em;color:#8cc63e;font-weight:600;margin-top:4px;text-transform:uppercase}
-.cls-count{font-size:11px;letter-spacing:0.06em;color:#777;text-align:right;white-space:nowrap}
+.cls-name{font-size:11px;letter-spacing:0.08em;color:#8cc63e;font-weight:600;margin-top:4px;text-transform:uppercase}
+.cls-count{font-size:11px;letter-spacing:0.06em;color:#999;text-align:right;white-space:nowrap}
 .cls-count b{color:#4aaa66;font-weight:700}
-.chev{color:#444;font-size:22px;margin-left:4px}
+.chev{color:#666;font-size:22px;margin-left:4px}
 .back{display:inline-flex;align-items:center;gap:8px;background:none;border:none;color:#8cc63e;font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:0.14em;font-weight:600;cursor:pointer;padding:0;margin-bottom:16px}
 .rhdr{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:16px}
 .rhdr-time{font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:0.06em;color:#fff}
-.rhdr-name{font-size:10px;letter-spacing:0.1em;color:#8cc63e;font-weight:600;text-transform:uppercase}
-.rhdr-count{font-size:11px;letter-spacing:0.06em;color:#777}
+.rhdr-name{font-size:11px;letter-spacing:0.08em;color:#8cc63e;font-weight:600;text-transform:uppercase}
+.rhdr-count{font-size:11px;letter-spacing:0.06em;color:#999}
 .rhdr-count b{color:#4aaa66}
-.mrow{background:#0e0e0e;border:1px solid #1e1e1e;border-radius:0;padding:15px 16px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;transition:all .12s}
-.mrow.on{background:#12220a;border-color:#3f6b1e}
+.mrow{background:#0e0e0e;border:1px solid #666;border-radius:0;padding:15px 16px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;transition:all .12s}
+.mrow.on{background:#12220a;border-color:#8cc63e}
 .mname{font-size:15px;letter-spacing:0.03em;color:#eee;font-weight:500}
 .mrow.on .mname{color:#fff}
-.tick{width:30px;height:30px;border-radius:50%;border:2px solid #333;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:'Bebas Neue',sans-serif;font-size:18px;color:transparent;transition:all .12s}
+.tick{width:30px;height:30px;border-radius:50%;border:2px solid #777;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:'Bebas Neue',sans-serif;font-size:18px;color:transparent;transition:all .12s}
 .mrow.on .tick{background:#8cc63e;border-color:#8cc63e;color:#0a0a0a}
-.empty{text-align:center;color:#555;font-size:13px;letter-spacing:0.04em;padding:40px 0;line-height:1.7}
-.refresh{width:100%;background:transparent;border:1px solid #2a2a2a;color:#888;font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:0.16em;font-weight:600;padding:13px;border-radius:0;cursor:pointer;margin-top:18px}
+.empty{text-align:center;color:#777;font-size:13px;letter-spacing:0.04em;padding:40px 0;line-height:1.7}
+.refresh{width:100%;background:transparent;border:1px solid #666;color:#aaa;font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:0.16em;font-weight:600;padding:13px;border-radius:0;cursor:pointer;margin-top:18px}
 </style>
 </head>
 <body>
@@ -57,6 +57,13 @@ const SB_HDR = {"apikey":SB_KEY,"Authorization":`Bearer ${SB_KEY}`,"Content-Type
 async function sbGet(t,q=""){try{const r=await fetch(`${SB_URL}/rest/v1/${t}?${q}`,{headers:SB_HDR});return r.ok?await r.json():[];}catch{return[];}}
 async function sbPatch(t,q,d){try{const r=await fetch(`${SB_URL}/rest/v1/${t}?${q}`,{method:"PATCH",headers:SB_HDR,body:JSON.stringify(d)});return r.ok;}catch{return false;}}
 
+// Class-name resolution (mirrors the app): custom slot name -> default schedule -> day name
+const DEFAULT_SCHEDULE={1:[{t:"05:00",n:"Mixed Performance"},{t:"06:00",n:"Mixed Performance"},{t:"07:00",n:"Mixed Performance"},{t:"16:00",n:"Mixed Performance"},{t:"17:00",n:"S&C Lower Body"},{t:"18:00",n:"S&C Lower Body"}],2:[{t:"16:00",n:"Teens S&C Upper"},{t:"17:00",n:"Team-Up"},{t:"18:00",n:"Teens/Girls S&C Upper"}],3:[{t:"05:00",n:"S&C Upper"},{t:"06:00",n:"S&C Upper"},{t:"07:00",n:"S&C Upper"},{t:"16:00",n:"S&C Upper"},{t:"17:00",n:"Boxing"},{t:"18:00",n:"S&C Upper"}],4:[{t:"16:00",n:"Teens S&C Lower"},{t:"17:00",n:"Teens/Girls S&C Upper"}],5:[{t:"05:00",n:"Levels"},{t:"06:00",n:"Levels"},{t:"07:00",n:"Levels"},{t:"16:00",n:"Levels"},{t:"17:00",n:"Teens Sports"}],6:[{t:"06:00",n:"Hero WOD"},{t:"07:30",n:"Boxing"},{t:"08:30",n:"Body Pump - Upper"}],0:[]};
+let DOW_NAMES={1:"RISE UP",2:"STRENGTH LOWER",3:"ASCEND",4:"STRENGTH UPPER",5:"ELEVATE",6:"SUMMIT",0:""};
+let slotNames={}; // time -> custom name for today (from class_limits)
+function defaultSlotName(time){const d=new Date().getDay();const f=(DEFAULT_SCHEDULE[d]||[]).find(x=>x.t===time);return f?f.n:"";}
+function resolveName(time){return slotNames[time]||defaultSlotName(time)||DOW_NAMES[new Date().getDay()]||"";}
+
 const MONTHS=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const DAYS=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
 function todayKey(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;}
@@ -65,7 +72,7 @@ function fmt12(t){const [h,m]=t.split(":").map(Number);const ap=h<12?"am":"pm";c
 function esc(s){return (s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
 
 const root=document.getElementById("root");
-let all=[];        // all of today's bookings
+let all=[];
 let view="classes";
 let curTime=null;
 
@@ -73,12 +80,20 @@ function heroHtml(){
   return `<div class="hero">
     <div class="hero-circle"><img src="loginprofile.jpg" onerror="this.style.display='none'" alt="Soul Fitness"/></div>
     <div class="hero-name">SOUL FITNESS</div>
-    <div class="hero-badge">CLASS CHECK IN</div>
+    <div class="hero-badge">CHECK IN KIOSK</div>
   </div>`;
 }
 
 async function loadAll(){
-  all = await sbGet("bookings",`date_key=eq.${todayKey()}&select=id,name,time,session_type,checked_in&order=time.asc`);
+  const [bk, lim, dn] = await Promise.all([
+    sbGet("bookings",`date_key=eq.${todayKey()}&select=id,name,time,session_type,checked_in&order=time.asc`),
+    sbGet("class_limits",`date_key=eq.${todayKey()}&select=time_slot,name`),
+    sbGet("coaching_notes","class_name=eq.__DOW_NAMES__&select=content")
+  ]);
+  all = bk||[];
+  slotNames = {};
+  (lim||[]).forEach(r=>{ if(r.name) slotNames[r.time_slot]=r.name; });
+  if(dn&&dn.length){ try{const o=JSON.parse(dn[0].content); if(o&&typeof o==="object") DOW_NAMES={...DOW_NAMES,...o}; }catch(e){} }
   if(view==="roster"&&curTime) renderRoster(curTime); else renderClasses();
 }
 
@@ -94,11 +109,11 @@ function renderClasses(){
   const body = groups.length
     ? groups.map(g=>{
         const inCount=g.list.filter(b=>b.checked_in).length;
-        const type=g.list[0].session_type||"";
+        const nm=resolveName(g.time)||g.list[0].session_type||"";
         return `<div class="cls" onclick="openRoster('${g.time}')">
           <div>
             <div class="cls-time">${fmt12(g.time)}</div>
-            ${type?`<div class="cls-name">${esc(type)}</div>`:""}
+            ${nm?`<div class="cls-name">${esc(nm)}</div>`:""}
           </div>
           <div style="display:flex;align-items:center">
             <div class="cls-count"><b>${inCount}</b> in · ${g.list.length} booked</div>
@@ -120,7 +135,7 @@ function openRoster(t){ curTime=t; renderRoster(t); }
 function renderRoster(t){
   view="roster"; curTime=t;
   const list=all.filter(b=>b.time===t).sort((a,b)=>(a.name||"").localeCompare(b.name||""));
-  const type=list[0]?list[0].session_type||"":"";
+  const nm=resolveName(t)||(list[0]?list[0].session_type||"":"");
   const inCount=list.filter(b=>b.checked_in).length;
   const rows=list.map(b=>`
     <div class="mrow ${b.checked_in?"on":""}" data-id="${b.id}" onclick="toggle(${b.id})">
@@ -132,7 +147,7 @@ function renderRoster(t){
     <div class="rhdr">
       <div>
         <div class="rhdr-time">${fmt12(t)}</div>
-        ${type?`<div class="rhdr-name">${esc(type)}</div>`:""}
+        ${nm?`<div class="rhdr-name">${esc(nm)}</div>`:""}
       </div>
       <div class="rhdr-count"><b>${inCount}</b> / ${list.length} checked in</div>
     </div>
@@ -144,7 +159,7 @@ function renderRoster(t){
 async function toggle(id){
   const b=all.find(x=>x.id===id); if(!b)return;
   const nv=!b.checked_in;
-  b.checked_in=nv;                 // optimistic
+  b.checked_in=nv;
   renderRoster(curTime);
   const ok=await sbPatch("bookings",`id=eq.${id}`,{checked_in:nv});
   if(!ok){ b.checked_in=!nv; renderRoster(curTime); }
