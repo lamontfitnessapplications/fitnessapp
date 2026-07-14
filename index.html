@@ -17,7 +17,7 @@
 html,body{background:#ffffff;min-height:100vh}
 #root{min-height:100vh}
 .app{font-family:'DM Sans',sans-serif;background:#ffffff;color:#181818;min-height:100vh;display:flex;flex-direction:column;max-width:480px;margin:0 auto}
-.hdr{padding:14px 20px 0;display:flex;flex-direction:column;background:#ffffff}
+.hdr{padding:14px 20px 0;display:flex;flex-direction:column;background:#161616}
 .hdr-row{display:flex;align-items:center;justify-content:space-between}
 .hdr-left{display:flex;align-items:center;gap:10px;cursor:pointer}
 .hdr-avatar-wrap{position:relative;flex-shrink:0}
@@ -25,13 +25,13 @@ html,body{background:#ffffff;min-height:100vh}
 .avatar-init-hdr{width:46px;height:46px;border-radius:50%;background:#ffffff;border:2px solid #111111;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:18px;color:#777;flex-shrink:0}
 .hdr-avatar-plus{position:absolute;bottom:-1px;right:-1px;width:16px;height:16px;border-radius:50%;background:#8cc63e;border:2px solid #ffffff;display:flex;align-items:center;justify-content:center;font-size:11px;color:#000;font-weight:700;line-height:1}
 .hdr-name-col{display:flex;flex-direction:column}
-.name-lbl{font-size:13px;letter-spacing:0.08em;color:#181818;font-weight:600}
-.edit-lbl{font-size:8px;letter-spacing:0.14em;color:#555;margin-top:2px;transition:color .15s}
+.name-lbl{font-size:13px;letter-spacing:0.08em;color:#ffffff;font-weight:600}
+.edit-lbl{font-size:8px;letter-spacing:0.14em;color:#cccccc;margin-top:2px;transition:color .15s}
 .hdr-left:hover .edit-lbl{color:#aaa}
 .logo-area{text-align:right}
-.logo-sub{font-size:8px;letter-spacing:0.22em;color:#555;font-weight:500}
-.logo{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:0.18em;line-height:1;color:#111111}
-.logo-tag{font-size:6px;letter-spacing:0.2em;color:#111111;margin-top:1px}
+.logo-sub{font-size:8px;letter-spacing:0.22em;color:#cccccc;font-weight:500}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:0.18em;line-height:1;color:#ffffff}
+.logo-tag{font-size:6px;letter-spacing:0.2em;color:#cccccc;margin-top:1px}
 .hdr-website{text-align:center;padding:8px 0 10px;border-top:1px solid #111111;margin-top:10px}
 .hdr-website a{font-size:9px;letter-spacing:0.1em;color:#8cc63e;text-decoration:none;font-weight:400}
 .hdr-website a:hover{text-decoration:underline}
@@ -65,7 +65,7 @@ html,body{background:#ffffff;min-height:100vh}
 .c-row.cp{opacity:0.3;pointer-events:none}
 .c-time{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:0.03em;color:#181818;min-width:72px}
 .c-mid{flex:1;display:flex;flex-direction:column;gap:5px}
-.c-bars{display:flex;gap:2px}
+.c-bars{display:flex;gap:2px;width:100%}
 .c-bar{flex:1;height:2px;border-radius:1px;background:#8cc63e;transition:background .3s}
 .c-bar.ct{background:#8cc63e}.cb-mine .c-bar.ct{background:#4aaa66}
 .c-sub{font-size:10px;letter-spacing:0.1em;color:#999;font-weight:500}
@@ -74,7 +74,7 @@ html,body{background:#ffffff;min-height:100vh}
 .c-sub.ck{color:#777}
 .c-sub.cf{color:#555}.c-sub.cg{color:#4aaa66}
 .c-btn{font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:0.12em;padding:8px 12px;border-radius:3px;border:none;cursor:pointer;white-space:nowrap;transition:all .15s}
-.c-btn.bb{background:#8cc63e;color:#000}
+.c-btn.bb{background:#8cc63e;color:#000;border:1px solid #111111}
 .c-btn.bb:hover:not(:disabled){background:#f6f7f6}
 .c-btn.bf{background:transparent;color:#555;border:1px solid #111111;cursor:default;font-size:10px}
 .c-btn.bc{background:transparent;color:#8a2515;border:1px solid #3a1208;cursor:pointer;font-size:10px}
@@ -124,7 +124,7 @@ html,body{background:#ffffff;min-height:100vh}
 .comm-compose-footer{display:flex;align-items:center;justify-content:space-between;margin-top:8px;padding-top:8px;border-top:1px solid #111111}
 .comm-char{font-size:9px;letter-spacing:0.1em;color:#777;font-weight:500}
 .comm-char.warn{color:#e06040}
-.comm-post-btn{font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:0.14em;padding:8px 18px;background:#8cc63e;color:#000;border:none;border-radius:3px;cursor:pointer;transition:background .15s}
+.comm-post-btn{font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:0.14em;padding:8px 18px;background:#8cc63e;color:#000;border:1px solid #111111;border-radius:3px;cursor:pointer;transition:background .15s}
 .comm-post-btn:hover:not(:disabled){background:#f6f7f6}
 .comm-post-btn:disabled{background:#f6f7f6;color:#777;cursor:not-allowed}
 .comm-feed{flex:1;overflow-y:auto;padding:0 16px 16px}
@@ -1745,9 +1745,9 @@ function AdminView({bookings,setBookings,showToast,isAdmin,getMaxSpots,saveClass
             const custom=!WELL_TIMES.includes(time);
             const booked=dayWellBks.some(b=>b.time===time);
             return React.createElement("div",{key:time,style:{display:"flex",alignItems:"center",gap:10,background:"#f6f7f5",border:"1px solid "+(hidden?"#edefea":"#111111"),borderRadius:7,padding:"11px 14px",marginBottom:7,opacity:hidden?0.55:1}},
-              React.createElement("div",{style:{fontFamily:"'Bebas Neue',sans-serif",fontSize:19,color:hidden?"#666":"#fff",minWidth:76}},fmt12(time)),
+              React.createElement("div",{style:{fontFamily:"'Bebas Neue',sans-serif",fontSize:19,color:hidden?"#666":"#000",minWidth:76}},fmt12(time)),
               React.createElement("div",{style:{flex:1,fontSize:9,letterSpacing:"0.12em",fontWeight:600,color:hidden?"#555":booked?"#8cc63e":"#4aaa66"}},(hidden?"HIDDEN":booked?"BOOKED":"AVAILABLE")+(custom?" · CUSTOM":"")),
-              React.createElement("button",{onClick:()=>wsSetHide(time,!hidden),style:{background:hidden?"#fff":"transparent",color:hidden?"#000":"#888",border:"1px solid "+(hidden?"#fff":"#111111"),borderRadius:4,fontFamily:"'Bebas Neue',sans-serif",fontSize:12,letterSpacing:"0.1em",padding:"7px 14px",cursor:"pointer",flexShrink:0}},hidden?"SHOW":"HIDE"),
+              React.createElement("button",{onClick:()=>wsSetHide(time,!hidden),style:{background:"#8cc63e",color:"#000",border:"1px solid #111111",borderRadius:4,fontFamily:"'Bebas Neue',sans-serif",fontSize:12,letterSpacing:"0.1em",padding:"7px 14px",cursor:"pointer",flexShrink:0}},hidden?"SHOW":"HIDE"),
               custom&&React.createElement("button",{onClick:()=>wsRemoveCustom(time),title:"Remove custom time",style:{background:"none",border:"1px solid #111111",borderRadius:4,color:"#8a2515",fontSize:12,padding:"6px 10px",cursor:"pointer",flexShrink:0}},"✕")
             );
           }),
@@ -4474,7 +4474,7 @@ React.createElement("div",{style:{display:"flex",flexDirection:"column",alignIte
   React.createElement("div",{style:{width:62,height:62,borderRadius:"50%",border:"2px solid #111111",marginBottom:10,overflow:"hidden"}},
     React.createElement("img",{src:"icon-192.png",style:{width:"100%",height:"100%",objectFit:"cover"}})
   ),
-  React.createElement("div",{style:{fontFamily:"'Syncopate',sans-serif",fontSize:11,fontWeight:700,color:"#181818",textAlign:"center",letterSpacing:"0.1em",lineHeight:1.3,whiteSpace:"nowrap"}},"SOUL FITNESS"),
+  React.createElement("div",{style:{fontFamily:"'Syncopate',sans-serif",fontSize:15,fontWeight:700,color:"#181818",textAlign:"center",letterSpacing:"0.1em",lineHeight:1.3,whiteSpace:"nowrap"}},"SOUL FITNESS"),
   React.createElement("div",{style:{fontFamily:"'Syncopate',sans-serif",fontSize:6,fontWeight:700,color:"#111111",textAlign:"center",marginTop:4,letterSpacing:"0.12em",whiteSpace:"nowrap"}},"WHERE COMMUNITY MEETS FITNESS")
 ),
     React.createElement("div",{className:"auth-card"},
@@ -4514,20 +4514,20 @@ React.createElement("div",{className:"auth-guest",style:{marginTop:24}},"Not a m
     React.createElement("div",{className:"hdr",style:{paddingBottom:0,background:"#ffffff"}},
       React.createElement("div",{style:{display:"flex",alignItems:"center",padding:"30px 4px 30px",position:"relative",minHeight:140}},
         React.createElement("div",{style:{flex:1,paddingLeft:0,zIndex:1}},
-          React.createElement("div",{style:{fontFamily:"'Syncopate',sans-serif",fontSize:8,fontWeight:700,color:"#181818",letterSpacing:"0.04em",lineHeight:1.3,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}},session.name.toUpperCase()),
+          React.createElement("div",{style:{fontFamily:"'Syncopate',sans-serif",fontSize:10,fontWeight:700,color:"#ffffff",letterSpacing:"0.04em",lineHeight:1.3,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}},session.name.toUpperCase()),
           React.createElement("div",{style:{fontFamily:"'Syncopate',sans-serif",fontSize:7,color:"#8cc63e",letterSpacing:"0.04em",marginTop:4,lineHeight:1.4,whiteSpace:"nowrap"}},((memberData?.membership_type||"").replace(/\s*[-–]\s*\d[\s\S]*$/i,"").replace(/\s*\bMEMBER\b\s*$/i,"").trim()).toUpperCase()),
-          memberData?.joined_at?React.createElement("div",{style:{fontFamily:"'Syncopate',sans-serif",fontSize:7,color:"#777",letterSpacing:"0.04em",marginTop:3,whiteSpace:"nowrap"}},("JOINED "+new Date(memberData.joined_at).toLocaleDateString("en-US",{month:"short",year:"numeric"})).toUpperCase()):null
+          memberData?.joined_at?React.createElement("div",{style:{fontFamily:"'Syncopate',sans-serif",fontSize:7,color:"#cccccc",letterSpacing:"0.04em",marginTop:3,whiteSpace:"nowrap"}},("JOINED "+new Date(memberData.joined_at).toLocaleDateString("en-US",{month:"short",year:"numeric"})).toUpperCase()):null
         ),
         React.createElement("div",{style:{position:"absolute",left:0,right:0,display:"flex",flexDirection:"column",alignItems:"center",pointerEvents:"none"}},
           memberPhoto
             ?React.createElement("img",{src:memberPhoto,alt:"profile",style:{display:"block",width:62,height:62,borderRadius:"50%",objectFit:"cover",border:"2px solid #111111",marginBottom:8,pointerEvents:"auto"}})
             :React.createElement("div",{style:{width:62,height:62,borderRadius:"50%",background:"#ffffff",border:"2px solid #111111",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'Bebas Neue',sans-serif",fontSize:22,color:"#777",marginBottom:8}},memberInit),
-          React.createElement("div",{style:{fontFamily:"'Syncopate',sans-serif",fontSize:9,fontWeight:700,color:"#181818",textAlign:"center",letterSpacing:"0.1em",lineHeight:1.3,whiteSpace:"nowrap"}},"SOUL FITNESS"),
-          React.createElement("div",{style:{fontFamily:"'Syncopate',sans-serif",fontSize:5,color:"#181818",textAlign:"center",marginTop:4,letterSpacing:"0.12em",fontWeight:700,whiteSpace:"nowrap"}},"WHERE COMMUNITY MEETS FITNESS")
+          React.createElement("div",{style:{fontFamily:"'Syncopate',sans-serif",fontSize:15,fontWeight:700,color:"#ffffff",textAlign:"center",letterSpacing:"0.1em",lineHeight:1.3,whiteSpace:"nowrap"}},"SOUL FITNESS"),
+          React.createElement("div",{style:{fontFamily:"'Syncopate',sans-serif",fontSize:8,color:"#ffffff",textAlign:"center",marginTop:5,letterSpacing:"0.12em",fontWeight:700,whiteSpace:"nowrap"}},"WHERE COMMUNITY MEETS FITNESS")
         ),
         React.createElement("div",{style:{flex:1,display:"flex",justifyContent:"flex-end",alignItems:"center",zIndex:1},onClick:openProf},
           React.createElement("div",{style:{display:"flex",flexDirection:"column",alignItems:"center",gap:4,cursor:"pointer"}},
-            React.createElement("svg",{xmlns:"http://www.w3.org/2000/svg",width:16,height:16,viewBox:"0 0 24 24",fill:"none",stroke:"#111111",strokeWidth:1.5,strokeLinecap:"round",strokeLinejoin:"round"},
+            React.createElement("svg",{xmlns:"http://www.w3.org/2000/svg",width:16,height:16,viewBox:"0 0 24 24",fill:"none",stroke:"#ffffff",strokeWidth:1.5,strokeLinecap:"round",strokeLinejoin:"round"},
               React.createElement("path",{d:"M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"}),
               React.createElement("circle",{cx:"12",cy:"7",r:"4"})
             ),
