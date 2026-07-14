@@ -3264,7 +3264,7 @@ function isWorkoutReleased(monthYear,weekNum,isAdmin){
 function ExSection({sectionName,exercises,isFirst,ctx}){
   const {editingId,setEditingId,exEdit,setExEdit,savingEx,saveExercise,
          session,ticks,toggleTick,expandedEx,toggleEx,weights,saveSetWeight,
-         isAdmin,deleteExercise,monthYear}=ctx;
+         isAdmin,deleteExercise,deleteSeries,monthYear}=ctx;
   return React.createElement(React.Fragment,null,
     React.createElement("div",{className:`sp-section-hdr${isFirst?" spsh-first":""}`},sectionName.toUpperCase()),
     exercises.map(ex=>{
@@ -3285,6 +3285,7 @@ function ExSection({sectionName,exercises,isFirst,ctx}){
           React.createElement("input",{className:"sp-edit-input",value:exEdit.exercise||"",onChange:e=>setExEdit(p=>({...p,exercise:e.target.value})),placeholder:"Exercise name"}),
           React.createElement("div",{className:"sp-edit-lbl"},"SECTION"),
           React.createElement("select",{className:"sp-edit-input",value:exEdit.section||"Main",onChange:e=>setExEdit(p=>({...p,section:e.target.value}))},
+            React.createElement("option",{value:"Warm Up"},"Warm Up"),
             React.createElement("option",{value:"Core"},"Core"),
             React.createElement("option",{value:"Main"},"Main"),
             React.createElement("option",{value:"Mobility"},"Mobility"),
@@ -3502,7 +3503,7 @@ function StrengthTab({session,isAdmin,showToast,bookings,memberData}){
       ...(()=>{
         const exCtx={editingId,setEditingId,exEdit,setExEdit,savingEx,saveExercise,
           session,ticks,toggleTick,expandedEx,toggleEx,weights,saveSetWeight,
-          isAdmin,deleteExercise,monthYear};
+          isAdmin,deleteExercise,deleteSeries,monthYear};
         return sectionOrder.filter(s=>sections[s]&&sections[s].length>0).map((s,i)=>
           React.createElement(ExSection,{key:s,sectionName:s,exercises:sections[s],isFirst:i===0,ctx:exCtx})
         );
