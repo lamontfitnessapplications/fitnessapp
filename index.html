@@ -436,7 +436,7 @@ async function sbDelete(t,q){
     return r.ok;
   }catch{return false;}
 }
-const MAX_SPOTS=16;
+const MAX_SPOTS=25;
 const WD_TIMES=["05:15","06:15","07:15","09:15","12:00","17:15","18:15","19:15"];
 const SAT_TIMES=["06:30","07:30","08:30","09:30"];
 const DEFAULT_SCHEDULE={1:[{t:"05:00",n:"Mixed Performance"},{t:"06:00",n:"Mixed Performance"},{t:"07:00",n:"Mixed Performance"},{t:"16:00",n:"Mixed Performance"},{t:"17:00",n:"S&C Lower Body"},{t:"18:00",n:"S&C Lower Body"}],2:[{t:"16:00",n:"Teens S&C Upper"},{t:"17:00",n:"Team-Up"},{t:"18:00",n:"Teens/Girls S&C Upper"}],3:[{t:"05:00",n:"S&C Upper"},{t:"06:00",n:"S&C Upper"},{t:"07:00",n:"S&C Upper"},{t:"16:00",n:"S&C Upper"},{t:"17:00",n:"Boxing"},{t:"18:00",n:"S&C Upper"}],4:[{t:"16:00",n:"Teens S&C Lower"},{t:"17:00",n:"Teens/Girls S&C Upper"}],5:[{t:"05:00",n:"Levels"},{t:"06:00",n:"Levels"},{t:"07:00",n:"Levels"},{t:"16:00",n:"Levels"},{t:"17:00",n:"Teens Sports"}],6:[{t:"06:00",n:"Hero WOD"},{t:"07:30",n:"Boxing"},{t:"08:30",n:"Body Pump - Upper"}],0:[]};
@@ -544,7 +544,7 @@ function ImageCropper({imageSrc,onSave,onCancel}){
   );
 }
 // ── Member Profile Overlay (Admin) ────────────────────────────────────────────
-function MemberProfileOverlay({member,bookings,onClose,currentUserIsAdmin,isMaster}){
+function MemberProfileOverlay({member,bookings,onClose,currentUserIsAdmin,isMaster,mfWk,mfPasteAI}){
   const upcomingBks=bookings.filter(b=>b.email===member.email&&b.date_key>=toDS(new Date())).length;
   const attendedBks=bookings.filter(b=>b.email===member.email&&b.date_key<toDS(new Date())).length;
   const joinDate=fmtJoinDate(member.joined_at);
@@ -921,7 +921,7 @@ function MemberProfileOverlay({member,bookings,onClose,currentUserIsAdmin,isMast
         ),
         accMsg&&React.createElement("div",{style:{fontSize:10,color:"#4aaa88",letterSpacing:"0.04em",marginBottom:4}},accMsg)
       ),
-      currentUserIsAdmin&&React.createElement(MemberWorkoutAdmin,{member,memberView:wkMemberView}),
+      currentUserIsAdmin&&(mfWk!==false)&&React.createElement(MemberWorkoutAdmin,{member,memberView:wkMemberView,isMaster,mfPasteAI}),
       currentUserIsAdmin&&React.createElement(React.Fragment,null,
         React.createElement("div",{className:"mp-section"},"ADMIN CONTROLS"),
         React.createElement("button",{
@@ -1187,7 +1187,7 @@ function CommunityView({session,isAdmin,showToast,memberPhotos,allMemberNames}){
               photo?React.createElement("img",{src:photo,className:"post-av-img",alt:""}):React.createElement("div",{className:`post-av-init${isAdminPost?" admin-av":""}`},initials(post.author_name)),
               React.createElement("div",null,
                 React.createElement("div",{className:"post-name"},post.author_name),
-                React.createElement("div",{className:`post-badge${isAdminPost?" admin-badge":""}`},isAdminPost?"COACH · SOUL FITNESS":"MEMBER")
+                React.createElement("div",{className:`post-badge${isAdminPost?" admin-badge":""}`},isAdminPost?"MASTER ADMIN":"MEMBER")
               )
             ),
             React.createElement("div",{className:"post-time"},timeAgo(post.created_at))
@@ -1336,7 +1336,7 @@ function MilestoneAdminPanel({milestoneConfig,saveMilestoneConfig,showToast}){
     )
   );
 }
-function AdminView({bookings,setBookings,showToast,isAdmin,isMaster,getMaxSpots,saveClassLimit,deleteClass,cancelClass,restoreClass,classLimits,wellnessEnabled,saveWellnessSetting,classesEnabled,strengthEnabled,saveClassesSetting,saveStrengthSetting,calendarEnabled,saveCalendarSetting,dowNames,saveDowName,slotNames,saveSlotName,wellSlots,saveWellSlots,milestoneConfig,saveMilestoneConfig,admSeg,setAdmSeg}){
+function AdminView({bookings,setBookings,showToast,isAdmin,isMaster,mFlags,saveMFlag,getMaxSpots,saveClassLimit,deleteClass,cancelClass,restoreClass,classLimits,wellnessEnabled,saveWellnessSetting,classesEnabled,strengthEnabled,saveClassesSetting,saveStrengthSetting,calendarEnabled,saveCalendarSetting,dowNames,saveDowName,slotNames,saveSlotName,wellSlots,saveWellSlots,milestoneConfig,saveMilestoneConfig,admSeg,setAdmSeg}){
   const [expandedTier,setExpandedTier]=useState(null);
   const [admDate,setAdmDate]=useState(new Date());
   const [expanded,setExpanded]=useState({});
@@ -1464,7 +1464,7 @@ function AdminView({bookings,setBookings,showToast,isAdmin,isMaster,getMaxSpots,
   }
   const admDateLabel=`${["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][admDOW]} ${admDate.getDate()} ${MONTHS[admDate.getMonth()]} ${admDate.getFullYear()}`;
   return React.createElement("div",{className:"adm-wrap"},
-    selectedMember&&React.createElement(MemberProfileOverlay,{member:selectedMember,bookings,onClose:()=>setSelectedMember(null),currentUserIsAdmin:isAdmin,isMaster}),
+    selectedMember&&React.createElement(MemberProfileOverlay,{member:selectedMember,bookings,onClose:()=>setSelectedMember(null),currentUserIsAdmin:isAdmin,isMaster,mfWk:mFlags.wk,mfPasteAI:mFlags.pasteai}),
     React.createElement("div",{className:"adm-title"},"ADMIN"),
     React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"center",gap:8,padding:"0 0 6px"}},
       React.createElement("span",{onClick:e=>{const n=e.currentTarget.parentElement.nextElementSibling;if(n&&n.scrollBy)n.scrollBy({left:-160,behavior:"smooth"});},style:{color:"#8cc63e",fontSize:12,lineHeight:1,cursor:"pointer",padding:"3px 8px"}},"‹"),
@@ -1474,7 +1474,7 @@ function AdminView({bookings,setBookings,showToast,isAdmin,isMaster,getMaxSpots,
     React.createElement("div",{className:"adm-seg"},
       React.createElement("button",{"data-adm":"members",className:`adm-seg-btn${admSeg==="members"?" aas":""}`,onClick:()=>setAdmSeg("members")},"MEMBERS"),
       React.createElement("button",{"data-adm":"classes",className:`adm-seg-btn${admSeg==="classes"?" aas":""}`,onClick:()=>setAdmSeg("classes")},"CLASSES"),
-      React.createElement("button",{"data-adm":"wellness",className:`adm-seg-btn${admSeg==="wellness"?" aas":""}`,onClick:()=>setAdmSeg("wellness")},"WELLNESS"),
+      (isMaster||mFlags.welladm)&&React.createElement("button",{"data-adm":"wellness",className:`adm-seg-btn${admSeg==="wellness"?" aas":""}`,onClick:()=>setAdmSeg("wellness")},"WELLNESS"),
       isMaster&&React.createElement("button",{"data-adm":"sections",className:`adm-seg-btn${admSeg==="sections"?" aas":""}`,onClick:()=>setAdmSeg("sections")},"SECTIONS"),
       React.createElement("button",{"data-adm":"onboarding",className:`adm-seg-btn${admSeg==="onboarding"?" aas":""}`,onClick:()=>setAdmSeg("onboarding")},"ONBOARDING")
     ),
@@ -1488,6 +1488,27 @@ function AdminView({bookings,setBookings,showToast,isAdmin,isMaster,getMaxSpots,
         React.createElement("button",{onClick:toggleMasterHidden,disabled:mhSaving,
           style:{background:masterHidden?"#fff":"#222",color:masterHidden?"#000":"#555",border:"1px solid "+(masterHidden?"#fff":"#333"),padding:"6px 18px",fontSize:10,letterSpacing:"0.12em",fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}},
           masterHidden?"ON":"OFF")
+      ),
+      isMaster&&React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",background:"#0e0e0e",border:"1px solid "+(mFlags.wk?"#3f6b1e":"#222"),padding:"11px 14px",marginBottom:mFlags.wk?0:10}},
+        React.createElement("div",null,
+          React.createElement("div",{style:{fontSize:11,fontWeight:600,letterSpacing:"0.08em",color:"#fff"}},"WORKOUT PROGRAM"),
+          React.createElement("div",{style:{fontSize:9,color:"#555",marginTop:2,letterSpacing:"0.04em"}},"Off = hidden from everyone")
+        ),
+        React.createElement("button",{onClick:()=>saveMFlag("wk",!mFlags.wk),style:{background:mFlags.wk?"#fff":"#222",color:mFlags.wk?"#000":"#555",border:"1px solid "+(mFlags.wk?"#fff":"#333"),padding:"6px 18px",fontSize:10,letterSpacing:"0.12em",fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}},mFlags.wk?"ON":"OFF")
+      ),
+      isMaster&&mFlags.wk&&React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",background:"#0b0b0b",border:"1px solid "+(mFlags.pasteai?"#3f6b1e":"#222"),borderTop:"none",padding:"10px 14px 10px 26px",marginBottom:10}},
+        React.createElement("div",null,
+          React.createElement("div",{style:{fontSize:10,fontWeight:600,letterSpacing:"0.08em",color:"#ccc"}},"⤵ PASTE FROM AI"),
+          React.createElement("div",{style:{fontSize:9,color:"#555",marginTop:2,letterSpacing:"0.04em"}},"Off = hidden from admins")
+        ),
+        React.createElement("button",{onClick:()=>saveMFlag("pasteai",!mFlags.pasteai),style:{background:mFlags.pasteai?"#fff":"#222",color:mFlags.pasteai?"#000":"#555",border:"1px solid "+(mFlags.pasteai?"#fff":"#333"),padding:"6px 18px",fontSize:10,letterSpacing:"0.12em",fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}},mFlags.pasteai?"ON":"OFF")
+      ),
+      isMaster&&React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",background:"#0e0e0e",border:"1px solid "+(mFlags.welladm?"#3f6b1e":"#222"),padding:"11px 14px",marginBottom:10}},
+        React.createElement("div",null,
+          React.createElement("div",{style:{fontSize:11,fontWeight:600,letterSpacing:"0.08em",color:"#fff"}},"WELLNESS"),
+          React.createElement("div",{style:{fontSize:9,color:"#555",marginTop:2,letterSpacing:"0.04em"}},"Off = hidden from admins")
+        ),
+        React.createElement("button",{onClick:()=>saveMFlag("welladm",!mFlags.welladm),style:{background:mFlags.welladm?"#fff":"#222",color:mFlags.welladm?"#000":"#555",border:"1px solid "+(mFlags.welladm?"#fff":"#333"),padding:"6px 18px",fontSize:10,letterSpacing:"0.12em",fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}},mFlags.welladm?"ON":"OFF")
       ),
       React.createElement("div",{className:"adm-stats-row"},
         React.createElement("div",{className:"adm-stat"},React.createElement("div",{className:"adm-stat-num"},visMembers.length),React.createElement("div",{className:"adm-stat-lbl"},"MEMBERS")),
@@ -1578,7 +1599,7 @@ undoData&&React.createElement("div",{style:{display:"flex",alignItems:"center",j
               ),
             React.createElement("div",{className:"adm-class-mid"},
               React.createElement("div",{className:`adm-class-count${taken>=slotMax?" full":taken>0?" has-bk":""}`},`${taken} / ${slotMax}${taken>=slotMax?" · FULL":""}`),
-              React.createElement("div",{className:"adm-class-bars"},Array.from({length:Math.min(slotMax,20)}).map((_,i)=>React.createElement("div",{key:i,className:`adm-bar${i<taken?" at":""}`})))
+              React.createElement("div",{className:"adm-class-bars"},Array.from({length:Math.min(slotMax,25)}).map((_,i)=>React.createElement("div",{key:i,className:`adm-bar${i<taken?" at":""}`})))
             ),
             React.createElement("div",{style:{display:"flex",alignItems:"center",gap:6}},
               !isEditingTimeThis&&!isEditingNameThis&&React.createElement("button",{
@@ -1710,7 +1731,7 @@ undoData&&React.createElement("div",{style:{display:"flex",alignItems:"center",j
           )
       )
     ),
-    admSeg==="wellness"&&React.createElement(React.Fragment,null,
+    admSeg==="wellness"&&(isMaster||mFlags.welladm)&&React.createElement(React.Fragment,null,
       React.createElement("div",{className:"adm-day-nav"},
         React.createElement("button",{className:"adm-arrow",onClick:()=>changeDay(-1)},"‹"),
         React.createElement("div",{className:"adm-day-lbl"},admDateLabel.toUpperCase()),
@@ -3579,7 +3600,7 @@ function mwWorkouts(items){
   });
   return [...map.values()].sort((a,b)=>a.num-b.num);
 }
-function MemberWorkoutAdmin({member,memberView}){
+function MemberWorkoutAdmin({member,memberView,isMaster,mfPasteAI}){
   const [enabled,setEnabled]=useState(member.workouts_enabled===true);
   const [weekStart,setWeekStart]=useState(()=>mondayOf(new Date()));
   const [draft,setDraft]=useState({});     // {Mon:[{title,body,repeat},...],...} (repeat is per-block, transient)
@@ -3700,7 +3721,7 @@ function MemberWorkoutAdmin({member,memberView}){
       React.createElement("button",{onClick:()=>setWeekStart(w=>addDays(w,7)),style:{background:"none",border:"none",color:"#888",fontSize:22,cursor:"pointer",lineHeight:1,padding:"0 8px"}},"›")
     ),
     React.createElement("div",{style:{marginBottom:14}},
-      React.createElement("button",{onClick:()=>{setShowImport(s=>!s);setImportErr("");},style:{width:"100%",background:showImport?"#16280d":"none",border:"1px dashed "+(showImport?"#3f6b1e":"#2a2a2a"),borderRadius:0,color:"#8cc63e",fontSize:10,letterSpacing:"0.12em",padding:"9px",cursor:"pointer"}},showImport?"✕ CLOSE IMPORT":"⤵ PASTE FROM AI"),
+      (isMaster||mfPasteAI!==false)&&React.createElement("button",{onClick:()=>{setShowImport(s=>!s);setImportErr("");},style:{width:"100%",background:showImport?"#16280d":"none",border:"1px dashed "+(showImport?"#3f6b1e":"#2a2a2a"),borderRadius:0,color:"#8cc63e",fontSize:10,letterSpacing:"0.12em",padding:"9px",cursor:"pointer"}},showImport?"✕ CLOSE IMPORT":"⤵ PASTE FROM AI"),
       showImport&&React.createElement("div",{style:{background:"#0e0e0e",border:"1px solid #3f6b1e",borderRadius:0,padding:"12px",marginTop:8}},
         React.createElement("div",{style:{fontSize:9,letterSpacing:"0.06em",color:"#89a",lineHeight:1.7,marginBottom:8}},"Paste the AI's workout block below and press Import. It replaces this whole week — you can then edit anything before you Save. Building by hand instead? Just ignore this and use the days below."),
         React.createElement("textarea",{value:importText,onChange:e=>{setImportText(e.target.value);setImportErr("");},placeholder:"Paste the { ... } block from Claude here",rows:5,style:{...inS,width:"100%",fontFamily:"monospace",fontSize:11,lineHeight:1.5,resize:"vertical"}}),
@@ -4038,6 +4059,15 @@ function MemberWorkoutReview({email}){
       ))
   );
 }
+function EyeToggle({shown,onToggle}){
+  return React.createElement("button",{type:"button",onClick:onToggle,tabIndex:-1,"aria-label":"Show password",style:{position:"absolute",right:8,top:"50%",transform:"translateY(-50%)",background:"none",border:"none",cursor:"pointer",padding:4,display:"flex",alignItems:"center"}},
+    React.createElement("svg",{width:16,height:16,viewBox:"0 0 24 24",fill:"none",stroke:shown?"#8cc63e":"#777",strokeWidth:1.6,strokeLinecap:"round",strokeLinejoin:"round"},
+      React.createElement("path",{d:"M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"}),
+      React.createElement("circle",{cx:12,cy:12,r:3}),
+      shown?null:React.createElement("line",{x1:3,y1:3,x2:21,y2:21})
+    )
+  );
+}
 // ── Main App ──────────────────────────────────────────────────────────────────
 function App(){
   const [ready,setReady]=useState(false);
@@ -4076,6 +4106,10 @@ function App(){
   useEffect(()=>{if(tab==="book"){sbGet("class_limits","select=time_slot,date_key,max_spots,name").then(data=>{const lm={};const sn={};(data||[]).forEach(r=>{lm[`${r.date_key}:${r.time_slot}`]=r.max_spots;if(r.name)sn[`${r.date_key}:${r.time_slot}`]=r.name;});setClassLimits(lm);setSlotNames(sn);});}},[tab]);
   const [authMode,setAuthMode]=useState("login");
   const [authForm,setAuthForm]=useState({name:"",email:"",phone:"",password:""});
+  const [showAuthPw,setShowAuthPw]=useState(false);
+  const [showNewPw,setShowNewPw]=useState(false);
+  const [showConfirmPw,setShowConfirmPw]=useState(false);
+  const [mFlags,setMFlags]=useState({wk:true,pasteai:true,welladm:true});
   const [authErr,setAuthErr]=useState("");
   const [authBusy,setAuthBusy]=useState(false);
   const [bkBusy,setBkBusy]=useState({});
@@ -4150,6 +4184,8 @@ function App(){
       if(wsData&&wsData.length){try{const ws=JSON.parse(wsData[0].content);if(ws&&typeof ws==="object")setWellSlots(ws);}catch{}}
       const mcData=await sbGet("coaching_notes","class_name=eq.__MILESTONE_CONFIG__&select=content");
       if(mcData&&mcData.length){try{const mc=JSON.parse(mcData[0].content);setMilestoneConfig(p=>({...p,...mc}));}catch{}}
+      const mfData=await sbGet("coaching_notes","class_name=eq.__MFLAGS__&select=content");
+      if(mfData&&mfData.length){try{const mf=JSON.parse(mfData[0].content);if(mf&&typeof mf==="object")setMFlags(p=>({...p,...mf}));}catch{}}
       setReady(true);
     })();
   },[]);
@@ -4190,7 +4226,7 @@ function App(){
     ...(strengthEnabled&&acc("strength")?[{id:"strength",label:"STRENGTH"}]:[]),
     ...(wellnessEnabled&&acc("wellness")?[{id:"wellness",label:"WELLNESS"}]:[]),
     ...(acc("progress")?[{id:"progress",label:"PROGRESS"}]:[]),
-    ...(workoutsEnabled?[{id:"workouts",label:"WORKOUTS"}]:[]),
+    ...(workoutsEnabled&&mFlags.wk?[{id:"workouts",label:"WORKOUTS"}]:[]),
     ...(isAdmin?[{id:"admin",label:"ADMIN"}]:[])
   ];
   const TAB_ORDER=NAV_TABS.map(t=>t.id);
@@ -4400,6 +4436,13 @@ function App(){
     setStrengthEnabled(enabled);
     if(!enabled&&tab==="strength")setTab("community");
   }
+  async function saveMFlag(key,val){
+    const next={...mFlags,[key]:val};setMFlags(next);
+    const q="class_name=eq."+encodeURIComponent("__MFLAGS__");
+    const ex=await sbGet("coaching_notes",q+"&select=id");
+    if(ex&&ex.length)await sbPatch("coaching_notes",q,{content:JSON.stringify(next),updated_at:Date.now()});
+    else await sbPost("coaching_notes",{class_name:"__MFLAGS__",content:JSON.stringify(next),updated_at:Date.now()});
+  }
   function getDayClassName(dateKey){
     const dow=new Date(dateKey+"T00:00:00").getDay();
     return dowNames[dow]||"";
@@ -4484,7 +4527,10 @@ React.createElement("div",{style:{display:"flex",flexDirection:"column",alignIte
       React.createElement("label",{className:"fl"},"EMAIL ADDRESS"),
       React.createElement("input",{className:"fi",type:"email",placeholder:"your@email.com",value:authForm.email,autoComplete:"email",onChange:e=>setAuthForm(f=>({...f,email:e.target.value})),onKeyDown:e=>e.key==="Enter"&&handleAuth()}),
       React.createElement("label",{className:"fl"},"PASSWORD"),
-      React.createElement("input",{className:"fi",type:"password",placeholder:"••••••••",value:authForm.password,autoComplete:authMode==="login"?"current-password":"new-password",onChange:e=>setAuthForm(f=>({...f,password:e.target.value})),onKeyDown:e=>e.key==="Enter"&&handleAuth()}),
+      React.createElement("div",{style:{position:"relative"}},
+        React.createElement("input",{className:"fi",type:showAuthPw?"text":"password",placeholder:"••••••••",value:authForm.password,autoComplete:authMode==="login"?"current-password":"new-password",onChange:e=>setAuthForm(f=>({...f,password:e.target.value})),onKeyDown:e=>e.key==="Enter"&&handleAuth(),style:{paddingRight:38}}),
+        React.createElement(EyeToggle,{shown:showAuthPw,onToggle:()=>setShowAuthPw(v=>!v)})
+      ),
       authErr&&React.createElement("div",{className:"auth-err"},authErr),
       React.createElement("button",{className:"auth-btn",onClick:handleAuth,disabled:authBusy},authBusy?"...":(authMode==="login"?"LOG IN":"CREATE ACCOUNT")),
       authMode==="login"&&React.createElement("button",{className:"fp-link",onClick:()=>{setShowForgotPw(p=>!p);setFpMsg("");setFpErr("");setFpEmail("");}},"Forgot password?"),
@@ -4596,7 +4642,12 @@ React.createElement("div",{style:{display:"flex",flexDirection:"column",alignIte
                 (slotNames[`${selDK}:${time}`]||defaultSlotName(selDK,time)||getDayClassName(selDK))&&React.createElement("div",{style:{fontSize:7,letterSpacing:"0.12em",color:"#555",fontWeight:600,marginTop:1,fontFamily:"'DM Sans',sans-serif"}},slotNames[`${selDK}:${time}`]||defaultSlotName(selDK,time)||getDayClassName(selDK))
               ),
               React.createElement("div",{className:"c-mid"},
-                React.createElement("div",{className:`c-bars${userBkd?" cb-mine":""}`},Array.from({length:maxSp}).map((_,i)=>React.createElement("div",{key:i,className:`c-bar${i<taken?" ct":""}`}))),
+                (maxSp>16
+                  ?React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:2}},
+                      React.createElement("div",{className:`c-bars${userBkd?" cb-mine":""}`},Array.from({length:Math.ceil(maxSp/2)}).map((_,i)=>React.createElement("div",{key:i,className:`c-bar${i<taken?" ct":""}`}))),
+                      React.createElement("div",{className:`c-bars${userBkd?" cb-mine":""}`},Array.from({length:Math.floor(maxSp/2)}).map((_,i)=>React.createElement("div",{key:i,className:`c-bar${(i+Math.ceil(maxSp/2))<taken?" ct":""}`})))
+                    )
+                  :React.createElement("div",{className:`c-bars${userBkd?" cb-mine":""}`},Array.from({length:maxSp}).map((_,i)=>React.createElement("div",{key:i,className:`c-bar${i<taken?" ct":""}`})))),
                 React.createElement("div",{className:`c-sub ${subCls}`},subText)
               ),
               isAdmin&&React.createElement("div",{style:{fontSize:10,color:"#555",marginRight:4,flexShrink:0}},isExpanded?"▴":"▾"),
@@ -4712,9 +4763,9 @@ React.createElement("div",{style:{display:"flex",flexDirection:"column",alignIte
     tab==="community"&&acc("community")&&React.createElement(CommunityView,{session,isAdmin,showToast,memberPhotos,allMemberNames}),
     tab==="wellness"&&wellnessEnabled&&acc("wellness")&&React.createElement(WellnessView,{session,showToast,bookings,isAdmin,memberData,wellSlots,calendarEnabled}),
     tab==="strength"&&acc("strength")&&React.createElement("div",{className:"sp-main-wrap"},React.createElement(StrengthTab,{session,isAdmin,showToast,bookings,memberData})),
-    tab==="workouts"&&workoutsEnabled&&React.createElement(MemberWorkoutsView,{session,memberData}),
+    tab==="workouts"&&workoutsEnabled&&mFlags.wk&&React.createElement(MemberWorkoutsView,{session,memberData}),
     tab==="progress"&&acc("progress")&&React.createElement(ProgressTab,{session,isAdmin,showToast,milestoneConfig,bookings,saveMilestoneConfig,memberData,dowNames}),
-    tab==="admin"&&React.createElement(AdminView,{bookings,setBookings,showToast,isAdmin,isMaster,getMaxSpots,saveClassLimit,deleteClass,cancelClass,restoreClass,classLimits,wellnessEnabled,saveWellnessSetting,classesEnabled,strengthEnabled,saveClassesSetting,saveStrengthSetting,calendarEnabled,saveCalendarSetting,dowNames,saveDowName,slotNames,saveSlotName,wellSlots,saveWellSlots,milestoneConfig,saveMilestoneConfig,admSeg,setAdmSeg}),
+    tab==="admin"&&React.createElement(AdminView,{bookings,setBookings,showToast,isAdmin,isMaster,mFlags,saveMFlag,getMaxSpots,saveClassLimit,deleteClass,cancelClass,restoreClass,classLimits,wellnessEnabled,saveWellnessSetting,classesEnabled,strengthEnabled,saveClassesSetting,saveStrengthSetting,calendarEnabled,saveCalendarSetting,dowNames,saveDowName,slotNames,saveSlotName,wellSlots,saveWellSlots,milestoneConfig,saveMilestoneConfig,admSeg,setAdmSeg}),
     React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"center",gap:8,padding:"5px 0 4px",background:"#080808",marginTop:"auto"}},
       React.createElement("span",{onClick:e=>{const n=e.currentTarget.parentElement.nextElementSibling;if(n&&n.scrollBy)n.scrollBy({left:-160,behavior:"smooth"});},style:{color:"#8cc63e",fontSize:12,lineHeight:1,cursor:"pointer",padding:"3px 8px"}},"‹"),
       React.createElement("span",{onClick:e=>{const n=e.currentTarget.parentElement.nextElementSibling;if(n&&n.scrollBy)n.scrollBy({left:160,behavior:"smooth"});},style:{color:"#8cc63e",fontSize:7,letterSpacing:"0.22em",fontWeight:600,cursor:"pointer"}},"SWIPE FOR MORE"),
@@ -4771,9 +4822,15 @@ React.createElement("div",{style:{display:"flex",flexDirection:"column",alignIte
         React.createElement("div",{style:{fontSize:10,color:"#444",letterSpacing:"0.06em",marginBottom:4}},"Update your medical conditions, fitness level, or consents"),
         React.createElement("div",{className:"prof-section"},"CHANGE PASSWORD"),
         React.createElement("label",{className:"fl"},"NEW PASSWORD"),
-        React.createElement("input",{className:"fi",type:"password",placeholder:"Leave blank to keep current",value:profForm.newPw,onChange:e=>{setProfForm(f=>({...f,newPw:e.target.value}));setProfErr("");setProfOk("");}}),
+        React.createElement("div",{style:{position:"relative"}},
+          React.createElement("input",{className:"fi",type:showNewPw?"text":"password",placeholder:"Leave blank to keep current",value:profForm.newPw,onChange:e=>{setProfForm(f=>({...f,newPw:e.target.value}));setProfErr("");setProfOk("");},style:{paddingRight:38}}),
+          React.createElement(EyeToggle,{shown:showNewPw,onToggle:()=>setShowNewPw(v=>!v)})
+        ),
         React.createElement("label",{className:"fl"},"CONFIRM PASSWORD"),
-        React.createElement("input",{className:"fi",type:"password",placeholder:"Repeat new password",value:profForm.confirmPw,onChange:e=>{setProfForm(f=>({...f,confirmPw:e.target.value}));setProfErr("");setProfOk("");}}),
+        React.createElement("div",{style:{position:"relative"}},
+          React.createElement("input",{className:"fi",type:showConfirmPw?"text":"password",placeholder:"Repeat new password",value:profForm.confirmPw,onChange:e=>{setProfForm(f=>({...f,confirmPw:e.target.value}));setProfErr("");setProfOk("");},style:{paddingRight:38}}),
+          React.createElement(EyeToggle,{shown:showConfirmPw,onToggle:()=>setShowConfirmPw(v=>!v)})
+        ),
         profErr&&React.createElement("div",{className:"prof-err"},profErr),
         profOk&&React.createElement("div",{className:"prof-ok"},profOk),
         React.createElement("button",{className:"prof-save",onClick:handleSaveProf,disabled:profBusy},profBusy?"SAVING...":"SAVE CHANGES"),
