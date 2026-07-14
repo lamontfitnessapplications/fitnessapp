@@ -887,7 +887,7 @@ function MemberProfileOverlay({member,bookings,onClose,currentUserIsAdmin,isMast
           React.createElement("span",null,"SECTION ACCESS"),
           React.createElement("span",{style:{fontSize:9,letterSpacing:"0.06em",color:accTabs===null?"#4aaa66":accTabs.length===0?"#e06040":"#8cc63e",fontWeight:700}},accTabs===null?"FITNESS":accTabs.length===0?"TRIAL":accTabs.length+"/"+ACCESS_TABS.length)
         ),
-        React.createElement("div",{style:{fontSize:10,color:"#666",letterSpacing:"0.04em",lineHeight:1.6,marginBottom:8}},"Which tabs this member can see. FITNESS = everything except Workouts. Workouts is a separate add-on you switch on below. My Bookings appears automatically when a bookable section is on. Your global Section toggles still apply on top."),
+        React.createElement("div",{style:{fontSize:10,color:"#666",letterSpacing:"0.04em",lineHeight:1.6,marginBottom:8}},"Which tabs this member can see. Tap a section below to grant or remove it — changes save automatically, no save button needed. FITNESS = everything except Workouts. Workouts is a separate add-on. My Bookings appears automatically when a bookable section is on."),
         React.createElement("div",{style:{display:"flex",gap:6,marginBottom:10}},
           React.createElement("button",{onClick:()=>saveAccess(null),disabled:savingAcc,style:accSegBtn(accTabs===null)},"FITNESS MEMBER"),
           React.createElement("button",{onClick:setNoAccess,disabled:savingAcc,style:accSegBtn(accTabs!==null&&accTabs.length===0&&!wkEnabled)},"TRIAL MEMBER")
@@ -901,7 +901,8 @@ function MemberProfileOverlay({member,bookings,onClose,currentUserIsAdmin,isMast
               (on?"✓ ":"")+t.label);
           })
         ),
-        React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",background:"#0e0e0e",border:"1px solid "+(wkEnabled?"#3f6b1e":"#222"),borderRadius:0,padding:"11px 14px",marginBottom:6}},
+        React.createElement("div",{style:{fontSize:11,color:accMsg?"#8cc63e":"#444",letterSpacing:"0.04em",fontWeight:600,marginBottom:10,minHeight:14}},accMsg||"Changes save automatically"),
+        (mfWk!==false)&&React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",background:"#0e0e0e",border:"1px solid "+(wkEnabled?"#3f6b1e":"#222"),borderRadius:0,padding:"11px 14px",marginBottom:6}},
           React.createElement("div",null,
             React.createElement("div",{style:{fontSize:11,fontWeight:600,letterSpacing:"0.08em",color:"#fff"}},"WORKOUTS"),
             React.createElement("div",{style:{fontSize:9,color:"#555",marginTop:2,letterSpacing:"0.04em"}},"Add-on · personal training programs"+(isMaster?"":" · master only"))
@@ -910,7 +911,7 @@ function MemberProfileOverlay({member,bookings,onClose,currentUserIsAdmin,isMast
             style:{background:wkEnabled?"#fff":"#222",color:wkEnabled?"#000":"#555",border:"1px solid "+(wkEnabled?"#fff":"#333"),borderRadius:0,padding:"6px 18px",fontSize:10,letterSpacing:"0.12em",fontWeight:700,cursor:isMaster?"pointer":"not-allowed",opacity:isMaster?1:0.55,fontFamily:"'DM Sans',sans-serif"}},
             wkEnabled?"ON":"OFF")
         ),
-        React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",background:"#0e0e0e",border:"1px solid "+(wkMemberView?"#1d5a34":"#222"),borderRadius:0,padding:"11px 14px",marginBottom:6}},
+        (mfWk!==false)&&React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",background:"#0e0e0e",border:"1px solid "+(wkMemberView?"#1d5a34":"#222"),borderRadius:0,padding:"11px 14px",marginBottom:6}},
           React.createElement("div",null,
             React.createElement("div",{style:{fontSize:11,fontWeight:600,letterSpacing:"0.08em",color:"#fff"}},"MEMBER VIEW"),
             React.createElement("div",{style:{fontSize:9,color:"#555",marginTop:2,letterSpacing:"0.04em"}},"See their program as they see it — with completed sets & past weeks")
@@ -918,8 +919,7 @@ function MemberProfileOverlay({member,bookings,onClose,currentUserIsAdmin,isMast
           React.createElement("button",{onClick:()=>setWkMemberView(v=>!v),
             style:{background:wkMemberView?"#4aaa66":"#222",color:wkMemberView?"#000":"#555",border:"1px solid "+(wkMemberView?"#4aaa66":"#333"),borderRadius:0,padding:"6px 18px",fontSize:10,letterSpacing:"0.12em",fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}},
             wkMemberView?"ON":"OFF")
-        ),
-        accMsg&&React.createElement("div",{style:{fontSize:10,color:"#4aaa88",letterSpacing:"0.04em",marginBottom:4}},accMsg)
+        )
       ),
       currentUserIsAdmin&&(mfWk!==false)&&React.createElement(MemberWorkoutAdmin,{member,memberView:wkMemberView,isMaster,mfPasteAI}),
       currentUserIsAdmin&&React.createElement(React.Fragment,null,
@@ -1487,14 +1487,14 @@ function AdminView({bookings,setBookings,showToast,isAdmin,isMaster,mFlags,saveM
         ),
         React.createElement("button",{onClick:toggleMasterHidden,disabled:mhSaving,
           style:{background:masterHidden?"#fff":"#222",color:masterHidden?"#000":"#555",border:"1px solid "+(masterHidden?"#fff":"#333"),padding:"6px 18px",fontSize:10,letterSpacing:"0.12em",fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}},
-          masterHidden?"ON":"OFF")
+          masterHidden?"HIDE":"OFF")
       ),
-      isMaster&&React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",background:"#0e0e0e",border:"1px solid "+(mFlags.wk?"#3f6b1e":"#222"),padding:"11px 14px",marginBottom:mFlags.wk?0:10}},
+      isMaster&&React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",background:"#0e0e0e",border:"1px solid "+(!mFlags.wk?"#3f6b1e":"#222"),padding:"11px 14px",marginBottom:mFlags.wk?0:10}},
         React.createElement("div",null,
           React.createElement("div",{style:{fontSize:11,fontWeight:600,letterSpacing:"0.08em",color:"#fff"}},"WORKOUT PROGRAM"),
-          React.createElement("div",{style:{fontSize:9,color:"#555",marginTop:2,letterSpacing:"0.04em"}},"Off = hidden from everyone")
+          React.createElement("div",{style:{fontSize:9,color:"#555",marginTop:2,letterSpacing:"0.04em"}},"HIDE = ON hides it from everyone")
         ),
-        React.createElement("button",{onClick:()=>saveMFlag("wk",!mFlags.wk),style:{background:mFlags.wk?"#fff":"#222",color:mFlags.wk?"#000":"#555",border:"1px solid "+(mFlags.wk?"#fff":"#333"),padding:"6px 18px",fontSize:10,letterSpacing:"0.12em",fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}},mFlags.wk?"ON":"OFF")
+        React.createElement("button",{onClick:()=>saveMFlag("wk",!mFlags.wk),style:{background:!mFlags.wk?"#fff":"#222",color:!mFlags.wk?"#000":"#555",border:"1px solid "+(!mFlags.wk?"#fff":"#333"),padding:"6px 18px",fontSize:10,letterSpacing:"0.12em",fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}},!mFlags.wk?"HIDE":"OFF")
       ),
       isMaster&&mFlags.wk&&React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",background:"#0b0b0b",border:"1px solid "+(mFlags.pasteai?"#3f6b1e":"#222"),borderTop:"none",padding:"10px 14px 10px 26px",marginBottom:10}},
         React.createElement("div",null,
@@ -1503,12 +1503,12 @@ function AdminView({bookings,setBookings,showToast,isAdmin,isMaster,mFlags,saveM
         ),
         React.createElement("button",{onClick:()=>saveMFlag("pasteai",!mFlags.pasteai),style:{background:mFlags.pasteai?"#fff":"#222",color:mFlags.pasteai?"#000":"#555",border:"1px solid "+(mFlags.pasteai?"#fff":"#333"),padding:"6px 18px",fontSize:10,letterSpacing:"0.12em",fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}},mFlags.pasteai?"ON":"OFF")
       ),
-      isMaster&&React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",background:"#0e0e0e",border:"1px solid "+(mFlags.welladm?"#3f6b1e":"#222"),padding:"11px 14px",marginBottom:10}},
+      isMaster&&React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",background:"#0e0e0e",border:"1px solid "+(!mFlags.welladm?"#3f6b1e":"#222"),padding:"11px 14px",marginBottom:10}},
         React.createElement("div",null,
           React.createElement("div",{style:{fontSize:11,fontWeight:600,letterSpacing:"0.08em",color:"#fff"}},"WELLNESS"),
-          React.createElement("div",{style:{fontSize:9,color:"#555",marginTop:2,letterSpacing:"0.04em"}},"Off = hidden from admins")
+          React.createElement("div",{style:{fontSize:9,color:"#555",marginTop:2,letterSpacing:"0.04em"}},"HIDE = ON hides it from admins")
         ),
-        React.createElement("button",{onClick:()=>saveMFlag("welladm",!mFlags.welladm),style:{background:mFlags.welladm?"#fff":"#222",color:mFlags.welladm?"#000":"#555",border:"1px solid "+(mFlags.welladm?"#fff":"#333"),padding:"6px 18px",fontSize:10,letterSpacing:"0.12em",fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}},mFlags.welladm?"ON":"OFF")
+        React.createElement("button",{onClick:()=>saveMFlag("welladm",!mFlags.welladm),style:{background:!mFlags.welladm?"#fff":"#222",color:!mFlags.welladm?"#000":"#555",border:"1px solid "+(!mFlags.welladm?"#fff":"#333"),padding:"6px 18px",fontSize:10,letterSpacing:"0.12em",fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}},!mFlags.welladm?"HIDE":"OFF")
       ),
       React.createElement("div",{className:"adm-stats-row"},
         React.createElement("div",{className:"adm-stat"},React.createElement("div",{className:"adm-stat-num"},visMembers.length),React.createElement("div",{className:"adm-stat-lbl"},"MEMBERS")),
