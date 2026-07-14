@@ -3475,7 +3475,8 @@ function StrengthTab({session,isAdmin,showToast,bookings,memberData}){
     ),
     React.createElement("div",{className:"sp-toggle"},
       React.createElement("button",{className:`sp-toggle-btn${sessType==="Lower"?" spta":""}`,onClick:()=>setSessType("Lower")},"STRENGTH LOWER"),
-      React.createElement("button",{className:`sp-toggle-btn${sessType==="Upper"?" spta":""}`,onClick:()=>setSessType("Upper")},"STRENGTH UPPER")
+      React.createElement("button",{className:`sp-toggle-btn${sessType==="Upper"?" spta":""}`,onClick:()=>setSessType("Upper")},"STRENGTH UPPER"),
+      React.createElement("button",{className:`sp-toggle-btn${sessType==="Strength"?" spta":""}`,onClick:()=>setSessType("Strength")},"STRENGTH")
     ),
     React.createElement("div",{className:"sp-weeks"},
       [1,2,3,4].map(w=>{
