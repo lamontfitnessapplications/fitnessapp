@@ -1,1 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="theme-color" content="#080808"/>
+<title>Soul Fitness · Health Screening Form</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Syncopate:wght@700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#080808;min-height:100vh}
+body{font-family:'DM Sans',sans-serif;color:#fff;padding:0}
+/* ── Hero header ── */
+.hero{
+  background-image:linear-gradient(rgba(8,8,8,0.72),rgba(8,8,8,0.88)),
+    url("Soulbackground.jpg");
+  background-size:cover;
+  background-position:center top;
+  padding:36px 28px 28px;
+  text-align:center;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  border-bottom:1px solid #1a1a1a;
+}
+.hero-circle{
+  width:88px;height:88px;border-radius:50%;
+  border:2px solid #8cc63e;background:#111;
+  overflow:hidden;margin-bottom:16px;
+  display:flex;align-items:center;justify-content:center;
+}
+.hero-circle img{width:100%;height:100%;object-fit:cover;}
+.hero-name{font-family:'Syncopate',sans-serif;font-size:13px;font-weight:700;letter-spacing:0.18em;color:#fff;margin-bottom:5px}
+.hero-tag{font-family:'Syncopate',sans-serif;font-size:6px;font-weight:700;letter-spacing:0.2em;color:#555;margin-bottom:14px}
+.hero-badge{font-size:9px;letter-spacing:0.18em;color:#8cc63e;background:#16280d;border:1px solid #3f6b1e;border-radius:0;padding:4px 14px}
+.wrap{max-width:480px;margin:0 auto;padding:32px 20px 60px}
+.logo-area{text-align:center;margin-bottom:36px}
+.logo-sub{font-size:9px;letter-spacing:0.22em;color:#777;font-weight:500;margin-bottom:4px}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:0.18em;color:#fff}
+.logo-tag{font-size:8px;letter-spacing:0.2em;color:#444;margin-top:3px}
+.form-title{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:0.12em;color:#fff;margin-bottom:6px}
+.form-sub{font-size:11px;letter-spacing:0.1em;color:#777;font-weight:500;margin-bottom:32px}
+.section{margin-bottom:28px}
+.section-label{font-size:9px;letter-spacing:0.22em;color:#666;font-weight:600;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid #141414}
+.fl{display:block;font-size:10px;letter-spacing:0.16em;color:#bbb;font-weight:600;margin-bottom:7px;margin-top:14px}
+.fl:first-of-type{margin-top:0}
+.fi{width:100%;background:#0e0e0e;border:1px solid #2a2a2a;color:#fff;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:300;padding:13px 15px;outline:none;border-radius:0;transition:border-color .2s;-webkit-appearance:none}
+.fi:focus{border-color:#555}
+.fi::placeholder{color:#333}
+textarea.fi{resize:none;min-height:80px;line-height:1.6}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.parq-item{background:#0e0e0e;border:1px solid #1e1e1e;border-radius:0;padding:14px;margin-bottom:8px}
+.parq-q{font-size:12px;color:#ccc;line-height:1.6;font-weight:300;margin-bottom:12px}
+.parq-opts{display:flex;gap:8px}
+.parq-btn{flex:1;padding:10px;background:#111;border:1px solid #222;border-radius:0;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:0.12em;color:#555;cursor:pointer;transition:all .15s;text-align:center}
+.parq-btn:hover{border-color:#444;color:#aaa}
+.parq-btn.sel-no{background:#0e1a0e;border-color:#2a4a2a;color:#4aaa66}
+.parq-btn.sel-yes{background:#1a0e0e;border-color:#4a2a2a;color:#e06040}
+.consent-item{background:#0e0e0e;border:1px solid #1e1e1e;border-radius:0;padding:14px;margin-bottom:8px}
+.consent-text{font-size:11px;color:#888;line-height:1.7;font-weight:300;margin-bottom:12px}
+.consent-bold{font-size:11px;color:#bbb;font-weight:600;margin-bottom:8px}
+.consent-opts{display:flex;gap:8px}
+.consent-btn{flex:1;padding:10px;background:#111;border:1px solid #222;border-radius:0;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:0.12em;color:#555;cursor:pointer;transition:all .15s;text-align:center}
+.consent-btn:hover{border-color:#444;color:#aaa}
+.consent-btn.sel-yes{background:#0e1a0e;border-color:#2a4a2a;color:#4aaa66}
+.consent-btn.sel-no{background:#111;border-color:#333;color:#666}
+.sig-wrap{background:#0e0e0e;border:1px solid #2a2a2a;border-radius:0;overflow:hidden;position:relative}
+.sig-canvas{display:block;width:100%;height:160px;cursor:crosshair;touch-action:none}
+.sig-clear{position:absolute;top:8px;right:10px;background:none;border:none;color:#444;font-size:10px;letter-spacing:0.12em;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;transition:color .15s}
+.sig-clear:hover{color:#aaa}
+.sig-hint{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);font-size:9px;letter-spacing:0.14em;color:#2a2a2a;font-weight:500;white-space:nowrap;pointer-events:none}
+.fitness-opts{display:flex;flex-direction:column;gap:8px}
+.fitness-btn{padding:13px 15px;background:#0e0e0e;border:1px solid #1e1e1e;border-radius:0;text-align:left;cursor:pointer;transition:all .15s}
+.fitness-btn:hover{border-color:#333}
+.fitness-btn.sel{border-color:#fff;background:#111}
+.fitness-num{font-family:'Bebas Neue',sans-serif;font-size:18px;color:#555;letter-spacing:0.1em;margin-bottom:2px}
+.fitness-btn.sel .fitness-num{color:#fff}
+.fitness-desc{font-size:11px;color:#666;font-weight:400}
+.fitness-btn.sel .fitness-desc{color:#aaa}
+.submit-btn{width:100%;background:#fff;color:#000;border:none;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:0.18em;padding:20px;cursor:pointer;border-radius:0;margin-top:32px;transition:background .15s}
+.submit-btn:hover:not(:disabled){background:#ddd}
+.submit-btn:disabled{background:#111;color:#333;cursor:not-allowed}
+.err-msg{font-size:12px;color:#e06040;letter-spacing:0.04em;margin-top:14px;line-height:1.6}
+.success-page{text-align:center;padding:60px 20px;max-width:480px;margin:0 auto}
+.success-icon{font-family:'Bebas Neue',sans-serif;font-size:72px;color:#fff;margin-bottom:8px}
+.success-title{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:0.12em;color:#fff;margin-bottom:16px}
+.success-body{font-size:14px;color:#777;line-height:1.8;font-weight:300;margin-bottom:32px}
+.success-link{display:block;width:100%;background:#fff;color:#000;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:0.18em;padding:18px;border-radius:0;text-decoration:none;text-align:center}
+.loading-screen{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#080808;font-size:10px;letter-spacing:0.2em;color:#333;gap:16px}
+.loading-bar{width:120px;height:1px;background:#1a1a1a;border-radius:0;overflow:hidden}
+.loading-fill{height:100%;background:#fff;border-radius:0;animation:ld 1.5s ease-in-out infinite}
+@keyframes ld{0%{width:0}50%{width:100%}100%{width:0}}
+select.fi{cursor:pointer}
+select.fi option{background:#0e0e0e;color:#fff}
+</style>
+</head>
+<body>
+<div id="root"><div class="loading-screen"><div style="font-family:'DM Sans',sans-serif">SOUL FITNESS</div><div class="loading-bar"><div class="loading-fill"></div></div></div></div>
+<script>
+const SB_URL = "https://tqidngxpbzkzdekhizyp.supabase.co";
+const SB_KEY = "sb_publishable_UTl_mZYy0xvuOUhNNOM6Mg_s6XOZlto";
+const SB_HDR = {"apikey":SB_KEY,"Authorization":`Bearer ${SB_KEY}`,"Content-Type":"application/json","Prefer":"return=minimal"};
+async function sbGet(t,q=""){try{const r=await fetch(`${SB_URL}/rest/v1/${t}?${q}`,{headers:SB_HDR});return r.ok?await r.json():[];}catch{return[];}}
+async function sbPost(t,d){try{const r=await fetch(`${SB_URL}/rest/v1/${t}`,{method:"POST",headers:SB_HDR,body:JSON.stringify(d)});return r.ok;}catch{return false;}}
+const hashPw = s=>{let h=5381;for(let i=0;i<s.length;i++)h=((h<<5)+h)^s.charCodeAt(i);return(h>>>0).toString(36);};
+const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const today = ()=>{const d=new Date();return`${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`;};
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx6ZLt0EiEsOANs67XTdpuP_mOWgcBGjCTJMPXSX4qaMONYHZ1hoTtDVl20cqy7BI0b/exec";
+async function sendWelcomeEmailViaScript(to, firstName, tempPassword) {
+  try {
+    const params = new URLSearchParams({action:"welcome",to,firstName,tempPassword});
+    await fetch(APPS_SCRIPT_URL + "?" + params.toString(), {method:"GET",mode:"no-cors"});
+  } catch(e) {}
+}
+async function logHealthToSheets(data) {
+  try {
+    const params = new URLSearchParams({action:"logHealth",...data});
+    await fetch(APPS_SCRIPT_URL + "?" + params.toString(), {method:"GET",mode:"no-cors"});
+  } catch(e) {}
+}
+const PARQ = [
+  "Has your doctor ever said that you have a heart condition and that you should only do physical activity recommended by a doctor?",
+  "Do you feel pain in your chest when you do physical activity?",
+  "In the past month, have you had chest pain when you were not doing physical activity?",
+  "Do you lose your balance because of dizziness or do you ever lose consciousness?",
+  "Do you have a bone or joint problem that could be made worse by a change in your physical activity? (e.g. back, knee, hip)",
+  "Is your doctor currently prescribing drugs for your blood pressure or heart condition?",
+  "Do you know of any other reason why you should not do physical activity? (e.g. pregnancy, recent surgery, diabetes)"
+];
+// State
+let parqAnswers = {};
+let fitnessLevel = "";
+let healthDeclaration = "";
+let mediaConsent = "";
+let sigCanvas, sigCtx, drawing = false, hasSig = false;
+let errEl;
+function initCanvas(){
+  sigCanvas = document.getElementById("sig-canvas");
+  if(!sigCanvas) return;
+  sigCtx = sigCanvas.getContext("2d");
+  sigCanvas.width = sigCanvas.offsetWidth * window.devicePixelRatio;
+  sigCanvas.height = sigCanvas.offsetHeight * window.devicePixelRatio;
+  sigCtx.scale(window.devicePixelRatio, window.devicePixelRatio);
+  sigCtx.strokeStyle = "#ffffff";
+  sigCtx.lineWidth = 2;
+  sigCtx.lineCap = "round";
+  sigCtx.lineJoin = "round";
+  function getPos(e){
+    const r = sigCanvas.getBoundingClientRect();
+    const src = e.touches ? e.touches[0] : e;
+    return {x: src.clientX - r.left, y: src.clientY - r.top};
+  }
+  sigCanvas.addEventListener("mousedown", e=>{drawing=true;const p=getPos(e);sigCtx.beginPath();sigCtx.moveTo(p.x,p.y);hasSig=true;document.querySelector(".sig-hint").style.display="none";});
+  sigCanvas.addEventListener("mousemove", e=>{if(!drawing)return;const p=getPos(e);sigCtx.lineTo(p.x,p.y);sigCtx.stroke();sigCtx.beginPath();sigCtx.moveTo(p.x,p.y);});
+  sigCanvas.addEventListener("mouseup", ()=>{drawing=false;});
+  sigCanvas.addEventListener("mouseleave", ()=>{drawing=false;});
+  sigCanvas.addEventListener("touchstart", e=>{e.preventDefault();drawing=true;const p=getPos(e);sigCtx.beginPath();sigCtx.moveTo(p.x,p.y);hasSig=true;document.querySelector(".sig-hint").style.display="none";},{passive:false});
+  sigCanvas.addEventListener("touchmove", e=>{e.preventDefault();if(!drawing)return;const p=getPos(e);sigCtx.lineTo(p.x,p.y);sigCtx.stroke();sigCtx.beginPath();sigCtx.moveTo(p.x,p.y);},{passive:false});
+  sigCanvas.addEventListener("touchend", ()=>{drawing=false;});
+}
+function clearSig(){
+  if(sigCtx) sigCtx.clearRect(0,0,sigCanvas.offsetWidth*2,sigCanvas.offsetHeight*2);
+  hasSig=false;
+  document.querySelector(".sig-hint").style.display="block";
+}
+function selectParq(idx, val){
+  parqAnswers[idx] = val;
+  document.querySelectorAll(`.parq-${idx} .parq-btn`).forEach(b=>{
+    b.classList.remove("sel-yes","sel-no");
+    if(b.dataset.val===val) b.classList.add(val==="Yes"?"sel-yes":"sel-no");
+  });
+}
+function selectFitness(val){
+  fitnessLevel = val;
+  document.querySelectorAll(".fitness-btn").forEach(b=>{
+    b.classList.toggle("sel", b.dataset.val===val);
+  });
+}
+function selectConsent(field, val){
+  if(field==="health") healthDeclaration=val;
+  else mediaConsent=val;
+  document.querySelectorAll(`.consent-${field} .consent-btn`).forEach(b=>{
+    b.classList.remove("sel-yes","sel-no");
+    if(b.dataset.val===val) b.classList.add(val==="Yes"?"sel-yes":"sel-no");
+  });
+}
+async function handleSubmit(){
+  errEl = document.getElementById("err-msg");
+  errEl.textContent = "";
+  const firstName = document.getElementById("fname").value.trim();
+  const lastName  = document.getElementById("lname").value.trim();
+  const dob       = document.getElementById("dob").value.trim();
+  const phone     = document.getElementById("phone").value.trim();
+  const email     = document.getElementById("email").value.toLowerCase().trim();
+  const eName     = document.getElementById("ename").value.trim();
+  const ePhone    = document.getElementById("ephone").value.trim();
+  const medCond   = document.getElementById("med-cond").value.trim();
+  const meds      = document.getElementById("meds").value.trim();
+  if(!firstName||!lastName){errEl.textContent="Please enter your full name.";return;}
+  if(!dob){errEl.textContent="Please enter your date of birth.";return;}
+  if(!phone){errEl.textContent="Please enter your phone number.";return;}
+  if(!email||!/\S+@\S+\.\S+/.test(email)){errEl.textContent="Please enter a valid email address.";return;}
+  if(!eName){errEl.textContent="Please enter an emergency contact name.";return;}
+  if(!ePhone){errEl.textContent="Please enter an emergency contact phone number.";return;}
+  if(Object.keys(parqAnswers).length<7){errEl.textContent="Please answer all health screening questions.";return;}
+  if(!fitnessLevel){errEl.textContent="Please select your fitness level.";return;}
+  if(!healthDeclaration){errEl.textContent="Please confirm the health declaration.";return;}
+  if(!mediaConsent){errEl.textContent="Please confirm your media consent preference.";return;}
+  if(!hasSig){errEl.textContent="Please sign the form.";return;}
+  const existing = await sbGet("members",`email=eq.${encodeURIComponent(email)}`);
+  const isExisting = existing.length > 0;
+  const btn = document.getElementById("submit-btn");
+  btn.disabled=true; btn.textContent="SUBMITTING...";
+  const sigData = sigCanvas.toDataURL("image/png",0.7);
+  const regDate = today();
+  const name = `${firstName} ${lastName}`;
+  const regData = {
+    name, phone, dob,
+    emergency_name:      eName,
+    emergency_phone:     ePhone,
+    parq_heart:          parqAnswers[0]||"",
+    parq_chest_activity: parqAnswers[1]||"",
+    parq_chest_rest:     parqAnswers[2]||"",
+    parq_dizziness:      parqAnswers[3]||"",
+    parq_joint:          parqAnswers[4]||"",
+    parq_blood_pressure: parqAnswers[5]||"",
+    parq_other:          parqAnswers[6]||"",
+    medical_conditions:  medCond,
+    medications:         meds,
+    fitness_level:       fitnessLevel,
+    health_declaration:  healthDeclaration,
+    media_consent:       mediaConsent,
+    signature:           sigData,
+    registration_date:   regDate
+  };
+  const healthData = {
+    name, email, phone, dob,
+    emergencyName: eName, emergencyPhone: ePhone,
+    parqHeart: parqAnswers[0]||"", parqChestActivity: parqAnswers[1]||"",
+    parqChestRest: parqAnswers[2]||"", parqDizziness: parqAnswers[3]||"",
+    parqJoint: parqAnswers[4]||"", parqBloodPressure: parqAnswers[5]||"",
+    parqOther: parqAnswers[6]||"",
+    medicalConditions: medCond, medications: meds,
+    fitnessLevel, healthDeclaration, mediaConsent,
+    registrationDate: regDate
+  };
+  let ok = false;
+  let tempPw = "";
+  if(isExisting){
+    const patchRes = await fetch(`${SB_URL}/rest/v1/members?email=eq.${encodeURIComponent(email)}`,{
+      method:"PATCH", headers:SB_HDR, body:JSON.stringify(regData)
+    });
+    ok = patchRes.ok;
+    if(ok) logHealthToSheets(healthData);
+  } else {
+    tempPw = Math.random().toString(36).slice(2,10);
+    ok = await sbPost("members", {email,photo:"",password:hashPw(tempPw),joined_at:Date.now(),workouts_enabled:true,...regData});
+    if(ok){
+      // New health-screening signups start with Notice Board + the Workouts add-on; admin grants the rest from their profile.
+      sbPost("coaching_notes",{class_name:"__ACCESS__"+email,content:JSON.stringify({tabs:["community"]}),updated_at:Date.now()});
+      sendWelcomeEmailViaScript(email, firstName, tempPw);
+      logHealthToSheets(healthData);
+    }
+  }
+  if(!ok){
+    errEl.textContent="Something went wrong. Please try again.";
+    btn.disabled=false; btn.textContent="SUBMIT";
+    return;
+  }
+  document.getElementById("root").innerHTML = `
+    <div class="success-page">
+      <div class="success-icon">✓</div>
+      <div class="success-title">${isExisting ? "Form Updated" : "Welcome to Soul Fitness"}</div>
+      <div class="success-body">
+        ${isExisting
+          ? `Thanks ${firstName}. Your health screening form has been updated successfully.`
+          : `Welcome ${firstName}. A welcome email with your login details has been sent to <strong style="color:#fff;">${email}</strong>.`
+        }
+      </div>
+      <a href="https://lamontfitnessapplications.github.io/fitnessapp/" class="success-link">OPEN BOOKING APP</a>
+    </div>`;
+}
+// Render form
+document.getElementById("root").innerHTML = `
+<div class="hero">
+  <div class="hero-circle">
+    <img src="loginprofile.jpg" onerror="this.style.display='none'" alt="Soul Fitness"/>
+  </div>
+  <div class="hero-name">SOUL FITNESS</div>
+  <div class="hero-tag">WHERE COMMUNITY MEETS FITNESS</div>
+  <div class="hero-badge">HEALTH SCREENING</div>
+</div>
+<div class="wrap">
+  <div class="form-title">Health Screening Form</div>
+  <div class="form-sub">COMPLETE BEFORE YOUR FIRST SESSION</div>
+  <div class="section">
+    <div class="section-label">PERSONAL DETAILS</div>
+    <div class="row2">
+      <div>
+        <label class="fl" for="fname">FIRST NAME</label>
+        <input class="fi" id="fname" placeholder="First name" autocomplete="given-name"/>
+      </div>
+      <div>
+        <label class="fl" for="lname">LAST NAME</label>
+        <input class="fi" id="lname" placeholder="Last name" autocomplete="family-name"/>
+      </div>
+    </div>
+    <label class="fl" for="dob">DATE OF BIRTH</label>
+    <input class="fi" id="dob" type="date"/>
+    <label class="fl" for="phone">PHONE NUMBER</label>
+    <input class="fi" id="phone" type="tel" placeholder="+64 21 000 0000" autocomplete="tel"/>
+    <label class="fl" for="email">EMAIL ADDRESS</label>
+    <input class="fi" id="email" type="email" placeholder="your@email.com" autocomplete="email"/>
+  </div>
+  <div class="section">
+    <div class="section-label">EMERGENCY CONTACT</div>
+    <div class="row2">
+      <div>
+        <label class="fl" for="ename">CONTACT NAME</label>
+        <input class="fi" id="ename" placeholder="Full name"/>
+      </div>
+      <div>
+        <label class="fl" for="ephone">PHONE NUMBER</label>
+        <input class="fi" id="ephone" type="tel" placeholder="+64 21 000 0000"/>
+      </div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-label">HEALTH SCREENING · PAR-Q</div>
+    ${PARQ.map((q,i)=>`
+      <div class="parq-item parq-${i}">
+        <div class="parq-q">${q}</div>
+        <div class="parq-opts">
+          <button class="parq-btn" data-val="Yes" onclick="selectParq(${i},'Yes')">YES</button>
+          <button class="parq-btn" data-val="No" onclick="selectParq(${i},'No')">NO</button>
+        </div>
+      </div>`).join("")}
+  </div>
+  <div class="section">
+    <div class="section-label">MEDICAL INFORMATION</div>
+    <label class="fl" for="med-cond">INJURIES OR CONDITIONS WE SHOULD KNOW ABOUT</label>
+    <textarea class="fi" id="med-cond" placeholder="List any injuries or conditions, or write 'None'"></textarea>
+    <label class="fl" for="meds">CURRENT MEDICATIONS</label>
+    <textarea class="fi" id="meds" placeholder="List any current medications, or write 'None'"></textarea>
+  </div>
+  <div class="section">
+    <div class="section-label">STARTING LEVEL</div>
+    <div class="fitness-opts">
+      <button class="fitness-btn" data-val="1. New to fitness or returning after a break." onclick="selectFitness(this.dataset.val)">
+        <div class="fitness-num">1</div>
+        <div class="fitness-desc">New to fitness or returning after a break</div>
+      </button>
+      <button class="fitness-btn" data-val="2. Active and training regularly." onclick="selectFitness(this.dataset.val)">
+        <div class="fitness-num">2</div>
+        <div class="fitness-desc">Active and training regularly</div>
+      </button>
+      <button class="fitness-btn" data-val="3. High performance, pushing the limits." onclick="selectFitness(this.dataset.val)">
+        <div class="fitness-num">3</div>
+        <div class="fitness-desc">High performance, pushing the limits</div>
+      </button>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-label">DECLARATIONS</div>
+    <div class="consent-item consent-health">
+      <div class="consent-bold">HEALTH & MEDICAL DECLARATION</div>
+      <div class="consent-text">I confirm that the information provided is accurate to the best of my knowledge. I agree to inform Soul Fitness of any changes to my health or medical status. I acknowledge that physical activity carries inherent risks, and I participate at my own risk.</div>
+      <div class="consent-opts">
+        <button class="consent-btn" data-val="Yes" onclick="selectConsent('health','Yes')">I AGREE</button>
+        <button class="consent-btn" data-val="No" onclick="selectConsent('health','No')">I DO NOT AGREE</button>
+      </div>
+    </div>
+    <div class="consent-item consent-media">
+      <div class="consent-bold">MEDIA & PROMOTIONAL USE</div>
+      <div class="consent-text">I grant permission for Soul Fitness to capture and use photographs and video footage of me during training sessions for promotional, marketing, and social media purposes.</div>
+      <div class="consent-opts">
+        <button class="consent-btn" data-val="Yes" onclick="selectConsent('media','Yes')">I AGREE</button>
+        <button class="consent-btn" data-val="No" onclick="selectConsent('media','No')">I DO NOT AGREE</button>
+      </div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-label">SIGNATURE</div>
+    <div class="sig-wrap">
+      <canvas id="sig-canvas" class="sig-canvas"></canvas>
+      <button class="sig-clear" onclick="clearSig()">CLEAR</button>
+      <div class="sig-hint">Sign here with your finger</div>
+    </div>
+  </div>
+  <div id="err-msg" class="err-msg"></div>
+  <button id="submit-btn" class="submit-btn" onclick="handleSubmit()">SUBMIT</button>
+</div>`;
+// Pre-fill form if member is already logged in
+async function prefillForm() {
+  try {
+    const session = JSON.parse(localStorage.getItem("t365-session"));
+    if(!session || !session.email) return;
+    const rows = await sbGet("members", `email=eq.${encodeURIComponent(session.email)}`);
+    if(!rows.length) return;
+    const mb = rows[0];
+    const nameParts = (mb.name||"").split(" ");
+    if(document.getElementById("fname")) document.getElementById("fname").value = nameParts[0]||"";
+    if(document.getElementById("lname")) document.getElementById("lname").value = nameParts.slice(1).join(" ")||"";
+    if(document.getElementById("dob"))   document.getElementById("dob").value   = mb.dob||"";
+    if(document.getElementById("phone")) document.getElementById("phone").value = mb.phone||"";
+    if(document.getElementById("email")) document.getElementById("email").value = mb.email||"";
+    if(document.getElementById("ename"))  document.getElementById("ename").value  = mb.emergency_name||"";
+    if(document.getElementById("ephone")) document.getElementById("ephone").value = mb.emergency_phone||"";
+    const parqMap = {
+      0:mb.parq_heart, 1:mb.parq_chest_activity, 2:mb.parq_chest_rest,
+      3:mb.parq_dizziness, 4:mb.parq_joint, 5:mb.parq_blood_pressure, 6:mb.parq_other
+    };
+    Object.entries(parqMap).forEach(([idx,val])=>{ if(val) selectParq(parseInt(idx),val); });
+    if(mb.fitness_level)      selectFitness(mb.fitness_level);
+    if(mb.health_declaration) selectConsent("health", mb.health_declaration);
+    if(mb.media_consent)      selectConsent("media",  mb.media_consent);
+    if(document.getElementById("med-cond")) document.getElementById("med-cond").value = mb.medical_conditions||"";
+    if(document.getElementById("meds"))     document.getElementById("meds").value     = mb.medications||"";
+  } catch(e) {}
+}
+setTimeout(()=>{ initCanvas(); prefillForm(); }, 100);
+</script>
+</body>
+</html>
 
