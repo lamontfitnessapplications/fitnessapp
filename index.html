@@ -21,8 +21,8 @@ html,body{background:#ffffff;min-height:100vh}
 .hdr-row{display:flex;align-items:center;justify-content:space-between}
 .hdr-left{display:flex;align-items:center;gap:10px;cursor:pointer}
 .hdr-avatar-wrap{position:relative;flex-shrink:0}
-.avatar-hdr{width:46px;height:46px;border-radius:50%;object-fit:cover;border:2px solid #d9e2cc;display:block}
-.avatar-init-hdr{width:46px;height:46px;border-radius:50%;background:#f6f7f5;border:2px solid #d9e2cc;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:18px;color:#777;flex-shrink:0}
+.avatar-hdr{width:46px;height:46px;border-radius:50%;object-fit:cover;border:2px solid #111111;display:block}
+.avatar-init-hdr{width:46px;height:46px;border-radius:50%;background:#f6f7f5;border:2px solid #111111;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:18px;color:#777;flex-shrink:0}
 .hdr-avatar-plus{position:absolute;bottom:-1px;right:-1px;width:16px;height:16px;border-radius:50%;background:#8cc63e;border:2px solid #ffffff;display:flex;align-items:center;justify-content:center;font-size:11px;color:#000;font-weight:700;line-height:1}
 .hdr-name-col{display:flex;flex-direction:column}
 .name-lbl{font-size:13px;letter-spacing:0.08em;color:#181818;font-weight:600}
@@ -30,28 +30,28 @@ html,body{background:#ffffff;min-height:100vh}
 .hdr-left:hover .edit-lbl{color:#aaa}
 .logo-area{text-align:right}
 .logo-sub{font-size:8px;letter-spacing:0.22em;color:#555;font-weight:500}
-.logo{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:0.18em;line-height:1;color:#c3d1ac}
-.logo-tag{font-size:6px;letter-spacing:0.2em;color:#d9e2cc;margin-top:1px}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:0.18em;line-height:1;color:#111111}
+.logo-tag{font-size:6px;letter-spacing:0.2em;color:#111111;margin-top:1px}
 .hdr-website{text-align:center;padding:8px 0 10px;border-top:1px solid #f6f7f5;margin-top:10px}
 .hdr-website a{font-size:9px;letter-spacing:0.1em;color:#8cc63e;text-decoration:none;font-weight:400}
 .hdr-website a:hover{text-decoration:underline}
-.avatar-sm{width:38px;height:38px;border-radius:50%;object-fit:cover;border:1px solid #c3d1ac;cursor:pointer;display:block}
+.avatar-sm{width:38px;height:38px;border-radius:50%;object-fit:cover;border:1px solid #111111;cursor:pointer;display:block}
 .avatar-init-sm{width:38px;height:38px;border-radius:50%;background:#f6f7f5;border:1px solid #888;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:14px;color:#999;cursor:pointer;flex-shrink:0}
 .week-nav{display:flex;align-items:center;padding:18px 14px 0}
 .wk-arrow{background:none;border:none;color:#888;cursor:pointer;font-size:24px;padding:4px 10px;line-height:1;transition:color .15s}
 .wk-arrow:hover:not(:disabled){color:#181818}
-.wk-arrow:disabled{color:#d9e2cc;cursor:default}
+.wk-arrow:disabled{color:#111111;cursor:default}
 .wk-label{flex:1;text-align:center;font-size:10px;letter-spacing:0.18em;color:#181818;font-weight:600}
 .day-strip{display:flex;gap:5px;padding:10px 16px 0;overflow-x:auto;scrollbar-width:none}
 .day-strip::-webkit-scrollbar{display:none}
 .day-btn{flex:1;min-width:44px;display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px;background:#f6f7f5;border:1px solid #888;border-radius:6px;cursor:pointer;transition:all .15s}
-.day-btn:hover:not(.da){border-color:#c3d1ac}
+.day-btn:hover:not(.da){border-color:#111111}
 .day-btn.dt{border-color:#555}
 .day-btn.da{background:#8cc63e;border-color:#181818}
 .d-name{font-size:9px;letter-spacing:0.12em;font-weight:600;color:#999}
 .d-num{font-family:'Bebas Neue',sans-serif;font-size:20px;line-height:1;color:#777}
 .day-btn.dt .d-num{color:#181818}
-.day-btn.dt .d-name{color:#d9e2cc}
+.day-btn.dt .d-name{color:#111111}
 .day-btn.da .d-name,.day-btn.da .d-num{color:#000}
 .d-dot{width:4px;height:4px;border-radius:50%;background:transparent}
 .day-btn.dhb .d-dot{background:#666}
@@ -61,12 +61,12 @@ html,body{background:#ffffff;min-height:100vh}
 .day-hdr span{color:#181818}
 .day-hdr em{color:#aaa;font-style:normal}
 .c-row{display:flex;align-items:center;gap:10px;padding:10px 13px;background:#f6f7f5;border:1px solid #888;border-radius:7px;transition:border-color .15s}
-.c-row.cb{border-color:#d9e2cc}
+.c-row.cb{border-color:#111111}
 .c-row.cp{opacity:0.3;pointer-events:none}
 .c-time{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:0.03em;color:#181818;min-width:72px}
 .c-mid{flex:1;display:flex;flex-direction:column;gap:5px}
 .c-bars{display:flex;gap:2px}
-.c-bar{flex:1;height:2px;border-radius:1px;background:#d9e2cc;transition:background .3s}
+.c-bar{flex:1;height:2px;border-radius:1px;background:#111111;transition:background .3s}
 .c-bar.ct{background:#8cc63e}.cb-mine .c-bar.ct{background:#4aaa66}
 .c-sub{font-size:10px;letter-spacing:0.1em;color:#999;font-weight:500}
 .c-sub.cl{color:#e06040}
@@ -75,8 +75,8 @@ html,body{background:#ffffff;min-height:100vh}
 .c-sub.cf{color:#555}.c-sub.cg{color:#4aaa66}
 .c-btn{font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:0.12em;padding:8px 12px;border-radius:3px;border:none;cursor:pointer;white-space:nowrap;transition:all .15s}
 .c-btn.bb{background:#8cc63e;color:#000}
-.c-btn.bb:hover:not(:disabled){background:#d9e2cc}
-.c-btn.bf{background:transparent;color:#555;border:1px solid #d9e2cc;cursor:default;font-size:10px}
+.c-btn.bb:hover:not(:disabled){background:#111111}
+.c-btn.bf{background:transparent;color:#555;border:1px solid #111111;cursor:default;font-size:10px}
 .c-btn.bc{background:transparent;color:#8a2515;border:1px solid #3a1208;cursor:pointer;font-size:10px}
 .c-btn.bc:hover{border-color:#8a2515;color:#e06040}
 .c-btn:disabled{opacity:.4;cursor:not-allowed}
@@ -89,7 +89,7 @@ html,body{background:#ffffff;min-height:100vh}
 .my-sess{font-size:9px;letter-spacing:0.1em;color:#777;margin-top:1px}
 .my-x{font-size:10px;letter-spacing:0.08em;color:#666;background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;transition:color .15s;font-weight:500}
 .my-x:hover{color:#e06040}
-.no-bk{text-align:center;padding:48px 0;font-size:11px;letter-spacing:0.16em;color:#c3d1ac;line-height:2.4}
+.no-bk{text-align:center;padding:48px 0;font-size:11px;letter-spacing:0.16em;color:#111111;line-height:2.4}
 .well-wrap{flex:1;overflow-y:auto}
 .well-hdr{padding:16px 16px 0;text-align:center}
 .well-title{font-size:10px;letter-spacing:0.22em;color:#181818;font-weight:600}
@@ -109,8 +109,8 @@ html,body{background:#ffffff;min-height:100vh}
 .well-slot-status.wss-taken{color:#e06040}
 .well-btn{font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:0.12em;padding:8px 12px;border-radius:3px;border:none;cursor:pointer;white-space:nowrap;transition:all .15s}
 .well-btn.wb-book{background:#8cc63e;color:#000}
-.well-btn.wb-book:hover:not(:disabled){background:#d9e2cc}
-.well-btn.wb-taken{background:transparent;color:#555;border:1px solid #d9e2cc;cursor:default;font-size:10px}
+.well-btn.wb-book:hover:not(:disabled){background:#111111}
+.well-btn.wb-taken{background:transparent;color:#555;border:1px solid #111111;cursor:default;font-size:10px}
 .well-btn.wb-cancel{background:transparent;color:#8a2515;border:1px solid #3a1208;font-size:10px;cursor:pointer}
 .well-btn.wb-cancel:hover{border-color:#8a2515;color:#e06040}
 .well-btn:disabled{opacity:.4;cursor:not-allowed}
@@ -118,51 +118,51 @@ html,body{background:#ffffff;min-height:100vh}
 .comm-hdr{padding:16px 16px 0;flex-shrink:0}
 .comm-title{font-size:10px;letter-spacing:0.22em;color:#181818;font-weight:600;margin-bottom:16px;text-align:center}
 .comm-sub{font-size:9px;letter-spacing:0.14em;color:#888;font-weight:500;margin-bottom:12px}
-.comm-compose{background:#f6f7f5;border:1px solid #d9e2cc;border-radius:8px;padding:12px;margin-bottom:12px}
+.comm-compose{background:#f6f7f5;border:1px solid #111111;border-radius:8px;padding:12px;margin-bottom:12px}
 .comm-textarea{width:100%;background:transparent;border:none;color:#181818;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:300;resize:none;outline:none;min-height:60px;line-height:1.6}
 .comm-textarea::placeholder{color:#666}
 .comm-compose-footer{display:flex;align-items:center;justify-content:space-between;margin-top:8px;padding-top:8px;border-top:1px solid #f6f7f5}
 .comm-char{font-size:9px;letter-spacing:0.1em;color:#777;font-weight:500}
 .comm-char.warn{color:#e06040}
 .comm-post-btn{font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:0.14em;padding:8px 18px;background:#8cc63e;color:#000;border:none;border-radius:3px;cursor:pointer;transition:background .15s}
-.comm-post-btn:hover:not(:disabled){background:#d9e2cc}
-.comm-post-btn:disabled{background:#d9e2cc;color:#777;cursor:not-allowed}
+.comm-post-btn:hover:not(:disabled){background:#111111}
+.comm-post-btn:disabled{background:#111111;color:#777;cursor:not-allowed}
 .comm-feed{flex:1;overflow-y:auto;padding:0 16px 16px}
 .comm-feed::-webkit-scrollbar{width:0}
 .post-card{background:#f6f7f5;border:1px solid #888;border-radius:8px;padding:13px 14px;margin-bottom:8px}
-.post-card.pinned-post{border-color:#d9e2cc;background:#f6f7f5;border-left:2px solid #fff}
+.post-card.pinned-post{border-color:#111111;background:#f6f7f5;border-left:2px solid #fff}
 .post-pin-label{font-size:8px;letter-spacing:0.18em;color:#888;font-weight:600;margin-bottom:8px}
 .post-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px}
 .post-author{display:flex;align-items:center;gap:9px}
 .post-av-img{width:30px;height:30px;border-radius:50%;object-fit:cover;border:1px solid #888;flex-shrink:0}
-.post-av-init{width:30px;height:30px;border-radius:50%;background:#f6f7f5;border:1px solid #d9e2cc;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:11px;color:#777;flex-shrink:0}
-.post-av-init.admin-av{border-color:#c3d1ac;color:#aaa}
+.post-av-init{width:30px;height:30px;border-radius:50%;background:#f6f7f5;border:1px solid #111111;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:11px;color:#777;flex-shrink:0}
+.post-av-init.admin-av{border-color:#111111;color:#aaa}
 .post-name{font-size:12px;letter-spacing:0.06em;color:#181818;font-weight:600}
 .post-badge{font-size:8px;letter-spacing:0.14em;color:#777;font-weight:600;margin-top:1px}
 .post-badge.admin-badge{color:#aaa}
-.post-time{font-size:9px;letter-spacing:0.06em;color:#c3d1ac;font-weight:500;white-space:nowrap;margin-top:2px}
-.post-content{font-size:13px;color:#d9e2cc;line-height:1.65;font-weight:300;word-break:break-word;margin-bottom:10px}
+.post-time{font-size:9px;letter-spacing:0.06em;color:#111111;font-weight:500;white-space:nowrap;margin-top:2px}
+.post-content{font-size:13px;color:#111111;line-height:1.65;font-weight:300;word-break:break-word;margin-bottom:10px}
 .post-actions{display:flex;align-items:center;gap:14px}
 .post-like-btn{display:flex;align-items:center;gap:5px;background:none;border:none;cursor:pointer;padding:0;transition:opacity .15s}
 .post-like-btn:hover{opacity:0.7}
 .post-like-icon{font-size:14px;line-height:1;color:#cc2200}
 .post-like-count{font-size:10px;letter-spacing:0.06em;color:#888;font-weight:500}
 .post-like-btn.liked .post-like-count{color:#cc2200}
-.post-delete{background:none;border:none;color:#d9e2cc;cursor:pointer;font-size:10px;font-family:'DM Sans',sans-serif;letter-spacing:0.06em;transition:color .15s;font-weight:500}
+.post-delete{background:none;border:none;color:#111111;cursor:pointer;font-size:10px;font-family:'DM Sans',sans-serif;letter-spacing:0.06em;transition:color .15s;font-weight:500}
 .post-delete:hover{color:#e06040}
-.post-pin-btn{background:none;border:none;color:#c3d1ac;cursor:pointer;font-size:10px;font-family:'DM Sans',sans-serif;letter-spacing:0.06em;transition:color .15s;font-weight:500}
+.post-pin-btn{background:none;border:none;color:#111111;cursor:pointer;font-size:10px;font-family:'DM Sans',sans-serif;letter-spacing:0.06em;transition:color .15s;font-weight:500}
 .post-pin-btn:hover{color:#aaa}
 .post-pin-btn.pinned{color:#888}
-.tab-bar{display:flex;border-top:1px solid #c3d1ac;border-bottom:1px solid #c3d1ac;margin-top:auto;background:#f6f7f5;overflow-x:auto}
+.tab-bar{display:flex;border-top:1px solid #111111;border-bottom:1px solid #111111;margin-top:auto;background:#f6f7f5;overflow-x:auto}
 .tab-btn{flex:1 0 auto;min-width:64px;padding:12px 10px;background:none;border:1px solid transparent;margin:-1px 0;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:8.5px;letter-spacing:0.1em;color:#777;font-weight:600;transition:color .15s;white-space:nowrap;position:relative}
 .tab-btn.ta{color:#181818;background:#edefea;border-top-color:#181818;border-bottom-color:#181818}
-.tab-btn:hover:not(.ta){color:#d9e2cc}
+.tab-btn:hover:not(.ta){color:#111111}
 .tab-dot{position:absolute;top:8px;right:calc(50% - 14px);width:7px;height:7px;background:#e06040;border-radius:50%;border:1px solid #ffffff}
-.post-reply-btn{background:none;border:none;color:#c3d1ac;cursor:pointer;font-size:10px;font-family:'DM Sans',sans-serif;letter-spacing:0.06em;transition:color .15s;font-weight:500}
+.post-reply-btn{background:none;border:none;color:#111111;cursor:pointer;font-size:10px;font-family:'DM Sans',sans-serif;letter-spacing:0.06em;transition:color .15s;font-weight:500}
 .post-reply-btn:hover{color:#aaa}
 .reply-compose{background:#f6f7f5;border:1px solid #888;border-radius:6px;padding:10px;margin-top:8px}
 .reply-textarea{width:100%;background:transparent;border:none;color:#181818;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:300;resize:none;outline:none;min-height:44px;line-height:1.6}
-.reply-textarea::placeholder{color:#c3d1ac}
+.reply-textarea::placeholder{color:#111111}
 .reply-footer{display:flex;align-items:center;justify-content:space-between;margin-top:6px;padding-top:6px;border-top:1px solid #f6f7f5}
 .reply-post-btn{font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:0.12em;padding:6px 14px;background:#8cc63e;color:#000;border:none;border-radius:3px;cursor:pointer}
 .reply-post-btn:disabled{background:#edefea;color:#555;cursor:not-allowed}
@@ -170,13 +170,13 @@ html,body{background:#ffffff;min-height:100vh}
 .reply-card{background:#f6f7f5;border-left:2px solid #8cc63e;padding:8px 10px;margin-top:6px;border-radius:0 4px 4px 0}
 .reply-author{font-size:10px;color:#666;font-weight:600;letter-spacing:0.06em;margin-bottom:3px}
 .reply-author span{color:#8cc63e}
-.reply-content{font-size:12px;color:#d9e2cc;line-height:1.6;font-weight:300}
+.reply-content{font-size:12px;color:#111111;line-height:1.6;font-weight:300}
 .tag-highlight{color:#8cc63e;font-weight:500}
-.tag-dropdown{position:absolute;bottom:100%;left:0;right:0;background:#f6f7f5;border:1px solid #d9e2cc;border-radius:6px;max-height:160px;overflow-y:auto;z-index:50;margin-bottom:4px}
-.tag-option{padding:8px 12px;font-size:12px;color:#d9e2cc;cursor:pointer;transition:background .1s}
+.tag-dropdown{position:absolute;bottom:100%;left:0;right:0;background:#f6f7f5;border:1px solid #111111;border-radius:6px;max-height:160px;overflow-y:auto;z-index:50;margin-bottom:4px}
+.tag-option{padding:8px 12px;font-size:12px;color:#111111;cursor:pointer;transition:background .1s}
 .tag-option:hover{background:#f6f7f5}
 .compose-wrap{position:relative}
-.foot{text-align:center;font-size:9px;letter-spacing:0.22em;color:#181818;padding:9px 0 4px}
+.foot{text-align:center;font-size:9px;letter-spacing:0.22em;color:#1d9bf0;padding:9px 0 4px}
 .toast{position:fixed;bottom:68px;left:50%;transform:translateX(-50%);background:#8cc63e;color:#000;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:0.15em;padding:10px 22px;border-radius:3px;pointer-events:none;transition:opacity .3s;z-index:200;white-space:nowrap;opacity:0}
 .toast.show{opacity:1}
 .auth-page{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;background:#ffffff;font-family:'DM Sans',sans-serif}
@@ -185,26 +185,26 @@ html,body{background:#ffffff;min-height:100vh}
 .auth-tag{font-size:8px;letter-spacing:0.22em;color:#555;margin-bottom:48px;font-weight:600;text-align:center}
 .auth-card{width:100%;max-width:380px}
 .auth-title{font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:0.1em;margin-bottom:24px;color:#181818}
-.fl{display:block;font-size:10px;letter-spacing:0.18em;color:#d9e2cc;font-weight:600;margin-bottom:7px}
-.fi{width:100%;background:#f6f7f5;border:1px solid #d9e2cc;color:#181818;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:300;padding:14px 15px;margin-bottom:12px;outline:none;border-radius:3px;transition:border-color .2s;-webkit-appearance:none}
+.fl{display:block;font-size:10px;letter-spacing:0.18em;color:#111111;font-weight:600;margin-bottom:7px}
+.fi{width:100%;background:#f6f7f5;border:1px solid #111111;color:#181818;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:300;padding:14px 15px;margin-bottom:12px;outline:none;border-radius:3px;transition:border-color .2s;-webkit-appearance:none}
 .fi:focus{border-color:#555}
-.fi::placeholder{color:#c3d1ac}
+.fi::placeholder{color:#111111}
 .auth-btn{width:100%;background:#8cc63e;color:#000;border:none;font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:0.18em;padding:18px;cursor:pointer;border-radius:3px;margin-top:4px;transition:background .15s}
-.auth-btn:hover:not(:disabled){background:#d9e2cc}
-.auth-btn:disabled{background:#f6f7f5;color:#c3d1ac;cursor:not-allowed}
+.auth-btn:hover:not(:disabled){background:#111111}
+.auth-btn:disabled{background:#f6f7f5;color:#111111;cursor:not-allowed}
 .auth-err{font-size:12px;color:#e06040;letter-spacing:0.04em;margin-top:12px;line-height:1.5}
 .auth-sw{text-align:center;margin-top:22px;font-size:12px;color:#888;letter-spacing:0.04em}
-.auth-sw button{background:none;border:none;color:#d9e2cc;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:12px;text-decoration:underline;text-underline-offset:3px;font-weight:500}
+.auth-sw button{background:none;border:none;color:#111111;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:12px;text-decoration:underline;text-underline-offset:3px;font-weight:500}
 .auth-sw button:hover{color:#181818}
 .auth-reg{text-align:center;margin-top:14px;font-size:11px;color:#555;letter-spacing:0.04em}
 .auth-reg a{color:#888;text-decoration:underline;text-underline-offset:3px}
 .auth-reg a:hover{color:#181818}
 .auth-guest-divider{display:flex;align-items:center;gap:10px;margin:20px 0 4px}
 .auth-guest-divider::before,.auth-guest-divider::after{content:"";flex:1;height:1px;background:#edefea}
-.auth-guest-divider span{font-size:9px;letter-spacing:0.18em;color:#d9e2cc;font-weight:600}
+.auth-guest-divider span{font-size:9px;letter-spacing:0.18em;color:#111111;font-weight:600}
 .auth-guest{text-align:center;margin-top:10px;font-size:11px;color:#555;letter-spacing:0.04em}
 .auth-guest a{color:#777;text-decoration:underline;text-underline-offset:3px;font-weight:500}
-.auth-guest a:hover{color:#d9e2cc}
+.auth-guest a:hover{color:#111111}
 .prof-overlay{position:fixed;inset:0;background:#ffffff;z-index:50;display:flex;flex-direction:column;max-width:480px;margin:0 auto;overflow-y:auto}
 .prof-hdr{display:flex;align-items:center;justify-content:space-between;padding:20px 20px 0;flex-shrink:0}
 .prof-title{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:0.15em;color:#181818}
@@ -213,22 +213,22 @@ html,body{background:#ffffff;min-height:100vh}
 .prof-body{padding:22px 20px 48px}
 .prof-since{font-size:10px;letter-spacing:0.18em;color:#777;margin-bottom:22px;font-weight:500}
 .photo-wrap{display:flex;flex-direction:column;align-items:center;margin-bottom:26px}
-.avatar-lg{width:90px;height:90px;border-radius:50%;object-fit:cover;border:2px solid #d9e2cc}
-.avatar-init-lg{width:90px;height:90px;border-radius:50%;background:#f6f7f5;border:2px solid #d9e2cc;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:34px;color:#555}
+.avatar-lg{width:90px;height:90px;border-radius:50%;object-fit:cover;border:2px solid #111111}
+.avatar-init-lg{width:90px;height:90px;border-radius:50%;background:#f6f7f5;border:2px solid #111111;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:34px;color:#555}
 .prof-name-lbl{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.1em;color:#181818;margin-top:12px}
 .photo-btn{margin-top:7px;background:none;border:none;color:#888;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:0.12em;transition:color .15s;text-decoration:underline;text-underline-offset:3px;font-weight:500}
 .photo-btn:hover{color:#181818}
 .prof-section{font-size:9px;letter-spacing:0.22em;color:#777;font-weight:600;margin:20px 0 13px;border-top:1px solid #f6f7f5;padding-top:20px}
 .prof-save{width:100%;background:#8cc63e;color:#000;border:none;font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:0.18em;padding:17px;cursor:pointer;border-radius:3px;margin-top:6px;transition:background .15s}
-.prof-save:hover:not(:disabled){background:#d9e2cc}
-.prof-save:disabled{background:#f6f7f5;color:#c3d1ac;cursor:not-allowed}
-.prof-logout{width:100%;background:transparent;color:#777;border:1px solid #d9e2cc;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:0.18em;padding:15px;cursor:pointer;border-radius:3px;margin-top:10px;transition:all .15s}
+.prof-save:hover:not(:disabled){background:#111111}
+.prof-save:disabled{background:#f6f7f5;color:#111111;cursor:not-allowed}
+.prof-logout{width:100%;background:transparent;color:#777;border:1px solid #111111;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:0.18em;padding:15px;cursor:pointer;border-radius:3px;margin-top:10px;transition:all .15s}
 .prof-logout:hover{border-color:#888;color:#aaa}
 .prof-err{font-size:12px;color:#e06040;letter-spacing:0.04em;margin-top:10px;line-height:1.5}
 .prof-ok{font-size:12px;color:#4aaa88;letter-spacing:0.06em;margin-top:10px;font-weight:500}
 .crop-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.97);z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
 .crop-title{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:0.15em;color:#181818;margin-bottom:20px}
-.crop-canvas-wrap{position:relative;width:280px;height:280px;border-radius:50%;overflow:hidden;border:2px solid #c3d1ac;cursor:grab;touch-action:none}
+.crop-canvas-wrap{position:relative;width:280px;height:280px;border-radius:50%;overflow:hidden;border:2px solid #111111;cursor:grab;touch-action:none}
 .crop-canvas-wrap:active{cursor:grabbing}
 .crop-hint{font-size:11px;letter-spacing:0.1em;color:#777;margin-top:16px;text-align:center;line-height:1.8;font-weight:500}
 .crop-actions{display:flex;gap:10px;margin-top:22px;width:100%;max-width:280px}
@@ -236,7 +236,7 @@ html,body{background:#ffffff;min-height:100vh}
 .crop-save{flex:1;background:#8cc63e;color:#000;border:none;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:0.15em;padding:14px;cursor:pointer;border-radius:3px}
 .zoom-wrap{display:flex;align-items:center;gap:12px;margin-top:16px;width:100%;max-width:280px}
 .zoom-lbl{font-size:9px;letter-spacing:0.18em;color:#777;font-weight:600;white-space:nowrap}
-.zoom-slider{flex:1;-webkit-appearance:none;appearance:none;height:2px;background:#d9e2cc;border-radius:1px;outline:none;cursor:pointer}
+.zoom-slider{flex:1;-webkit-appearance:none;appearance:none;height:2px;background:#111111;border-radius:1px;outline:none;cursor:pointer}
 .zoom-slider::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:#8cc63e;cursor:pointer}
 .loading-screen{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#ffffff;font-family:'DM Sans',sans-serif;font-size:10px;letter-spacing:0.2em;color:#555;gap:16px}
 .loading-bar{width:120px;height:1px;background:#f6f7f5;border-radius:1px;overflow:hidden}
@@ -244,12 +244,12 @@ html,body{background:#ffffff;min-height:100vh}
 @keyframes ld{0%{width:0}50%{width:100%}100%{width:0}}
 .adm-wrap{padding:16px;flex:1;overflow-y:auto}
 .adm-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.15em;color:#181818;margin-bottom:16px}
-.adm-seg{display:flex;border-top:1px solid #c3d1ac;border-bottom:1px solid #c3d1ac;margin-bottom:16px;background:#f6f7f5;overflow-x:auto;scrollbar-width:none}
+.adm-seg{display:flex;border-top:1px solid #111111;border-bottom:1px solid #111111;margin-bottom:16px;background:#f6f7f5;overflow-x:auto;scrollbar-width:none}
 .adm-seg::-webkit-scrollbar{display:none}
-.adm-seg-btn{flex:1 0 auto;min-width:76px;padding:9px 12px;background:none;border:1px solid transparent;border-right:1px solid #d9e2cc;margin:-1px 0;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:10px;letter-spacing:0.14em;color:#666;font-weight:600;transition:all .15s;white-space:nowrap}
+.adm-seg-btn{flex:1 0 auto;min-width:76px;padding:9px 12px;background:none;border:1px solid transparent;border-right:1px solid #111111;margin:-1px 0;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:10px;letter-spacing:0.14em;color:#666;font-weight:600;transition:all .15s;white-space:nowrap}
 .adm-seg-btn:last-child{border-right-color:transparent}
 .adm-seg-btn.aas{color:#181818;background:#edefea;border-top-color:#181818;border-bottom-color:#181818}
-.adm-seg-btn:hover:not(.aas){color:#d9e2cc}
+.adm-seg-btn:hover:not(.aas){color:#111111}
 .adm-day-nav{display:flex;align-items:center;gap:8px;margin-bottom:14px}
 .adm-day-lbl{flex:1;text-align:center;font-size:10px;letter-spacing:0.18em;color:#181818;font-weight:600}
 .adm-arrow{background:none;border:none;color:#888;cursor:pointer;font-size:22px;padding:4px 8px;line-height:1;transition:color .15s}
@@ -263,7 +263,7 @@ html,body{background:#ffffff;min-height:100vh}
 .adm-class-count.full{color:#e06040}
 .adm-class-count.has-bk{color:#4aaa66}
 .adm-class-bars{display:flex;gap:2px;margin-top:5px}
-.adm-bar{flex:1;height:2px;border-radius:1px;background:#d9e2cc}
+.adm-bar{flex:1;height:2px;border-radius:1px;background:#111111}
 .adm-bar.at{background:#4aaa66}
 .adm-chev{font-size:14px;color:#555;transition:transform .2s}
 .adm-chev.open{transform:rotate(180deg)}
@@ -274,17 +274,17 @@ html,body{background:#ffffff;min-height:100vh}
 .adm-member-email{font-size:10px;color:#666;letter-spacing:0.04em;margin-top:1px}
 .adm-remove-btn{font-size:10px;color:#4a1008;background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;letter-spacing:0.06em;transition:color .15s;font-weight:500}
 .adm-remove-btn:hover{color:#e06040}
-.adm-empty{text-align:center;padding:14px;font-size:10px;letter-spacing:0.14em;color:#d9e2cc;font-weight:500}
-.adm-no-classes{text-align:center;padding:48px 0;font-size:11px;letter-spacing:0.16em;color:#d9e2cc;line-height:2.4}
+.adm-empty{text-align:center;padding:14px;font-size:10px;letter-spacing:0.14em;color:#111111;font-weight:500}
+.adm-no-classes{text-align:center;padding:48px 0;font-size:11px;letter-spacing:0.16em;color:#111111;line-height:2.4}
 .adm-stats-row{display:flex;gap:8px;margin-bottom:16px}
 .adm-stat{flex:1;background:#f6f7f5;border:1px solid #888;border-radius:7px;padding:12px;text-align:center}
 .adm-stat-num{font-family:'Bebas Neue',sans-serif;font-size:32px;color:#181818;line-height:1}
 .adm-stat-lbl{font-size:9px;letter-spacing:0.16em;color:#666;font-weight:600;margin-top:3px}
 .adm-member-card{background:#f6f7f5;border:1px solid #888;border-radius:8px;padding:14px;margin-bottom:8px;cursor:pointer;transition:border-color .15s}
-.adm-member-card:hover{border-color:#d9e2cc}
+.adm-member-card:hover{border-color:#111111}
 .adm-mc-top{display:flex;align-items:center;justify-content:space-between}
 .adm-mc-name{font-family:'Bebas Neue',sans-serif;font-size:18px;color:#181818;letter-spacing:0.06em}
-.adm-mc-chev{font-size:14px;color:#c3d1ac}
+.adm-mc-chev{font-size:14px;color:#111111}
 .adm-mc-detail{font-size:10px;letter-spacing:0.08em;color:#777;font-weight:500;margin-top:3px}
 .adm-mc-detail span{color:#aaa}
 .member-profile-overlay{position:fixed;inset:0;background:#ffffff;z-index:60;display:flex;flex-direction:column;max-width:480px;margin:0 auto;overflow-y:auto;animation:su .2s ease}
@@ -294,7 +294,7 @@ html,body{background:#ffffff;min-height:100vh}
 .mp-close{background:none;border:none;color:#888;font-size:20px;cursor:pointer;padding:4px;line-height:1;transition:color .15s}
 .mp-close:hover{color:#181818}
 .mp-body{padding:20px 20px 48px}
-.mp-avatar{width:64px;height:64px;border-radius:50%;object-fit:cover;border:2px solid #d9e2cc}
+.mp-avatar{width:64px;height:64px;border-radius:50%;object-fit:cover;border:2px solid #111111}
 .mp-avatar-init{width:64px;height:64px;border-radius:50%;background:#f6f7f5;border:2px solid #edefea;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:24px;color:#555}
 .mp-top{display:flex;align-items:center;gap:16px;margin-bottom:24px}
 .mp-name{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:0.08em;color:#181818}
@@ -304,10 +304,10 @@ html,body{background:#ffffff;min-height:100vh}
 .mp-row{display:flex;justify-content:space-between;align-items:flex-start;padding:8px 0;border-bottom:1px solid #f6f7f5}
 .mp-row:last-child{border-bottom:none}
 .mp-label{font-size:10px;letter-spacing:0.1em;color:#555;font-weight:500;flex-shrink:0;margin-right:12px}
-.mp-value{font-size:11px;color:#d9e2cc;font-weight:400;text-align:right;line-height:1.5}
+.mp-value{font-size:11px;color:#111111;font-weight:400;text-align:right;line-height:1.5}
 .mp-value.yes{color:#4aaa66}
 .mp-value.no{color:#e06040}
-.mp-value.na{color:#c3d1ac}
+.mp-value.na{color:#111111}
 .mp-bks-count{font-family:'Bebas Neue',sans-serif;font-size:28px;color:#181818;margin-bottom:2px}
 .mp-bks-lbl{font-size:9px;letter-spacing:0.16em;color:#555}
 .parq-flag{display:inline-block;padding:2px 8px;border-radius:2px;font-size:9px;letter-spacing:0.1em;font-weight:600}
@@ -322,24 +322,24 @@ html,body{background:#ffffff;min-height:100vh}
 .sp-total-card{flex:1;background:#f6f7f5;border:1px solid #888;border-radius:6px;padding:10px 8px;text-align:center}
 .sp-total-num{font-family:'Bebas Neue',sans-serif;font-size:26px;color:#181818;line-height:1}
 .sp-total-lbl{font-size:8px;letter-spacing:0.13em;color:#555;font-weight:600;margin-top:3px}
-.sp-locked{text-align:center;padding:40px 20px;font-size:10px;letter-spacing:0.18em;color:#d9e2cc;line-height:2.4}
+.sp-locked{text-align:center;padding:40px 20px;font-size:10px;letter-spacing:0.18em;color:#111111;line-height:2.4}
 .sp-wk.spwl{color:#edefea;border-color:#f6f7f5;cursor:default;pointer-events:none}
 .prof-hdr-new{display:flex;flex-direction:column;align-items:center;padding:36px 20px 0;flex-shrink:0;position:relative}
 .prof-close-abs{position:absolute;top:20px;right:20px;background:none;border:none;color:#888;font-size:20px;cursor:pointer;padding:4px;line-height:1;transition:color .15s}
 .prof-close-abs:hover{color:#181818}
-.prof-hdr-avatar{width:84px;height:84px;border-radius:50%;object-fit:cover;border:2px solid #d9e2cc;margin-bottom:10px}
-.prof-hdr-avatar-init{width:84px;height:84px;border-radius:50%;background:#f6f7f5;border:2px solid #d9e2cc;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:32px;color:#555;margin-bottom:10px}
+.prof-hdr-avatar{width:84px;height:84px;border-radius:50%;object-fit:cover;border:2px solid #111111;margin-bottom:10px}
+.prof-hdr-avatar-init{width:84px;height:84px;border-radius:50%;background:#f6f7f5;border:2px solid #111111;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:32px;color:#555;margin-bottom:10px}
 .prof-hdr-name{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:0.1em;color:#181818;margin-bottom:2px}
 .prof-hdr-sublabel{font-size:8px;letter-spacing:0.18em;color:#555;font-weight:600;margin-bottom:14px}
 .prof-hdr-brand{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:0.2em;color:#181818;margin-bottom:3px}
-.prof-hdr-powered{font-size:8px;letter-spacing:0.1em;color:#c3d1ac;margin-bottom:3px}
+.prof-hdr-powered{font-size:8px;letter-spacing:0.1em;color:#111111;margin-bottom:3px}
 .prof-hdr-site{font-size:9px;letter-spacing:0.06em;color:#8cc63e;text-decoration:none}
 .prof-hdr-site:hover{text-decoration:underline}
 .prof-hdr-divider{width:100%;border:none;border-top:1px solid #f6f7f5;margin:16px 0 0}
 .prof-tab-btn:hover:not(.pta){color:#aaa}
 .sp-wrap{padding:20px 20px 48px}
 .sp-toggle{display:flex;gap:6px;margin-bottom:16px}
-.sp-toggle-btn{flex:1;padding:10px;background:#f6f7f5;border:1px solid #d9e2cc;border-radius:5px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:0.14em;color:#666;cursor:pointer;transition:all .15s}
+.sp-toggle-btn{flex:1;padding:10px;background:#f6f7f5;border:1px solid #111111;border-radius:5px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:0.14em;color:#666;cursor:pointer;transition:all .15s}
 .sp-toggle-btn.spta{background:#8cc63e;color:#000;border-color:#181818}
 .sp-weeks{display:flex;gap:6px;margin-bottom:20px}
 .sp-wk{flex:1;padding:8px 4px;background:#f6f7f5;border:1px solid #888;border-radius:4px;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:0.1em;color:#555;cursor:pointer;transition:all .15s;text-align:center}
@@ -352,35 +352,35 @@ html,body{background:#ffffff;min-height:100vh}
 .sp-ex-name{font-size:13px;color:#181818;font-weight:500;line-height:1.4}
 .sp-ex-meta{font-size:10px;letter-spacing:0.06em;color:#555;margin-top:3px}
 .sp-ex-edit{background:none;border:1px solid #edefea;color:#555;font-size:9px;letter-spacing:0.1em;padding:3px 7px;border-radius:3px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;flex-shrink:0;transition:color .15s}
-.sp-ex-edit:hover{color:#aaa;border-color:#c3d1ac}
+.sp-ex-edit:hover{color:#aaa;border-color:#111111}
 .sp-weight-row{display:flex;align-items:center;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid #f6f7f5}
 .sp-weight-lbl{font-size:9px;letter-spacing:0.14em;color:#555;font-weight:600;flex-shrink:0}
 .sp-weight-saved{font-size:12px;color:#aaa;font-weight:500;flex:1}
-.sp-weight-input{flex:1;background:#f6f7f5;border:1px solid #d9e2cc;border-radius:4px;padding:7px 10px;color:#181818;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;transition:border-color .15s}
+.sp-weight-input{flex:1;background:#f6f7f5;border:1px solid #111111;border-radius:4px;padding:7px 10px;color:#181818;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;transition:border-color .15s}
 .sp-weight-input:focus{border-color:#555}
-.sp-weight-input::placeholder{color:#d9e2cc}
+.sp-weight-input::placeholder{color:#111111}
 .sp-weight-save{background:#8cc63e;color:#000;border:none;border-radius:3px;font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:0.1em;padding:7px 12px;cursor:pointer;flex-shrink:0}
 .sp-weight-save:disabled{background:#edefea;color:#555;cursor:not-allowed}
-.sp-edit-form{background:#f6f7f5;border:1px solid #d9e2cc;border-radius:6px;padding:12px;margin-bottom:6px}
+.sp-edit-form{background:#f6f7f5;border:1px solid #111111;border-radius:6px;padding:12px;margin-bottom:6px}
 .sp-edit-lbl{font-size:9px;letter-spacing:0.14em;color:#555;font-weight:600;margin-bottom:5px}
-.sp-edit-input{width:100%;background:#f6f7f5;border:1px solid #d9e2cc;border-radius:4px;padding:8px 10px;color:#181818;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;margin-bottom:8px}
+.sp-edit-input{width:100%;background:#f6f7f5;border:1px solid #111111;border-radius:4px;padding:8px 10px;color:#181818;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;margin-bottom:8px}
 .sp-edit-row{display:flex;gap:6px;margin-bottom:8px}
 .sp-edit-row .sp-edit-input{margin-bottom:0}
 .sp-edit-actions{display:flex;gap:6px}
 .sp-edit-save{flex:1;background:#8cc63e;color:#000;border:none;border-radius:3px;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:0.12em;padding:10px;cursor:pointer}
 .sp-edit-cancel{background:none;border:1px solid #888;color:#666;border-radius:3px;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:0.12em;padding:10px 14px;cursor:pointer}
-.sp-loading{text-align:center;padding:48px 0;font-size:10px;letter-spacing:0.2em;color:#d9e2cc}
+.sp-loading{text-align:center;padding:48px 0;font-size:10px;letter-spacing:0.2em;color:#111111}
 .sp-section-hdr.spsh-first{border-top:none;padding-top:0;margin-top:0}
 .sp-ticks-row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
-.sp-tick{width:34px;height:34px;border-radius:50%;background:#f6f7f5;border:1px solid #edefea;color:#c3d1ac;font-family:'Bebas Neue',sans-serif;font-size:14px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;line-height:1}
+.sp-tick{width:34px;height:34px;border-radius:50%;background:#f6f7f5;border:1px solid #edefea;color:#111111;font-family:'Bebas Neue',sans-serif;font-size:14px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;line-height:1}
 .sp-tick.sptd{background:#0d2b1a;border-color:#4aaa66;color:#4aaa66}
 .sp-sets-col{display:flex;flex-direction:column;gap:6px;margin-top:10px;padding-top:10px;border-top:1px solid #f6f7f5}
 .sp-set-row{display:flex;align-items:center;gap:8px}
-.sp-set-lbl{font-size:10px;letter-spacing:0.1em;color:#c3d1ac;font-weight:600;width:22px;flex-shrink:0}
+.sp-set-lbl{font-size:10px;letter-spacing:0.1em;color:#111111;font-weight:600;width:22px;flex-shrink:0}
 .sp-set-input{width:62px;background:#f6f7f5;border:1px solid #edefea;border-radius:4px;padding:8px 8px;color:#181818;font-family:'DM Sans',sans-serif;font-size:15px;outline:none;text-align:center;-webkit-appearance:none;appearance:none}
 .sp-set-input:focus{border-color:#555}
-.sp-set-kg{font-size:10px;color:#c3d1ac;letter-spacing:0.08em;flex-shrink:0}
-.sp-set-reps{font-size:10px;color:#d9e2cc;letter-spacing:0.06em;flex-shrink:0}
+.sp-set-kg{font-size:10px;color:#111111;letter-spacing:0.08em;flex-shrink:0}
+.sp-set-reps{font-size:10px;color:#111111;letter-spacing:0.06em;flex-shrink:0}
 .sp-month-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding:2px 0}
 .sp-month-arrow{background:none;border:none;color:#555;font-size:22px;cursor:pointer;padding:4px 12px;line-height:1;transition:color .15s}
 .sp-month-arrow:hover:not(:disabled){color:#181818}
@@ -485,12 +485,12 @@ function openAddToCalendar(opts){
   const close=()=>{if(ov.parentNode)ov.parentNode.removeChild(ov);};
   ov.addEventListener("click",ev=>{if(ev.target===ov)close();});
   const card=document.createElement("div");
-  card.style.cssText="background:#f6f7f5;border:1px solid #d9e2cc;border-radius:14px;padding:22px 20px;max-width:340px;width:100%;text-align:center;font-family:'DM Sans',sans-serif";
+  card.style.cssText="background:#f6f7f5;border:1px solid #111111;border-radius:14px;padding:22px 20px;max-width:340px;width:100%;text-align:center;font-family:'DM Sans',sans-serif";
   card.innerHTML='<div style="font-family:\'Bebas Neue\',sans-serif;font-size:20px;letter-spacing:0.09em;color:#181818;margin-bottom:6px">ADD TO CALENDAR</div><div style="font-size:12px;color:#8aa;line-height:1.5;margin-bottom:16px">'+htmlEsc(opts.title)+'<br>'+htmlEsc(label)+'</div>';
   const mkb=(txt,bg,fg,bd,fn)=>{const b=document.createElement("button");b.textContent=txt;b.style.cssText="display:block;width:100%;margin-bottom:8px;padding:11px 0;border-radius:7px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:0.1em;cursor:pointer;background:"+bg+";color:"+fg+";border:1px solid "+bd;b.onclick=fn;return b;};
   card.appendChild(mkb("GOOGLE CALENDAR","#8cc63e","#fff","#8cc63e",()=>{window.open(g,"_blank");close();}));
   card.appendChild(mkb("APPLE / OUTLOOK","#eef7e0","#8cc63e","#bfe08a",()=>{try{const blob=new Blob([ics],{type:"text/calendar;charset=utf-8"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=(opts.title||"event").replace(/[^\w]+/g,"-")+".ics";document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(()=>URL.revokeObjectURL(url),3000);}catch(err){}close();}));
-  card.appendChild(mkb("NOT NOW","none","#666","#d9e2cc",close));
+  card.appendChild(mkb("NOT NOW","none","#666","#111111",close));
   ov.appendChild(card);document.body.appendChild(ov);
 }
 const hashPw=s=>{let h=5381;for(let i=0;i<s.length;i++)h=((h<<5)+h)^s.charCodeAt(i);return(h>>>0).toString(36);};
@@ -598,7 +598,7 @@ function MemberProfileOverlay({member,bookings,onClose,currentUserIsAdmin}){
     const set=new Set(base);set.has(id)?set.delete(id):set.add(id);
     saveAccess([...set]);
   }
-  const accSegBtn=active=>({flex:1,background:active?"#8cc63e":"transparent",color:active?"#fff":"#888",border:"1px solid "+(active?"#8cc63e":"#d9e2cc"),borderRadius:4,fontFamily:"'Bebas Neue',sans-serif",fontSize:11,letterSpacing:"0.06em",padding:"9px 4px",cursor:"pointer"});
+  const accSegBtn=active=>({flex:1,background:active?"#8cc63e":"transparent",color:active?"#fff":"#888",border:"1px solid "+(active?"#8cc63e":"#111111"),borderRadius:4,fontFamily:"'Bebas Neue',sans-serif",fontSize:11,letterSpacing:"0.06em",padding:"9px 4px",cursor:"pointer"});
   const [editingEmergency,setEditingEmergency]=useState(false);
   const [emergencyEdits,setEmergencyEdits]=useState({emergency_name:"",emergency_phone:""});
   const [editingMembership,setEditingMembership]=useState(false);
@@ -702,7 +702,7 @@ function MemberProfileOverlay({member,bookings,onClose,currentUserIsAdmin}){
           !editingMembership&&React.createElement("div",{className:"mp-value",style:{color:member.membership_type?"#8cc63e":"#555"}},member.membership_type||"—"),
           currentUserIsAdmin&&React.createElement("button",{
             onClick:()=>{setMembershipEdit(member.membership_type||"");setEditingMembership(e=>!e);},
-            style:{background:"none",border:"1px solid #d9e2cc",color:"#888",fontSize:9,letterSpacing:"0.12em",padding:"3px 8px",borderRadius:3,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",fontWeight:600,flexShrink:0}
+            style:{background:"none",border:"1px solid #111111",color:"#888",fontSize:9,letterSpacing:"0.12em",padding:"3px 8px",borderRadius:3,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",fontWeight:600,flexShrink:0}
           },editingMembership?"CANCEL":"EDIT")
         )
       ),
@@ -710,7 +710,7 @@ function MemberProfileOverlay({member,bookings,onClose,currentUserIsAdmin}){
         React.createElement("select",{
           value:membershipEdit,
           onChange:e=>setMembershipEdit(e.target.value),
-          style:{width:"100%",background:"#f6f7f5",border:"1px solid #d9e2cc",color:"#181818",fontFamily:"'DM Sans',sans-serif",fontSize:14,fontWeight:300,padding:"10px 12px",borderRadius:3,outline:"none",marginBottom:8,cursor:"pointer"}
+          style:{width:"100%",background:"#f6f7f5",border:"1px solid #111111",color:"#181818",fontFamily:"'DM Sans',sans-serif",fontSize:14,fontWeight:300,padding:"10px 12px",borderRadius:3,outline:"none",marginBottom:8,cursor:"pointer"}
         },
           React.createElement("option",{value:""},"Select membership..."),
           ["FOUNDATION MEMBER - 3 months","FOUNDATION MEMBER - 6 months","FOUNDATION MEMBER - 12 months",
@@ -751,18 +751,18 @@ function MemberProfileOverlay({member,bookings,onClose,currentUserIsAdmin}){
             if(!editingEmergency){setEmergencyEdits({emergency_name:member.emergency_name||"",emergency_phone:member.emergency_phone||""});}
             setEditingEmergency(e=>!e);
           },
-          style:{background:"none",border:"1px solid #d9e2cc",color:"#888",fontSize:9,letterSpacing:"0.12em",padding:"3px 8px",borderRadius:3,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",fontWeight:600}
+          style:{background:"none",border:"1px solid #111111",color:"#888",fontSize:9,letterSpacing:"0.12em",padding:"3px 8px",borderRadius:3,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",fontWeight:600}
         },editingEmergency?"CANCEL":"EDIT")
       ),
       editingEmergency
         ?React.createElement(React.Fragment,null,
           React.createElement("div",{style:{marginBottom:8}},
             React.createElement("div",{style:{fontSize:9,color:"#666",letterSpacing:"0.1em",marginBottom:4}},"CONTACT NAME"),
-            React.createElement("input",{value:emergencyEdits.emergency_name,onChange:e=>setEmergencyEdits(p=>({...p,emergency_name:e.target.value})),style:{width:"100%",background:"#f6f7f5",border:"1px solid #d9e2cc",color:"#181818",fontFamily:"'DM Sans',sans-serif",fontSize:14,fontWeight:300,padding:"10px 12px",borderRadius:3,outline:"none"}})
+            React.createElement("input",{value:emergencyEdits.emergency_name,onChange:e=>setEmergencyEdits(p=>({...p,emergency_name:e.target.value})),style:{width:"100%",background:"#f6f7f5",border:"1px solid #111111",color:"#181818",fontFamily:"'DM Sans',sans-serif",fontSize:14,fontWeight:300,padding:"10px 12px",borderRadius:3,outline:"none"}})
           ),
           React.createElement("div",{style:{marginBottom:10}},
             React.createElement("div",{style:{fontSize:9,color:"#666",letterSpacing:"0.1em",marginBottom:4}},"CONTACT PHONE"),
-            React.createElement("input",{value:emergencyEdits.emergency_phone,onChange:e=>setEmergencyEdits(p=>({...p,emergency_phone:e.target.value})),style:{width:"100%",background:"#f6f7f5",border:"1px solid #d9e2cc",color:"#181818",fontFamily:"'DM Sans',sans-serif",fontSize:14,fontWeight:300,padding:"10px 12px",borderRadius:3,outline:"none"}})
+            React.createElement("input",{value:emergencyEdits.emergency_phone,onChange:e=>setEmergencyEdits(p=>({...p,emergency_phone:e.target.value})),style:{width:"100%",background:"#f6f7f5",border:"1px solid #111111",color:"#181818",fontFamily:"'DM Sans',sans-serif",fontSize:14,fontWeight:300,padding:"10px 12px",borderRadius:3,outline:"none"}})
           ),
           React.createElement("button",{
             onClick:async()=>{
@@ -791,7 +791,7 @@ function MemberProfileOverlay({member,bookings,onClose,currentUserIsAdmin}){
             }
             setEditingParq(e=>!e);
           },
-          style:{background:"none",border:"1px solid #d9e2cc",color:"#888",fontSize:9,letterSpacing:"0.12em",padding:"3px 8px",borderRadius:3,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",fontWeight:600}
+          style:{background:"none",border:"1px solid #111111",color:"#888",fontSize:9,letterSpacing:"0.12em",padding:"3px 8px",borderRadius:3,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",fontWeight:600}
         },editingParq?"CANCEL":"EDIT")
       ),
       editingParq
@@ -827,18 +827,18 @@ function MemberProfileOverlay({member,bookings,onClose,currentUserIsAdmin}){
         React.createElement("span",null,"MEDICAL & DECLARATIONS"),
         currentUserIsAdmin&&React.createElement("button",{
           onClick:()=>setEditingExtra(e=>!e),
-          style:{background:"none",border:"1px solid #d9e2cc",color:"#888",fontSize:9,letterSpacing:"0.12em",padding:"3px 8px",borderRadius:3,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",fontWeight:600}
+          style:{background:"none",border:"1px solid #111111",color:"#888",fontSize:9,letterSpacing:"0.12em",padding:"3px 8px",borderRadius:3,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",fontWeight:600}
         },editingExtra?"CANCEL":"EDIT")
       ),
       editingExtra
         ?React.createElement(React.Fragment,null,
           React.createElement("div",{style:{marginBottom:8}},
             React.createElement("div",{style:{fontSize:9,color:"#666",letterSpacing:"0.1em",marginBottom:4}},"INJURIES OR CONDITIONS"),
-            React.createElement("textarea",{value:extraEdits.medical_conditions,onChange:e=>setExtraEdits(p=>({...p,medical_conditions:e.target.value})),style:{width:"100%",background:"#f6f7f5",border:"1px solid #d9e2cc",color:"#181818",fontFamily:"'DM Sans',sans-serif",fontSize:13,fontWeight:300,padding:"10px 12px",borderRadius:3,outline:"none",resize:"none",minHeight:60,lineHeight:1.6}})
+            React.createElement("textarea",{value:extraEdits.medical_conditions,onChange:e=>setExtraEdits(p=>({...p,medical_conditions:e.target.value})),style:{width:"100%",background:"#f6f7f5",border:"1px solid #111111",color:"#181818",fontFamily:"'DM Sans',sans-serif",fontSize:13,fontWeight:300,padding:"10px 12px",borderRadius:3,outline:"none",resize:"none",minHeight:60,lineHeight:1.6}})
           ),
           React.createElement("div",{style:{marginBottom:8}},
             React.createElement("div",{style:{fontSize:9,color:"#666",letterSpacing:"0.1em",marginBottom:4}},"CURRENT MEDICATIONS"),
-            React.createElement("textarea",{value:extraEdits.medications,onChange:e=>setExtraEdits(p=>({...p,medications:e.target.value})),style:{width:"100%",background:"#f6f7f5",border:"1px solid #d9e2cc",color:"#181818",fontFamily:"'DM Sans',sans-serif",fontSize:13,fontWeight:300,padding:"10px 12px",borderRadius:3,outline:"none",resize:"none",minHeight:60,lineHeight:1.6}})
+            React.createElement("textarea",{value:extraEdits.medications,onChange:e=>setExtraEdits(p=>({...p,medications:e.target.value})),style:{width:"100%",background:"#f6f7f5",border:"1px solid #111111",color:"#181818",fontFamily:"'DM Sans',sans-serif",fontSize:13,fontWeight:300,padding:"10px 12px",borderRadius:3,outline:"none",resize:"none",minHeight:60,lineHeight:1.6}})
           ),
           React.createElement("div",{style:{marginBottom:8}},
             React.createElement("div",{style:{fontSize:9,color:"#666",letterSpacing:"0.1em",marginBottom:6}},"FITNESS LEVEL"),
@@ -895,7 +895,7 @@ function MemberProfileOverlay({member,bookings,onClose,currentUserIsAdmin}){
           ACCESS_TABS.map(t=>{
             const on=accTabs===null||accTabs.includes(t.id);
             return React.createElement("button",{key:t.id,onClick:()=>toggleAccTab(t.id),disabled:savingAcc,
-              style:{background:on?"#eef7e0":"transparent",color:on?"#8cc63e":"#666",border:"1px solid "+(on?"#bfe08a":"#d9e2cc"),borderRadius:14,fontSize:10,letterSpacing:"0.04em",padding:"6px 12px",cursor:"pointer",fontFamily:"'DM Sans',sans-serif",fontWeight:600}},
+              style:{background:on?"#eef7e0":"transparent",color:on?"#8cc63e":"#666",border:"1px solid "+(on?"#bfe08a":"#111111"),borderRadius:14,fontSize:10,letterSpacing:"0.04em",padding:"6px 12px",cursor:"pointer",fontFamily:"'DM Sans',sans-serif",fontWeight:600}},
               (on?"✓ ":"")+t.label);
           })
         ),
@@ -905,7 +905,7 @@ function MemberProfileOverlay({member,bookings,onClose,currentUserIsAdmin}){
             React.createElement("div",{style:{fontSize:9,color:"#555",marginTop:2,letterSpacing:"0.04em"}},"Add-on · personal training programs")
           ),
           React.createElement("button",{onClick:()=>setWorkoutsFlag(!wkEnabled),disabled:savingAcc,
-            style:{background:wkEnabled?"#fff":"#edefea",color:wkEnabled?"#000":"#555",border:"1px solid "+(wkEnabled?"#fff":"#d9e2cc"),borderRadius:20,padding:"6px 18px",fontSize:10,letterSpacing:"0.12em",fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}},
+            style:{background:wkEnabled?"#fff":"#edefea",color:wkEnabled?"#000":"#555",border:"1px solid "+(wkEnabled?"#fff":"#111111"),borderRadius:20,padding:"6px 18px",fontSize:10,letterSpacing:"0.12em",fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}},
             wkEnabled?"ON":"OFF")
         ),
         React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",background:"#f6f7f5",border:"1px solid "+(wkMemberView?"#1d5a34":"#edefea"),borderRadius:8,padding:"11px 14px",marginBottom:6}},
@@ -914,7 +914,7 @@ function MemberProfileOverlay({member,bookings,onClose,currentUserIsAdmin}){
             React.createElement("div",{style:{fontSize:9,color:"#555",marginTop:2,letterSpacing:"0.04em"}},"See their program as they see it — with completed sets & past weeks")
           ),
           React.createElement("button",{onClick:()=>setWkMemberView(v=>!v),
-            style:{background:wkMemberView?"#4aaa66":"#edefea",color:wkMemberView?"#000":"#555",border:"1px solid "+(wkMemberView?"#4aaa66":"#d9e2cc"),borderRadius:20,padding:"6px 18px",fontSize:10,letterSpacing:"0.12em",fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}},
+            style:{background:wkMemberView?"#4aaa66":"#edefea",color:wkMemberView?"#000":"#555",border:"1px solid "+(wkMemberView?"#4aaa66":"#111111"),borderRadius:20,padding:"6px 18px",fontSize:10,letterSpacing:"0.12em",fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}},
             wkMemberView?"ON":"OFF")
         ),
         accMsg&&React.createElement("div",{style:{fontSize:10,color:"#4aaa88",letterSpacing:"0.04em",marginBottom:4}},accMsg)
@@ -1197,7 +1197,7 @@ function CommunityView({session,isAdmin,showToast,memberPhotos,allMemberNames}){
               return React.createElement("div",{key:ri,className:"reply-card"},
                 React.createElement("div",{className:"reply-author",style:{display:"flex",alignItems:"center",justifyContent:"space-between"}},
                   React.createElement("span",null,r.author_name,React.createElement("span",null," replied")),
-                  canDeleteReply&&React.createElement("button",{className:"post-delete",style:{fontSize:"9px",color:"#d9e2cc"},onClick:()=>handleDelete(r.id)},"Delete")
+                  canDeleteReply&&React.createElement("button",{className:"post-delete",style:{fontSize:"9px",color:"#111111"},onClick:()=>handleDelete(r.id)},"Delete")
                 ),
                 React.createElement("div",{className:"reply-content",dangerouslySetInnerHTML:{__html:renderContent(r.content)}})
               );
@@ -1303,7 +1303,7 @@ function MilestoneAdminPanel({milestoneConfig,saveMilestoneConfig,showToast}){
                 React.createElement("div",{style:{fontFamily:"'Bebas Neue',sans-serif",fontSize:15,color:"#8cc63e",letterSpacing:"0.06em"}},s.classes+" CLASSES"),
                 s.label&&React.createElement("div",{style:{fontSize:9,color:"#666",letterSpacing:"0.08em"}},s.label.toUpperCase())
               ),
-              React.createElement("button",{onClick:()=>{setSpecialDraft({classes:s.classes,label:s.label||"",emoji:s.emoji||"🏆"});setEditingSpecialIdx(idx);setAddingSpecial(false);},style:{background:"none",border:"1px solid #c3d1ac",color:"#888",borderRadius:4,padding:"4px 10px",fontFamily:"'Bebas Neue',sans-serif",fontSize:11,cursor:"pointer"}},"EDIT"),
+              React.createElement("button",{onClick:()=>{setSpecialDraft({classes:s.classes,label:s.label||"",emoji:s.emoji||"🏆"});setEditingSpecialIdx(idx);setAddingSpecial(false);},style:{background:"none",border:"1px solid #111111",color:"#888",borderRadius:4,padding:"4px 10px",fontFamily:"'Bebas Neue',sans-serif",fontSize:11,cursor:"pointer"}},"EDIT"),
               React.createElement("button",{onClick:()=>removeSpecial(idx),style:{background:"none",border:"1px solid #3a1a1a",color:"#e06040",borderRadius:4,padding:"4px 8px",fontFamily:"'Bebas Neue',sans-serif",fontSize:11,cursor:"pointer"}},"✕")
             )
       ),
@@ -1328,7 +1328,7 @@ function MilestoneAdminPanel({milestoneConfig,saveMilestoneConfig,showToast}){
               React.createElement("button",{onClick:()=>{setAddingSpecial(false);setSpecialDraft({classes:"",label:"",emoji:"🏆"});},style:{background:"none",border:"1px solid #888",color:"#aaa",borderRadius:5,padding:"7px 12px",fontFamily:"'Bebas Neue',sans-serif",fontSize:13,cursor:"pointer"}},"CANCEL")
             )
           )
-        :React.createElement("button",{onClick:()=>{setAddingSpecial(true);setEditingSpecialIdx(null);setSpecialDraft({classes:"",label:"",emoji:"🏆"});},style:{marginTop:specials.length>0?12:0,width:"100%",background:"none",border:"1px dashed #c3d1ac",color:"#888",borderRadius:6,padding:"8px",fontFamily:"'Bebas Neue',sans-serif",fontSize:13,letterSpacing:"0.08em",cursor:"pointer"}},
+        :React.createElement("button",{onClick:()=>{setAddingSpecial(true);setEditingSpecialIdx(null);setSpecialDraft({classes:"",label:"",emoji:"🏆"});},style:{marginTop:specials.length>0?12:0,width:"100%",background:"none",border:"1px dashed #111111",color:"#888",borderRadius:6,padding:"8px",fontFamily:"'Bebas Neue',sans-serif",fontSize:13,letterSpacing:"0.08em",cursor:"pointer"}},
             "+ ADD MILESTONE"
           )
     )
@@ -1474,8 +1474,8 @@ function AdminView({bookings,setBookings,showToast,isAdmin,getMaxSpots,saveClass
           React.createElement("div",{className:"adm-mc-top"},
             React.createElement("div",null,React.createElement("div",{className:"adm-mc-name"},(mb.name||"").toUpperCase())),
             mb.photo
-              ?React.createElement("img",{src:mb.photo,style:{width:32,height:32,borderRadius:"50%",objectFit:"cover",border:"1px solid #d9e2cc",flexShrink:0},alt:""})
-              :React.createElement("div",{style:{width:32,height:32,borderRadius:"50%",background:"#f6f7f5",border:"1px solid #d9e2cc",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'Bebas Neue',sans-serif",fontSize:12,color:"#666",flexShrink:0}},initials(mb.name||"?"))
+              ?React.createElement("img",{src:mb.photo,style:{width:32,height:32,borderRadius:"50%",objectFit:"cover",border:"1px solid #111111",flexShrink:0},alt:""})
+              :React.createElement("div",{style:{width:32,height:32,borderRadius:"50%",background:"#f6f7f5",border:"1px solid #111111",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'Bebas Neue',sans-serif",fontSize:12,color:"#666",flexShrink:0}},initials(mb.name||"?"))
           ),
           React.createElement("div",{className:"adm-mc-detail"},React.createElement("span",null,mb.email)),
           mb.phone&&React.createElement("div",{className:"adm-mc-detail"},React.createElement("span",null,mb.phone)),
@@ -1509,7 +1509,7 @@ function AdminView({bookings,setBookings,showToast,isAdmin,getMaxSpots,saveClass
                   autoFocus:true,value:classNameInput,
                   onChange:e=>setClassNameInput(e.target.value),
                   onKeyDown:async e=>{if(e.key==="Enter"){await saveDowName(admDOW,classNameInput);setEditingClassName(false);showToast("Class name updated ✓");}if(e.key==="Escape")setEditingClassName(false);},
-                  style:{flex:1,background:"#f6f7f5",border:"1px solid #c3d1ac",borderRadius:4,padding:"4px 8px",color:"#181818",fontFamily:"'Bebas Neue',sans-serif",fontSize:14,letterSpacing:"0.08em",outline:"none"}
+                  style:{flex:1,background:"#f6f7f5",border:"1px solid #111111",borderRadius:4,padding:"4px 8px",color:"#181818",fontFamily:"'Bebas Neue',sans-serif",fontSize:14,letterSpacing:"0.08em",outline:"none"}
                 }),
                 React.createElement("button",{
                   onClick:async()=>{await saveDowName(admDOW,classNameInput);setEditingClassName(false);showToast("Class name updated ✓");},
@@ -1517,11 +1517,11 @@ function AdminView({bookings,setBookings,showToast,isAdmin,getMaxSpots,saveClass
                 },"SAVE"),
                 React.createElement("button",{
                   onClick:()=>setEditingClassName(false),
-                  style:{background:"none",border:"1px solid #d9e2cc",color:"#666",borderRadius:3,fontFamily:"'Bebas Neue',sans-serif",fontSize:11,letterSpacing:"0.1em",padding:"5px 8px",cursor:"pointer",flexShrink:0}
+                  style:{background:"none",border:"1px solid #111111",color:"#666",borderRadius:3,fontFamily:"'Bebas Neue',sans-serif",fontSize:11,letterSpacing:"0.1em",padding:"5px 8px",cursor:"pointer",flexShrink:0}
                 },"✕")
               )
             :React.createElement(React.Fragment,null,
-                React.createElement("div",{style:{fontFamily:"'Bebas Neue',sans-serif",fontSize:15,color:"#d9e2cc",letterSpacing:"0.06em",flex:1}},dowNames?.[admDOW]||"—"),
+                React.createElement("div",{style:{fontFamily:"'Bebas Neue',sans-serif",fontSize:15,color:"#111111",letterSpacing:"0.06em",flex:1}},dowNames?.[admDOW]||"—"),
                 React.createElement("button",{
                   onClick:()=>{setClassNameInput(dowNames?.[admDOW]||"");setEditingClassName(true);},
                   style:{background:"none",border:"none",color:"#555",fontFamily:"'DM Sans',sans-serif",fontSize:9,letterSpacing:"0.08em",cursor:"pointer",padding:"2px 4px",flexShrink:0}
@@ -1529,7 +1529,7 @@ function AdminView({bookings,setBookings,showToast,isAdmin,getMaxSpots,saveClass
               )
         )
       ),
-      undoData&&React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",background:"#f6f7f5",border:"1px solid #d9e2cc",borderRadius:6,padding:"10px 14px",marginBottom:10}},
+      undoData&&React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",background:"#f6f7f5",border:"1px solid #111111",borderRadius:6,padding:"10px 14px",marginBottom:10}},
         React.createElement("div",{style:{fontSize:11,color:"#888",letterSpacing:"0.08em"}},"Class removed"),
         React.createElement("button",{onClick:undoRemove,style:{background:"none",border:"none",color:"#8cc63e",fontFamily:"'Bebas Neue',sans-serif",fontSize:13,letterSpacing:"0.1em",cursor:"pointer"}},"UNDO")
       ),
@@ -1547,11 +1547,11 @@ function AdminView({bookings,setBookings,showToast,isAdmin,getMaxSpots,saveClass
         const isEditingTimeThis=editingTime===time;
         const isEditingNameThis=editingName===time;
         if(isHidden){
-          return React.createElement("div",{key:time,style:{background:"#f6f7f5",border:"1px solid #d9e2cc",borderRadius:8,marginBottom:8,padding:"12px 14px",display:"flex",alignItems:"center",justifyContent:"space-between"}},
+          return React.createElement("div",{key:time,style:{background:"#f6f7f5",border:"1px solid #111111",borderRadius:8,marginBottom:8,padding:"12px 14px",display:"flex",alignItems:"center",justifyContent:"space-between"}},
             React.createElement("div",null,
               React.createElement("div",{style:{fontFamily:"'Bebas Neue',sans-serif",fontSize:16,color:"#555",letterSpacing:"0.08em"}},fmt12(time)),
-              (slotNames?.[admDK+":"+time]||dowNames?.[admDOW])&&React.createElement("div",{style:{fontSize:7,letterSpacing:"0.1em",color:"#c3d1ac",fontWeight:600,marginTop:2,fontFamily:"'DM Sans',sans-serif"}},slotNames?.[admDK+":"+time]||dowNames?.[admDOW]),
-              React.createElement("div",{style:{fontSize:8,letterSpacing:"0.15em",color:"#c3d1ac",fontWeight:600,marginTop:3}},"HIDDEN FROM MEMBERS")
+              (slotNames?.[admDK+":"+time]||dowNames?.[admDOW])&&React.createElement("div",{style:{fontSize:7,letterSpacing:"0.1em",color:"#111111",fontWeight:600,marginTop:2,fontFamily:"'DM Sans',sans-serif"}},slotNames?.[admDK+":"+time]||dowNames?.[admDOW]),
+              React.createElement("div",{style:{fontSize:8,letterSpacing:"0.15em",color:"#111111",fontWeight:600,marginTop:3}},"HIDDEN FROM MEMBERS")
             ),
             React.createElement("div",{style:{display:"flex",gap:8,alignItems:"center"}},
               React.createElement("button",{
@@ -1566,7 +1566,7 @@ function AdminView({bookings,setBookings,showToast,isAdmin,getMaxSpots,saveClass
                   if(!window.confirm("Delete this hidden class permanently?"))return;
                   await deleteClass(time,admDK);showToast("Class deleted");
                 },
-                style:{background:"none",border:"1px solid #d9e2cc",borderRadius:6,color:"#555",
+                style:{background:"none",border:"1px solid #111111",borderRadius:6,color:"#555",
                        fontFamily:"'Bebas Neue',sans-serif",fontSize:12,letterSpacing:"0.1em",
                        padding:"7px 14px",cursor:"pointer"}
               },"DELETE")
@@ -1623,14 +1623,14 @@ function AdminView({bookings,setBookings,showToast,isAdmin,getMaxSpots,saveClass
             React.createElement("div",{style:{fontSize:9,color:"#555",letterSpacing:"0.12em",fontWeight:600,flexShrink:0}},"CLASS NAME"),
             React.createElement("input",{type:"text",value:nameInput,onChange:e=>setNameInput(e.target.value),
               placeholder:slotNames?.[admDK+":"+time]||dowNames?.[admDOW]||"e.g. POWER HOUR",
-              style:{flex:1,background:"#f6f7f5",border:"1px solid #d9e2cc",borderRadius:4,padding:"7px 8px",color:"#181818",fontFamily:"'DM Sans',sans-serif",fontSize:14,outline:"none"}
+              style:{flex:1,background:"#f6f7f5",border:"1px solid #111111",borderRadius:4,padding:"7px 8px",color:"#181818",fontFamily:"'DM Sans',sans-serif",fontSize:14,outline:"none"}
             }),
             React.createElement("button",{
               onClick:async()=>{const n=nameInput.trim()||null;if(saveSlotName)await saveSlotName(time,admDK,n);setEditingName(null);showToast("Name updated ✓");},
               style:{background:"#8cc63e",color:"#000",border:"none",borderRadius:3,fontFamily:"'Bebas Neue',sans-serif",fontSize:12,letterSpacing:"0.1em",padding:"8px 14px",cursor:"pointer",flexShrink:0}
             },"SAVE"),
             React.createElement("button",{onClick:()=>setEditingName(null),
-              style:{background:"none",border:"1px solid #d9e2cc",color:"#666",borderRadius:3,fontFamily:"'Bebas Neue',sans-serif",fontSize:11,letterSpacing:"0.1em",padding:"8px 10px",cursor:"pointer",flexShrink:0}
+              style:{background:"none",border:"1px solid #111111",color:"#666",borderRadius:3,fontFamily:"'Bebas Neue',sans-serif",fontSize:11,letterSpacing:"0.1em",padding:"8px 10px",cursor:"pointer",flexShrink:0}
             },"CANCEL")
           ),
           isEditingThis&&React.createElement("div",{style:{padding:"12px 14px",borderTop:"1px solid #f6f7f5",display:"flex",alignItems:"center",gap:8}},
@@ -1638,7 +1638,7 @@ function AdminView({bookings,setBookings,showToast,isAdmin,getMaxSpots,saveClass
             React.createElement("input",{
               type:"number",min:1,max:99,value:limitInput,
               onChange:e=>setLimitInput(e.target.value),
-              style:{width:60,background:"#f6f7f5",border:"1px solid #d9e2cc",borderRadius:4,padding:"7px 8px",color:"#181818",fontFamily:"'DM Sans',sans-serif",fontSize:16,textAlign:"center",outline:"none"}
+              style:{width:60,background:"#f6f7f5",border:"1px solid #111111",borderRadius:4,padding:"7px 8px",color:"#181818",fontFamily:"'DM Sans',sans-serif",fontSize:16,textAlign:"center",outline:"none"}
             }),
             React.createElement("button",{
               onClick:async()=>{if(saveClassLimit){await saveClassLimit(time,admDK,limitInput);}setEditingLimit(null);showToast("Capacity updated ✓");},
@@ -1646,7 +1646,7 @@ function AdminView({bookings,setBookings,showToast,isAdmin,getMaxSpots,saveClass
             },"SAVE"),
             React.createElement("button",{
               onClick:()=>setEditingLimit(null),
-              style:{background:"none",border:"1px solid #d9e2cc",color:"#666",borderRadius:3,fontFamily:"'Bebas Neue',sans-serif",fontSize:11,letterSpacing:"0.1em",padding:"8px 10px",cursor:"pointer",flexShrink:0}
+              style:{background:"none",border:"1px solid #111111",color:"#666",borderRadius:3,fontFamily:"'Bebas Neue',sans-serif",fontSize:11,letterSpacing:"0.1em",padding:"8px 10px",cursor:"pointer",flexShrink:0}
             },"CANCEL")
           ),
           isEditingTimeThis&&React.createElement("div",{style:{padding:"12px 14px",borderTop:"1px solid #f6f7f5",display:"flex",alignItems:"center",gap:8}},
@@ -1654,7 +1654,7 @@ function AdminView({bookings,setBookings,showToast,isAdmin,getMaxSpots,saveClass
             React.createElement("input",{
               type:"time",value:newTimeVal,
               onChange:e=>setNewTimeVal(e.target.value),
-              style:{flex:1,background:"#f6f7f5",border:"1px solid #d9e2cc",borderRadius:4,padding:"7px 8px",color:"#181818",fontFamily:"'DM Sans',sans-serif",fontSize:14,outline:"none"}
+              style:{flex:1,background:"#f6f7f5",border:"1px solid #111111",borderRadius:4,padding:"7px 8px",color:"#181818",fontFamily:"'DM Sans',sans-serif",fontSize:14,outline:"none"}
             }),
             React.createElement("button",{
               disabled:!newTimeVal||newTimeVal===time,
@@ -1664,11 +1664,11 @@ function AdminView({bookings,setBookings,showToast,isAdmin,getMaxSpots,saveClass
                 setEditingTime(null);
                 showToast("Time updated ✓");
               },
-              style:{background:newTimeVal&&newTimeVal!==time?"#fff":"#f6f7f5",color:newTimeVal&&newTimeVal!==time?"#000":"#c3d1ac",border:"none",borderRadius:3,fontFamily:"'Bebas Neue',sans-serif",fontSize:12,letterSpacing:"0.1em",padding:"8px 14px",cursor:"pointer",flexShrink:0}
+              style:{background:newTimeVal&&newTimeVal!==time?"#fff":"#f6f7f5",color:newTimeVal&&newTimeVal!==time?"#000":"#111111",border:"none",borderRadius:3,fontFamily:"'Bebas Neue',sans-serif",fontSize:12,letterSpacing:"0.1em",padding:"8px 14px",cursor:"pointer",flexShrink:0}
             },"SAVE"),
             React.createElement("button",{
               onClick:()=>setEditingTime(null),
-              style:{background:"none",border:"1px solid #d9e2cc",color:"#666",borderRadius:3,fontFamily:"'Bebas Neue',sans-serif",fontSize:11,letterSpacing:"0.1em",padding:"8px 10px",cursor:"pointer",flexShrink:0}
+              style:{background:"none",border:"1px solid #111111",color:"#666",borderRadius:3,fontFamily:"'Bebas Neue',sans-serif",fontSize:11,letterSpacing:"0.1em",padding:"8px 10px",cursor:"pointer",flexShrink:0}
             },"CANCEL")
           ),
           isOpen&&!isEditingThis&&!isEditingTimeThis&&React.createElement("div",{className:"adm-members-list"},
@@ -1682,23 +1682,23 @@ function AdminView({bookings,setBookings,showToast,isAdmin,getMaxSpots,saveClass
       }),
       admDOW!==0&&React.createElement("div",{style:{marginTop:12}},
         !addingClass
-          ?React.createElement("button",{onClick:()=>{setAddingClass(true);setNewClassTime("");setNewClassSpots("16");},style:{width:"100%",background:"none",border:"1px dashed #d9e2cc",borderRadius:6,padding:"11px",color:"#555",fontSize:10,letterSpacing:"0.14em",cursor:"pointer"}},"+ ADD CLASS")
-          :React.createElement("div",{style:{background:"#f6f7f5",border:"1px solid #d9e2cc",borderRadius:6,padding:"14px"}},
+          ?React.createElement("button",{onClick:()=>{setAddingClass(true);setNewClassTime("");setNewClassSpots("16");},style:{width:"100%",background:"none",border:"1px dashed #111111",borderRadius:6,padding:"11px",color:"#555",fontSize:10,letterSpacing:"0.14em",cursor:"pointer"}},"+ ADD CLASS")
+          :React.createElement("div",{style:{background:"#f6f7f5",border:"1px solid #111111",borderRadius:6,padding:"14px"}},
               React.createElement("div",{style:{fontSize:9,letterSpacing:"0.14em",color:"#555",fontWeight:600,marginBottom:10}},"NEW CLASS · "+admDateLabel.toUpperCase()),
               React.createElement("div",{style:{display:"flex",gap:8,alignItems:"center",marginBottom:10}},
                 React.createElement("div",{style:{flex:1}},
                   React.createElement("div",{style:{fontSize:9,color:"#555",letterSpacing:"0.1em",fontWeight:600,marginBottom:4}},"TIME"),
                   React.createElement("input",{type:"time",value:newClassTime,onChange:e=>setNewClassTime(e.target.value),
-                    style:{width:"100%",background:"#f6f7f5",border:"1px solid #d9e2cc",borderRadius:4,color:"#d9e2cc",fontSize:14,padding:"8px 10px",fontFamily:"'DM Sans',sans-serif",outline:"none",boxSizing:"border-box"}})
+                    style:{width:"100%",background:"#f6f7f5",border:"1px solid #111111",borderRadius:4,color:"#111111",fontSize:14,padding:"8px 10px",fontFamily:"'DM Sans',sans-serif",outline:"none",boxSizing:"border-box"}})
                 ),
                 React.createElement("div",{style:{width:80}},
                   React.createElement("div",{style:{fontSize:9,color:"#555",letterSpacing:"0.1em",fontWeight:600,marginBottom:4}},"MAX SPOTS"),
                   React.createElement("input",{type:"number",min:1,max:99,value:newClassSpots,onChange:e=>setNewClassSpots(e.target.value),
-                    style:{width:"100%",background:"#f6f7f5",border:"1px solid #d9e2cc",borderRadius:4,color:"#d9e2cc",fontSize:14,padding:"8px",fontFamily:"'DM Sans',sans-serif",textAlign:"center",outline:"none",boxSizing:"border-box"}})
+                    style:{width:"100%",background:"#f6f7f5",border:"1px solid #111111",borderRadius:4,color:"#111111",fontSize:14,padding:"8px",fontFamily:"'DM Sans',sans-serif",textAlign:"center",outline:"none",boxSizing:"border-box"}})
                 )
               ),
               React.createElement("div",{style:{display:"flex",gap:8}},
-                React.createElement("button",{onClick:()=>setAddingClass(false),style:{flex:1,background:"none",border:"1px solid #d9e2cc",borderRadius:4,padding:"9px",color:"#666",fontSize:10,letterSpacing:"0.1em",cursor:"pointer"}},"CANCEL"),
+                React.createElement("button",{onClick:()=>setAddingClass(false),style:{flex:1,background:"none",border:"1px solid #111111",borderRadius:4,padding:"9px",color:"#666",fontSize:10,letterSpacing:"0.1em",cursor:"pointer"}},"CANCEL"),
                 React.createElement("button",{
                   disabled:!newClassTime,
                   onClick:async()=>{
@@ -1707,7 +1707,7 @@ function AdminView({bookings,setBookings,showToast,isAdmin,getMaxSpots,saveClass
                     setAddingClass(false);
                     showToast("Class added ✓");
                   },
-                  style:{flex:2,background:newClassTime?"#fff":"#f6f7f5",color:newClassTime?"#000":"#c3d1ac",border:"none",borderRadius:4,padding:"9px",fontFamily:"'Bebas Neue',sans-serif",fontSize:13,letterSpacing:"0.12em",cursor:newClassTime?"pointer":"default"}
+                  style:{flex:2,background:newClassTime?"#fff":"#f6f7f5",color:newClassTime?"#000":"#111111",border:"none",borderRadius:4,padding:"9px",fontFamily:"'Bebas Neue',sans-serif",fontSize:13,letterSpacing:"0.12em",cursor:newClassTime?"pointer":"default"}
                 },"SAVE CLASS")
               )
           )
@@ -1730,7 +1730,7 @@ function AdminView({bookings,setBookings,showToast,isAdmin,getMaxSpots,saveClass
           React.createElement("div",{style:{fontSize:10,letterSpacing:"0.18em",color:"#555",fontWeight:600,margin:"4px 0 8px"}},"SESSION TIMES"),
           React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8,marginBottom:12}},
             React.createElement("span",{style:{fontSize:9,letterSpacing:"0.12em",color:"#555",fontWeight:600,flexShrink:0}},"APPLIES TO"),
-            React.createElement("select",{value:wellScope,onChange:e=>setWellScope(parseInt(e.target.value)),style:{flex:1,background:"#f6f7f5",border:"1px solid "+(wellScope>1?"#bfe08a":"#d9e2cc"),borderRadius:4,color:wellScope>1?"#8cc63e":"#d9e2cc",fontSize:12,padding:"7px 8px",fontFamily:"'DM Sans',sans-serif",outline:"none",cursor:"pointer"}},
+            React.createElement("select",{value:wellScope,onChange:e=>setWellScope(parseInt(e.target.value)),style:{flex:1,background:"#f6f7f5",border:"1px solid "+(wellScope>1?"#bfe08a":"#111111"),borderRadius:4,color:wellScope>1?"#8cc63e":"#111111",fontSize:12,padding:"7px 8px",fontFamily:"'DM Sans',sans-serif",outline:"none",cursor:"pointer"}},
               React.createElement("option",{value:1},"This date only"),
               React.createElement("option",{value:2},"This + next week (2 total)"),
               React.createElement("option",{value:4},"This + next 3 weeks (4 total)"),
@@ -1742,21 +1742,21 @@ function AdminView({bookings,setBookings,showToast,isAdmin,getMaxSpots,saveClass
             const hidden=wsHide.includes(time);
             const custom=!WELL_TIMES.includes(time);
             const booked=dayWellBks.some(b=>b.time===time);
-            return React.createElement("div",{key:time,style:{display:"flex",alignItems:"center",gap:10,background:"#f6f7f5",border:"1px solid "+(hidden?"#edefea":"#d9e2cc"),borderRadius:7,padding:"11px 14px",marginBottom:7,opacity:hidden?0.55:1}},
+            return React.createElement("div",{key:time,style:{display:"flex",alignItems:"center",gap:10,background:"#f6f7f5",border:"1px solid "+(hidden?"#edefea":"#111111"),borderRadius:7,padding:"11px 14px",marginBottom:7,opacity:hidden?0.55:1}},
               React.createElement("div",{style:{fontFamily:"'Bebas Neue',sans-serif",fontSize:19,color:hidden?"#666":"#fff",minWidth:76}},fmt12(time)),
               React.createElement("div",{style:{flex:1,fontSize:9,letterSpacing:"0.12em",fontWeight:600,color:hidden?"#555":booked?"#8cc63e":"#4aaa66"}},(hidden?"HIDDEN":booked?"BOOKED":"AVAILABLE")+(custom?" · CUSTOM":"")),
-              React.createElement("button",{onClick:()=>wsSetHide(time,!hidden),style:{background:hidden?"#fff":"transparent",color:hidden?"#000":"#888",border:"1px solid "+(hidden?"#fff":"#d9e2cc"),borderRadius:4,fontFamily:"'Bebas Neue',sans-serif",fontSize:12,letterSpacing:"0.1em",padding:"7px 14px",cursor:"pointer",flexShrink:0}},hidden?"SHOW":"HIDE"),
-              custom&&React.createElement("button",{onClick:()=>wsRemoveCustom(time),title:"Remove custom time",style:{background:"none",border:"1px solid #d9e2cc",borderRadius:4,color:"#8a2515",fontSize:12,padding:"6px 10px",cursor:"pointer",flexShrink:0}},"✕")
+              React.createElement("button",{onClick:()=>wsSetHide(time,!hidden),style:{background:hidden?"#fff":"transparent",color:hidden?"#000":"#888",border:"1px solid "+(hidden?"#fff":"#111111"),borderRadius:4,fontFamily:"'Bebas Neue',sans-serif",fontSize:12,letterSpacing:"0.1em",padding:"7px 14px",cursor:"pointer",flexShrink:0}},hidden?"SHOW":"HIDE"),
+              custom&&React.createElement("button",{onClick:()=>wsRemoveCustom(time),title:"Remove custom time",style:{background:"none",border:"1px solid #111111",borderRadius:4,color:"#8a2515",fontSize:12,padding:"6px 10px",cursor:"pointer",flexShrink:0}},"✕")
             );
           }),
           !addingWell
-            ?React.createElement("button",{onClick:()=>{setAddingWell(true);setWellNewTime("");},style:{width:"100%",background:"none",border:"1px dashed #d9e2cc",borderRadius:6,padding:"11px",color:"#555",fontSize:10,letterSpacing:"0.14em",cursor:"pointer",marginTop:2}},"+ ADD CUSTOM TIME")
-            :React.createElement("div",{style:{background:"#f6f7f5",border:"1px solid #d9e2cc",borderRadius:6,padding:"14px",marginTop:2}},
+            ?React.createElement("button",{onClick:()=>{setAddingWell(true);setWellNewTime("");},style:{width:"100%",background:"none",border:"1px dashed #111111",borderRadius:6,padding:"11px",color:"#555",fontSize:10,letterSpacing:"0.14em",cursor:"pointer",marginTop:2}},"+ ADD CUSTOM TIME")
+            :React.createElement("div",{style:{background:"#f6f7f5",border:"1px solid #111111",borderRadius:6,padding:"14px",marginTop:2}},
                 React.createElement("div",{style:{fontSize:9,letterSpacing:"0.14em",color:"#555",fontWeight:600,marginBottom:10}},"NEW TIME · "+admDateLabel.toUpperCase()),
                 React.createElement("div",{style:{display:"flex",gap:8,alignItems:"center"}},
-                  React.createElement("input",{type:"time",value:wellNewTime,onChange:e=>setWellNewTime(e.target.value),style:{flex:1,background:"#f6f7f5",border:"1px solid #d9e2cc",borderRadius:4,color:"#d9e2cc",fontSize:14,padding:"8px 10px",fontFamily:"'DM Sans',sans-serif",outline:"none",boxSizing:"border-box"}}),
-                  React.createElement("button",{onClick:()=>setAddingWell(false),style:{background:"none",border:"1px solid #d9e2cc",borderRadius:4,padding:"9px 12px",color:"#666",fontSize:10,letterSpacing:"0.1em",cursor:"pointer"}},"CANCEL"),
-                  React.createElement("button",{disabled:!wellNewTime,onClick:()=>{if(!wellNewTime)return;wsAddCustom(wellNewTime);setAddingWell(false);showToast("Time added ✓");},style:{background:wellNewTime?"#fff":"#f6f7f5",color:wellNewTime?"#000":"#c3d1ac",border:"none",borderRadius:4,padding:"9px 16px",fontFamily:"'Bebas Neue',sans-serif",fontSize:13,letterSpacing:"0.12em",cursor:wellNewTime?"pointer":"default"}},"ADD")
+                  React.createElement("input",{type:"time",value:wellNewTime,onChange:e=>setWellNewTime(e.target.value),style:{flex:1,background:"#f6f7f5",border:"1px solid #111111",borderRadius:4,color:"#111111",fontSize:14,padding:"8px 10px",fontFamily:"'DM Sans',sans-serif",outline:"none",boxSizing:"border-box"}}),
+                  React.createElement("button",{onClick:()=>setAddingWell(false),style:{background:"none",border:"1px solid #111111",borderRadius:4,padding:"9px 12px",color:"#666",fontSize:10,letterSpacing:"0.1em",cursor:"pointer"}},"CANCEL"),
+                  React.createElement("button",{disabled:!wellNewTime,onClick:()=>{if(!wellNewTime)return;wsAddCustom(wellNewTime);setAddingWell(false);showToast("Time added ✓");},style:{background:wellNewTime?"#fff":"#f6f7f5",color:wellNewTime?"#000":"#111111",border:"none",borderRadius:4,padding:"9px 16px",fontFamily:"'Bebas Neue',sans-serif",fontSize:13,letterSpacing:"0.12em",cursor:wellNewTime?"pointer":"default"}},"ADD")
                 )
             ),
           React.createElement("div",{style:{fontSize:10,letterSpacing:"0.18em",color:"#555",fontWeight:600,margin:"20px 0 10px"}},"BOOKINGS"),
@@ -1793,7 +1793,7 @@ function AdminView({bookings,setBookings,showToast,isAdmin,getMaxSpots,saveClass
             React.createElement("div",{style:{fontSize:10,color:"#555",marginTop:3,letterSpacing:"0.06em"}},s.enabled?"Visible to members":"Hidden from members")
           ),
           React.createElement("button",{
-            style:{background:s.enabled?"#fff":"#edefea",color:s.enabled?"#000":"#555",border:`1px solid ${s.enabled?"#fff":"#d9e2cc"}`,borderRadius:20,padding:"6px 18px",fontSize:10,letterSpacing:"0.12em",fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",transition:"all .2s"},
+            style:{background:s.enabled?"#fff":"#edefea",color:s.enabled?"#000":"#555",border:`1px solid ${s.enabled?"#fff":"#111111"}`,borderRadius:20,padding:"6px 18px",fontSize:10,letterSpacing:"0.12em",fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",transition:"all .2s"},
             onClick:async()=>{if(s.save)await s.save(!s.enabled);}
           },s.enabled?"ON":"OFF")
         )
@@ -1806,7 +1806,7 @@ function AdminView({bookings,setBookings,showToast,isAdmin,getMaxSpots,saveClass
             React.createElement("div",{style:{fontSize:10,color:"#555",marginTop:3,letterSpacing:"0.06em"}},calendarEnabled?"Members get a calendar link when they book":"Off — no calendar prompt on booking")
           ),
           React.createElement("button",{
-            style:{background:calendarEnabled?"#fff":"#edefea",color:calendarEnabled?"#000":"#555",border:`1px solid ${calendarEnabled?"#fff":"#d9e2cc"}`,borderRadius:20,padding:"6px 18px",fontSize:10,letterSpacing:"0.12em",fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",transition:"all .2s"},
+            style:{background:calendarEnabled?"#fff":"#edefea",color:calendarEnabled?"#000":"#555",border:`1px solid ${calendarEnabled?"#fff":"#111111"}`,borderRadius:20,padding:"6px 18px",fontSize:10,letterSpacing:"0.12em",fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",transition:"all .2s"},
             onClick:async()=>{await saveCalendarSetting(!calendarEnabled);}
           },calendarEnabled?"ON":"OFF")
         )
@@ -1849,31 +1849,31 @@ function StepListEditor({storageKey,defaultSteps,toastMsg,showToast}){
   function updateDraft(i,field,val){setDraft(d=>d.map((s,idx)=>idx===i?{...s,[field]:val}:s));}
   function addStep(){setDraft(d=>[...d,{title:"",body:""}]);}
   function removeStep(i){setDraft(d=>d.filter((_,idx)=>idx!==i));}
-  if(!loaded)return React.createElement("div",{style:{fontSize:10,color:"#c3d1ac",letterSpacing:"0.1em",padding:"10px 0"}},"LOADING...");
+  if(!loaded)return React.createElement("div",{style:{fontSize:10,color:"#111111",letterSpacing:"0.1em",padding:"10px 0"}},"LOADING...");
   if(editing){
     return React.createElement("div",null,
       React.createElement("div",{style:{display:"flex",justifyContent:"flex-end",gap:8,marginBottom:14}},
-        React.createElement("button",{onClick:()=>setEditing(false),style:{background:"none",border:"1px solid #d9e2cc",borderRadius:4,padding:"4px 12px",color:"#666",fontSize:10,letterSpacing:"0.1em",cursor:"pointer"}},"CANCEL"),
+        React.createElement("button",{onClick:()=>setEditing(false),style:{background:"none",border:"1px solid #111111",borderRadius:4,padding:"4px 12px",color:"#666",fontSize:10,letterSpacing:"0.1em",cursor:"pointer"}},"CANCEL"),
         React.createElement("button",{onClick:save,disabled:saving,style:{background:"#8cc63e",border:"none",borderRadius:4,padding:"4px 14px",color:"#181818",fontSize:10,letterSpacing:"0.1em",cursor:"pointer",fontWeight:600}},saving?"SAVING...":"SAVE")
       ),
       draft.map((s,i)=>React.createElement("div",{key:i,style:{background:"#f6f7f5",border:"1px solid #edefea",borderRadius:6,padding:"12px",marginBottom:10}},
         React.createElement("div",{style:{display:"flex",alignItems:"center",gap:10,marginBottom:8}},
           React.createElement("div",{style:{fontFamily:"'Bebas Neue',sans-serif",fontSize:22,color:"#8cc63e",lineHeight:1,minWidth:20}},(i+1).toString()),
           React.createElement("input",{value:s.title,onChange:e=>updateDraft(i,"title",e.target.value),placeholder:"Step title",
-            style:{flex:1,background:"#f6f7f5",border:"1px solid #d9e2cc",borderRadius:4,color:"#d9e2cc",fontSize:12,padding:"6px 10px",fontFamily:"'DM Sans',sans-serif",outline:"none",letterSpacing:"0.06em"}}),
-          React.createElement("button",{onClick:()=>removeStep(i),style:{background:"none",border:"1px solid #d9e2cc",borderRadius:4,padding:"3px 8px",color:"#555",fontSize:11,cursor:"pointer",flexShrink:0}},"✕")
+            style:{flex:1,background:"#f6f7f5",border:"1px solid #111111",borderRadius:4,color:"#111111",fontSize:12,padding:"6px 10px",fontFamily:"'DM Sans',sans-serif",outline:"none",letterSpacing:"0.06em"}}),
+          React.createElement("button",{onClick:()=>removeStep(i),style:{background:"none",border:"1px solid #111111",borderRadius:4,padding:"3px 8px",color:"#555",fontSize:11,cursor:"pointer",flexShrink:0}},"✕")
         ),
         React.createElement("textarea",{value:s.body,onChange:e=>updateDraft(i,"body",e.target.value),placeholder:"Notes (optional)",rows:2,
-          style:{width:"100%",background:"#f6f7f5",border:"1px solid #d9e2cc",borderRadius:4,color:"#888",fontSize:12,padding:"8px 10px",fontFamily:"'DM Sans',sans-serif",lineHeight:1.6,resize:"vertical",boxSizing:"border-box",outline:"none"}})
+          style:{width:"100%",background:"#f6f7f5",border:"1px solid #111111",borderRadius:4,color:"#888",fontSize:12,padding:"8px 10px",fontFamily:"'DM Sans',sans-serif",lineHeight:1.6,resize:"vertical",boxSizing:"border-box",outline:"none"}})
       )),
-      React.createElement("button",{onClick:addStep,style:{width:"100%",background:"none",border:"1px dashed #d9e2cc",borderRadius:6,padding:"10px",color:"#c3d1ac",fontSize:10,letterSpacing:"0.12em",cursor:"pointer",marginTop:4}},"+ ADD STEP")
+      React.createElement("button",{onClick:addStep,style:{width:"100%",background:"none",border:"1px dashed #111111",borderRadius:6,padding:"10px",color:"#111111",fontSize:10,letterSpacing:"0.12em",cursor:"pointer",marginTop:4}},"+ ADD STEP")
     );
   }
   return React.createElement("div",null,
     React.createElement("div",{style:{display:"flex",justifyContent:"flex-end",marginBottom:12}},
-      React.createElement("button",{onClick:()=>{setDraft(steps.map(s=>({...s})));setEditing(true);},style:{background:"none",border:"1px solid #d9e2cc",borderRadius:4,padding:"4px 12px",color:"#aaa",fontSize:10,letterSpacing:"0.1em",cursor:"pointer"}},"EDIT")
+      React.createElement("button",{onClick:()=>{setDraft(steps.map(s=>({...s})));setEditing(true);},style:{background:"none",border:"1px solid #111111",borderRadius:4,padding:"4px 12px",color:"#aaa",fontSize:10,letterSpacing:"0.1em",cursor:"pointer"}},"EDIT")
     ),
-    steps.length===0&&React.createElement("div",{style:{fontSize:10,color:"#d9e2cc",letterSpacing:"0.1em",textAlign:"center",padding:"20px 0"}},"NO STEPS YET · TAP EDIT TO ADD"),
+    steps.length===0&&React.createElement("div",{style:{fontSize:10,color:"#111111",letterSpacing:"0.1em",textAlign:"center",padding:"20px 0"}},"NO STEPS YET · TAP EDIT TO ADD"),
     steps.map((s,i)=>React.createElement("div",{key:i,style:{display:"flex",gap:12,marginBottom:16,paddingBottom:16,borderBottom:i<steps.length-1?"1px solid #f6f7f5":"none"}},
       React.createElement("div",{style:{fontFamily:"'Bebas Neue',sans-serif",fontSize:22,color:"#8cc63e",lineHeight:1,minWidth:20,paddingTop:1}},(i+1).toString()),
       React.createElement("div",null,
@@ -1941,8 +1941,8 @@ function InviteForm(props){
   }
   return React.createElement("div",null,
     React.createElement("div",{style:{fontSize:10,color:"#555",letterSpacing:"0.1em",marginBottom:12,lineHeight:1.7}},description),
-    React.createElement("input",{type:"email",placeholder:"member@email.com",value:email,onChange:e=>setEmail(e.target.value),onKeyDown:e=>{if(e.key==="Enter")send();},style:{width:"100%",background:"#f6f7f5",border:"1px solid #d9e2cc",borderRadius:4,color:"#d9e2cc",fontSize:13,padding:"10px 12px",fontFamily:"'DM Sans',sans-serif",letterSpacing:"0.02em",boxSizing:"border-box",marginBottom:10,outline:"none"}}),
-    React.createElement("button",{onClick:send,disabled:sending||!email.trim(),style:{width:"100%",background:email.trim()?"#8cc63e":"#f6f7f5",border:"none",borderRadius:4,padding:"11px",color:email.trim()?"#fff":"#c3d1ac",fontSize:10,letterSpacing:"0.14em",fontWeight:600,cursor:email.trim()?"pointer":"default",fontFamily:"'DM Sans',sans-serif",transition:"all .15s"}},sending?"SENDING...":buttonLabel),
+    React.createElement("input",{type:"email",placeholder:"member@email.com",value:email,onChange:e=>setEmail(e.target.value),onKeyDown:e=>{if(e.key==="Enter")send();},style:{width:"100%",background:"#f6f7f5",border:"1px solid #111111",borderRadius:4,color:"#111111",fontSize:13,padding:"10px 12px",fontFamily:"'DM Sans',sans-serif",letterSpacing:"0.02em",boxSizing:"border-box",marginBottom:10,outline:"none"}}),
+    React.createElement("button",{onClick:send,disabled:sending||!email.trim(),style:{width:"100%",background:email.trim()?"#8cc63e":"#f6f7f5",border:"none",borderRadius:4,padding:"11px",color:email.trim()?"#fff":"#111111",fontSize:10,letterSpacing:"0.14em",fontWeight:600,cursor:email.trim()?"pointer":"default",fontFamily:"'DM Sans',sans-serif",transition:"all .15s"}},sending?"SENDING...":buttonLabel),
     msg&&React.createElement("div",{style:{marginTop:10,fontSize:10,letterSpacing:"0.1em",color:msg.startsWith("✓")?"#4aaa66":"#e05",textAlign:"center"}},msg)
   );
 }
@@ -1980,23 +1980,23 @@ function TierEditor({showToast}){
     type,value:draft[field]??"",
     onChange:e=>setDraft(d=>({...d,[field]:e.target.value})),
     placeholder,
-    style:{width:"100%",background:"#f6f7f5",border:"1px solid #d9e2cc",borderRadius:4,color:"#d9e2cc",fontSize:13,padding:"8px 10px",fontFamily:"'DM Sans',sans-serif",boxSizing:"border-box",marginBottom:8,outline:"none"}
+    style:{width:"100%",background:"#f6f7f5",border:"1px solid #111111",borderRadius:4,color:"#111111",fontSize:13,padding:"8px 10px",fontFamily:"'DM Sans',sans-serif",boxSizing:"border-box",marginBottom:8,outline:"none"}
   });
-  if(loading)return React.createElement("div",{style:{fontSize:10,color:"#c3d1ac",letterSpacing:"0.1em",padding:"10px 0"}},"LOADING...");
+  if(loading)return React.createElement("div",{style:{fontSize:10,color:"#111111",letterSpacing:"0.1em",padding:"10px 0"}},"LOADING...");
   return React.createElement("div",null,
     tiers.map(tier=>{
       const isOpen=expanded===tier.id;
       const isEditing=editing===tier.id;
-      return React.createElement("div",{key:tier.id,style:{background:"#f6f7f5",border:"1px solid #d9e2cc",borderRadius:6,marginBottom:6,overflow:"hidden"}},
+      return React.createElement("div",{key:tier.id,style:{background:"#f6f7f5",border:"1px solid #111111",borderRadius:6,marginBottom:6,overflow:"hidden"}},
         React.createElement("button",{onClick:()=>{setExpanded(isOpen?null:tier.id);setEditing(null);},style:{width:"100%",background:"none",border:"none",padding:"12px",display:"flex",alignItems:"center",justifyContent:"space-between",cursor:"pointer",textAlign:"left"}},
-          React.createElement("div",{style:{fontFamily:"'Bebas Neue',sans-serif",fontSize:16,letterSpacing:"0.08em",color:"#d9e2cc"}},tier.name),
-          React.createElement("div",{style:{color:"#c3d1ac",fontSize:12,transition:"transform .2s",transform:isOpen?"rotate(180deg)":"rotate(0deg)",lineHeight:1}},"▾")
+          React.createElement("div",{style:{fontFamily:"'Bebas Neue',sans-serif",fontSize:16,letterSpacing:"0.08em",color:"#111111"}},tier.name),
+          React.createElement("div",{style:{color:"#111111",fontSize:12,transition:"transform .2s",transform:isOpen?"rotate(180deg)":"rotate(0deg)",lineHeight:1}},"▾")
         ),
         isOpen&&React.createElement("div",{style:{padding:"0 12px 14px"}},
           !isEditing
             ?React.createElement("div",null,
                 React.createElement("div",{style:{display:"flex",justifyContent:"flex-end",marginBottom:10}},
-                  React.createElement("button",{onClick:()=>startEdit(tier),style:{background:"none",border:"1px solid #d9e2cc",borderRadius:4,padding:"4px 12px",color:"#aaa",fontSize:10,letterSpacing:"0.1em",cursor:"pointer"}},"EDIT")
+                  React.createElement("button",{onClick:()=>startEdit(tier),style:{background:"none",border:"1px solid #111111",borderRadius:4,padding:"4px 12px",color:"#aaa",fontSize:10,letterSpacing:"0.1em",cursor:"pointer"}},"EDIT")
                 ),
                 React.createElement("div",{style:{fontSize:11,color:"#888",letterSpacing:"0.06em",marginBottom:6,fontWeight:400}},tier.desc_text),
                 tier.note&&React.createElement("div",{style:{fontSize:10,color:"#555",letterSpacing:"0.06em",marginBottom:10}},tier.note),
@@ -2004,13 +2004,13 @@ function TierEditor({showToast}){
                   [[12,"12 MO","price_12"],[6,"6 MO","price_6"],[3,"3 MO","price_3"]].map(([t,lbl,k])=>React.createElement("div",{key:t,style:{flex:1,background:"#f6f7f5",border:"1px solid #edefea",borderRadius:4,padding:"7px 4px",textAlign:"center"}},
                     React.createElement("div",{style:{fontSize:8,letterSpacing:"0.1em",color:"#555",fontWeight:600,marginBottom:2}},lbl),
                     React.createElement("div",{style:{fontFamily:"'Bebas Neue',sans-serif",fontSize:15,color:"#aaa"}},"$"+parseFloat(tier[k]).toFixed(2)),
-                    React.createElement("div",{style:{fontSize:7,color:"#c3d1ac",letterSpacing:"0.08em"}},"per week")
+                    React.createElement("div",{style:{fontSize:7,color:"#111111",letterSpacing:"0.08em"}},"per week")
                   ))
                 )
               )
             :React.createElement("div",null,
                 React.createElement("div",{style:{display:"flex",justifyContent:"flex-end",gap:8,marginBottom:10}},
-                  React.createElement("button",{onClick:()=>setEditing(null),style:{background:"none",border:"1px solid #d9e2cc",borderRadius:4,padding:"4px 12px",color:"#666",fontSize:10,letterSpacing:"0.1em",cursor:"pointer"}},"CANCEL"),
+                  React.createElement("button",{onClick:()=>setEditing(null),style:{background:"none",border:"1px solid #111111",borderRadius:4,padding:"4px 12px",color:"#666",fontSize:10,letterSpacing:"0.1em",cursor:"pointer"}},"CANCEL"),
                   React.createElement("button",{onClick:()=>save(tier.id),disabled:saving,style:{background:"#8cc63e",border:"none",borderRadius:4,padding:"4px 14px",color:"#181818",fontSize:10,letterSpacing:"0.1em",cursor:"pointer",fontWeight:600}},saving?"SAVING...":"SAVE")
                 ),
                 React.createElement("div",{style:{fontSize:9,letterSpacing:"0.14em",color:"#555",fontWeight:600,marginBottom:4}},"TIER NAME"),
@@ -2024,7 +2024,7 @@ function TierEditor({showToast}){
                   [["price_12","12 MO"],["price_6","6 MO"],["price_3","3 MO"]].map(([k,lbl])=>React.createElement("div",{key:k,style:{flex:1}},
                     React.createElement("div",{style:{fontSize:8,color:"#555",letterSpacing:"0.1em",fontWeight:600,marginBottom:4,textAlign:"center"}},lbl),
                     React.createElement("input",{type:"number",value:draft[k]??"",onChange:e=>setDraft(d=>({...d,[k]:e.target.value})),
-                      style:{width:"100%",background:"#f6f7f5",border:"1px solid #d9e2cc",borderRadius:4,color:"#d9e2cc",fontSize:14,padding:"8px 6px",fontFamily:"'DM Sans',sans-serif",boxSizing:"border-box",textAlign:"center",outline:"none"}})
+                      style:{width:"100%",background:"#f6f7f5",border:"1px solid #111111",borderRadius:4,color:"#111111",fontSize:14,padding:"8px 6px",fontFamily:"'DM Sans',sans-serif",boxSizing:"border-box",textAlign:"center",outline:"none"}})
                   ))
                 )
               )
@@ -2038,7 +2038,7 @@ function OnboardingPanel({id,title,children,openPanel,setOpenPanel}){
   return React.createElement("div",{style:{background:"#f6f7f5",border:"1px solid #edefea",borderRadius:8,marginBottom:8,overflow:"hidden"}},
     React.createElement("button",{onClick:()=>setOpenPanel(open?null:id),style:{width:"100%",background:"none",border:"none",padding:"14px",display:"flex",alignItems:"center",justifyContent:"space-between",cursor:"pointer",textAlign:"left"}},
       React.createElement("div",{style:{fontFamily:"'Bebas Neue',sans-serif",fontSize:18,letterSpacing:"0.08em",color:"#181818"}},title),
-      React.createElement("div",{style:{color:"#c3d1ac",fontSize:14,transition:"transform .2s",transform:open?"rotate(180deg)":"rotate(0deg)",lineHeight:1}},"▾")
+      React.createElement("div",{style:{color:"#111111",fontSize:14,transition:"transform .2s",transform:open?"rotate(180deg)":"rotate(0deg)",lineHeight:1}},"▾")
     ),
     open&&React.createElement("div",{style:{padding:"0 14px 14px"}},children)
   );
@@ -2114,30 +2114,30 @@ function CoachingNoteEditor({className,showToast}){
     showToast("Notes saved ✓");
   }
   function updateDraft(i,field,val){setDraft(d=>d.map((s,idx)=>idx===i?{...s,[field]:val}:s));}
-  if(!loaded)return React.createElement("div",{style:{fontSize:10,color:"#c3d1ac",letterSpacing:"0.1em",padding:"10px 0"}},"LOADING...");
+  if(!loaded)return React.createElement("div",{style:{fontSize:10,color:"#111111",letterSpacing:"0.1em",padding:"10px 0"}},"LOADING...");
   if(editing){
     return React.createElement("div",null,
       React.createElement("div",{style:{display:"flex",justifyContent:"flex-end",gap:8,marginBottom:14}},
-        React.createElement("button",{onClick:()=>setEditing(false),style:{background:"none",border:"1px solid #d9e2cc",borderRadius:4,padding:"4px 12px",color:"#666",fontSize:10,letterSpacing:"0.1em",cursor:"pointer"}},"CANCEL"),
+        React.createElement("button",{onClick:()=>setEditing(false),style:{background:"none",border:"1px solid #111111",borderRadius:4,padding:"4px 12px",color:"#666",fontSize:10,letterSpacing:"0.1em",cursor:"pointer"}},"CANCEL"),
         React.createElement("button",{onClick:save,disabled:saving,style:{background:"#8cc63e",border:"none",borderRadius:4,padding:"4px 14px",color:"#181818",fontSize:10,letterSpacing:"0.1em",cursor:"pointer",fontWeight:600}},saving?"SAVING...":"SAVE")
       ),
       draft.map((s,i)=>React.createElement("div",{key:i,style:{background:"#f6f7f5",border:"1px solid #edefea",borderRadius:6,padding:"12px",marginBottom:10}},
         React.createElement("div",{style:{display:"flex",alignItems:"center",gap:10,marginBottom:8}},
           React.createElement("input",{value:s.title,onChange:e=>updateDraft(i,"title",e.target.value),placeholder:"Section title",
-            style:{flex:1,background:"#f6f7f5",border:"1px solid #d9e2cc",borderRadius:4,color:"#d9e2cc",fontSize:12,padding:"6px 10px",fontFamily:"'DM Sans',sans-serif",outline:"none",letterSpacing:"0.06em"}}),
-          React.createElement("button",{onClick:()=>setDraft(d=>d.filter((_,idx)=>idx!==i)),style:{background:"none",border:"1px solid #d9e2cc",borderRadius:4,padding:"3px 8px",color:"#555",fontSize:11,cursor:"pointer",flexShrink:0}},"✕")
+            style:{flex:1,background:"#f6f7f5",border:"1px solid #111111",borderRadius:4,color:"#111111",fontSize:12,padding:"6px 10px",fontFamily:"'DM Sans',sans-serif",outline:"none",letterSpacing:"0.06em"}}),
+          React.createElement("button",{onClick:()=>setDraft(d=>d.filter((_,idx)=>idx!==i)),style:{background:"none",border:"1px solid #111111",borderRadius:4,padding:"3px 8px",color:"#555",fontSize:11,cursor:"pointer",flexShrink:0}},"✕")
         ),
         React.createElement("textarea",{value:s.body,onChange:e=>updateDraft(i,"body",e.target.value),placeholder:"Notes for this section",rows:4,
-          style:{width:"100%",background:"#f6f7f5",border:"1px solid #d9e2cc",borderRadius:4,color:"#888",fontSize:12,padding:"8px 10px",fontFamily:"'DM Sans',sans-serif",lineHeight:1.6,resize:"vertical",boxSizing:"border-box",outline:"none"}})
+          style:{width:"100%",background:"#f6f7f5",border:"1px solid #111111",borderRadius:4,color:"#888",fontSize:12,padding:"8px 10px",fontFamily:"'DM Sans',sans-serif",lineHeight:1.6,resize:"vertical",boxSizing:"border-box",outline:"none"}})
       )),
-      React.createElement("button",{onClick:()=>setDraft(d=>[...d,{title:"",body:""}]),style:{width:"100%",background:"none",border:"1px dashed #d9e2cc",borderRadius:6,padding:"10px",color:"#c3d1ac",fontSize:10,letterSpacing:"0.12em",cursor:"pointer",marginTop:4}},"+ ADD SECTION")
+      React.createElement("button",{onClick:()=>setDraft(d=>[...d,{title:"",body:""}]),style:{width:"100%",background:"none",border:"1px dashed #111111",borderRadius:6,padding:"10px",color:"#111111",fontSize:10,letterSpacing:"0.12em",cursor:"pointer",marginTop:4}},"+ ADD SECTION")
     );
   }
   return React.createElement("div",null,
     React.createElement("div",{style:{display:"flex",justifyContent:"flex-end",marginBottom:12}},
-      React.createElement("button",{onClick:()=>{setDraft(sections.map(s=>({...s})));setEditing(true);},style:{background:"none",border:"1px solid #d9e2cc",borderRadius:4,padding:"4px 12px",color:"#aaa",fontSize:10,letterSpacing:"0.1em",cursor:"pointer"}},"EDIT")
+      React.createElement("button",{onClick:()=>{setDraft(sections.map(s=>({...s})));setEditing(true);},style:{background:"none",border:"1px solid #111111",borderRadius:4,padding:"4px 12px",color:"#aaa",fontSize:10,letterSpacing:"0.1em",cursor:"pointer"}},"EDIT")
     ),
-    sections.length===0&&React.createElement("div",{style:{fontSize:10,color:"#d9e2cc",letterSpacing:"0.1em",textAlign:"center",padding:"20px 0"}},"NO NOTES YET · TAP EDIT TO ADD"),
+    sections.length===0&&React.createElement("div",{style:{fontSize:10,color:"#111111",letterSpacing:"0.1em",textAlign:"center",padding:"20px 0"}},"NO NOTES YET · TAP EDIT TO ADD"),
     sections.map((s,i)=>React.createElement("div",{key:i,style:{marginBottom:16,paddingBottom:16,borderBottom:i<sections.length-1?"1px solid #f6f7f5":"none"}},
       React.createElement("div",{style:{fontFamily:"'Bebas Neue',sans-serif",fontSize:14,letterSpacing:"0.1em",color:"#181818",marginBottom:s.body?6:0}},s.title),
       s.body&&React.createElement("div",{style:{fontSize:12,color:"#777",lineHeight:1.7,fontWeight:300,whiteSpace:"pre-wrap"}},s.body)
@@ -2248,7 +2248,7 @@ function WorkoutDetailsEditor({className,showToast}){
     const parts=groups.map((g,i)=>`<div class="rd" data-rd="${i}">${g.hideTv?"":`<div class="sec"><span class="rnm">${displayEsc(g.hdr)}</span><span class="rtot">${(g.dur&&g.dur.trim())?displayEsc(g.dur.trim()):fmtSecs(roundSecs(g.sts))}</span></div>`}<div class="sts">${g.sts.map(stCard).join("")}</div></div>`).join("");
     const visRounds=groups.map((g,i)=>({g,i})).filter(o=>!o.g.hideTv);
     const ctrlHtml=visRounds.length>1?`<div id="ctrl"><button class="rbtn active" data-i="-1">ALL</button>${visRounds.map(o=>{const m=(o.g.hdr||"").match(/(\d+)/);return `<button class="rbtn" data-i="${o.i}">${m?("R"+m[1]):("R"+(o.i+1))}</button>`;}).join("")}</div>`:"";
-    const html=`<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${displayEsc(className)}</title><link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,600&family=Syncopate:wght@700&display=swap" rel="stylesheet"><style>*{box-sizing:border-box;margin:0;padding:0}html,body{height:100%;background:#ffffff;color:#181818;font-family:'DM Sans',sans-serif;overflow:hidden}body{display:flex;align-items:center;justify-content:center}#fit{width:100vw;padding:2.4vh 3vw;transform-origin:center center}h1{font-family:'Syncopate',sans-serif;font-weight:700;font-size:22px;letter-spacing:0.1em;text-align:center;margin-bottom:8px}.wname{color:#8cc63e}#ctrl{position:fixed;bottom:8px;left:50%;transform:translateX(-50%);z-index:10;display:flex;gap:6px;background:rgba(8,8,8,0.72);border:1px solid #d9e2cc;border-radius:9px;padding:5px 7px;max-width:96vw;overflow-x:auto}.rbtn{background:#f6f7f5;color:#9aa;border:1px solid #d9e2cc;border-radius:5px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:0.08em;padding:5px 12px;cursor:pointer;white-space:nowrap;flex-shrink:0}.rbtn.active{background:#8cc63e;color:#181818;border-color:#8cc63e}.rd{margin-bottom:24px}.sec{display:flex;align-items:baseline;gap:12px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:0.1em;background:#eef7e0;border:1px solid #c3d1ac;border-radius:6px;padding:3px 11px;margin-bottom:12px}.rnm{color:#8cc63e}.rtot{color:#cfe3f5;font-size:12px;font-weight:400;font-family:'DM Sans',sans-serif;letter-spacing:0.08em}.sts{display:grid;grid-template-columns:repeat(5,1fr);grid-auto-rows:1fr;gap:16px}.cell{display:flex;flex-direction:column}.top{display:grid;grid-template-columns:1fr auto 1fr;align-items:baseline;gap:8px;margin-bottom:3px;padding:0 3px}.stn{font-size:11px;font-weight:400;letter-spacing:0.12em;color:#181818;text-align:left}.trep{font-size:13px;font-weight:700;letter-spacing:0.05em;color:#8cc63e;text-align:center;white-space:nowrap}.sdur{font-size:11px;font-weight:400;letter-spacing:0.12em;color:#181818;text-align:right}.st{flex:1;background:#edefea;border:1px solid #c3d1ac;border-radius:9px;padding:9px 9px;display:flex;flex-direction:column}.ex{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:0.09em;line-height:1.12;text-align:center;margin-bottom:3px;text-decoration:underline;text-decoration-color:#6b7d8c;text-decoration-thickness:1px;text-underline-offset:3px}.mao{font-size:11px;font-style:italic;color:#8cc63e;text-align:center;line-height:1.1;margin-bottom:6px}.lv{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:auto}.lvc{display:flex;flex-direction:column}.lvn{font-size:9px;letter-spacing:0.02em;color:#181818;font-weight:600;text-align:center;margin-bottom:3px}.lvb{flex:1;display:flex;align-items:center;justify-content:center;text-align:center;background:#eef7e0;border:1px solid #c3d1ac;border-radius:5px;padding:5px 3px;font-size:14px;color:#181818;line-height:1.15;min-height:24px}#fit.solo .sts{row-gap:42px}#fit.solo .st{padding:20px 14px}#fit.solo .top{margin-bottom:7px}#fit.solo .stn,#fit.solo .sdur{font-size:14px}#fit.solo .trep{font-size:18px}#fit.solo .ex{font-size:26px;margin-bottom:8px}#fit.solo .mao{font-size:17px;margin-bottom:18px}#fit.solo .lv{gap:10px}#fit.solo .lvn{font-size:10px;letter-spacing:0;margin-bottom:6px;white-space:nowrap}#fit.solo .lvb{min-height:84px;font-size:18px;white-space:nowrap}</style></head><body>${ctrlHtml}<div id="fit"><h1>SOUL FITNESS <span class="wname">${displayEsc(className)}</span></h1>${parts}</div><script>(function(){function fit(){var f=document.getElementById('fit');if(!f)return;var vw=window.innerWidth,vh=window.innerHeight;var portrait=vh>vw;var lng=Math.max(vw,vh),sht=Math.min(vw,vh);f.style.transform='none';f.style.width=lng+'px';var w=f.offsetWidth,h=f.offsetHeight;var s=Math.min(lng/w,sht/h);f.style.transform=(portrait?'rotate(90deg) ':'')+'scale('+s+')';}function setRound(i){var fx=document.getElementById('fit');if(fx)fx.className=(i>=0?'solo':'');var rds=document.querySelectorAll('#fit .rd');for(var k=0;k<rds.length;k++){rds[k].style.display=(i<0||k===i)?'':'none';}var bs=document.querySelectorAll('#ctrl .rbtn');for(var j=0;j<bs.length;j++){bs[j].className='rbtn'+((bs[j].getAttribute('data-i')==String(i))?' active':'');}fit();}Array.prototype.forEach.call(document.querySelectorAll('#ctrl .rbtn'),function(b){b.onclick=function(){setRound(parseInt(b.getAttribute('data-i')));};});window.addEventListener('resize',fit);window.addEventListener('orientationchange',function(){setTimeout(fit,100);});window.addEventListener('load',fit);if(document.fonts&&document.fonts.ready){document.fonts.ready.then(fit);}setTimeout(fit,250);})();<\/script></body></html>`;
+    const html=`<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${displayEsc(className)}</title><link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,600&family=Syncopate:wght@700&display=swap" rel="stylesheet"><style>*{box-sizing:border-box;margin:0;padding:0}html,body{height:100%;background:#ffffff;color:#181818;font-family:'DM Sans',sans-serif;overflow:hidden}body{display:flex;align-items:center;justify-content:center}#fit{width:100vw;padding:2.4vh 3vw;transform-origin:center center}h1{font-family:'Syncopate',sans-serif;font-weight:700;font-size:22px;letter-spacing:0.1em;text-align:center;margin-bottom:8px}.wname{color:#8cc63e}#ctrl{position:fixed;bottom:8px;left:50%;transform:translateX(-50%);z-index:10;display:flex;gap:6px;background:rgba(8,8,8,0.72);border:1px solid #111111;border-radius:9px;padding:5px 7px;max-width:96vw;overflow-x:auto}.rbtn{background:#f6f7f5;color:#9aa;border:1px solid #111111;border-radius:5px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:0.08em;padding:5px 12px;cursor:pointer;white-space:nowrap;flex-shrink:0}.rbtn.active{background:#8cc63e;color:#181818;border-color:#8cc63e}.rd{margin-bottom:24px}.sec{display:flex;align-items:baseline;gap:12px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:0.1em;background:#eef7e0;border:1px solid #111111;border-radius:6px;padding:3px 11px;margin-bottom:12px}.rnm{color:#8cc63e}.rtot{color:#cfe3f5;font-size:12px;font-weight:400;font-family:'DM Sans',sans-serif;letter-spacing:0.08em}.sts{display:grid;grid-template-columns:repeat(5,1fr);grid-auto-rows:1fr;gap:16px}.cell{display:flex;flex-direction:column}.top{display:grid;grid-template-columns:1fr auto 1fr;align-items:baseline;gap:8px;margin-bottom:3px;padding:0 3px}.stn{font-size:11px;font-weight:400;letter-spacing:0.12em;color:#181818;text-align:left}.trep{font-size:13px;font-weight:700;letter-spacing:0.05em;color:#8cc63e;text-align:center;white-space:nowrap}.sdur{font-size:11px;font-weight:400;letter-spacing:0.12em;color:#181818;text-align:right}.st{flex:1;background:#edefea;border:1px solid #111111;border-radius:9px;padding:9px 9px;display:flex;flex-direction:column}.ex{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:0.09em;line-height:1.12;text-align:center;margin-bottom:3px;text-decoration:underline;text-decoration-color:#6b7d8c;text-decoration-thickness:1px;text-underline-offset:3px}.mao{font-size:11px;font-style:italic;color:#8cc63e;text-align:center;line-height:1.1;margin-bottom:6px}.lv{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:auto}.lvc{display:flex;flex-direction:column}.lvn{font-size:9px;letter-spacing:0.02em;color:#181818;font-weight:600;text-align:center;margin-bottom:3px}.lvb{flex:1;display:flex;align-items:center;justify-content:center;text-align:center;background:#eef7e0;border:1px solid #111111;border-radius:5px;padding:5px 3px;font-size:14px;color:#181818;line-height:1.15;min-height:24px}#fit.solo .sts{row-gap:42px}#fit.solo .st{padding:20px 14px}#fit.solo .top{margin-bottom:7px}#fit.solo .stn,#fit.solo .sdur{font-size:14px}#fit.solo .trep{font-size:18px}#fit.solo .ex{font-size:26px;margin-bottom:8px}#fit.solo .mao{font-size:17px;margin-bottom:18px}#fit.solo .lv{gap:10px}#fit.solo .lvn{font-size:10px;letter-spacing:0;margin-bottom:6px;white-space:nowrap}#fit.solo .lvb{min-height:84px;font-size:18px;white-space:nowrap}</style></head><body>${ctrlHtml}<div id="fit"><h1>SOUL FITNESS <span class="wname">${displayEsc(className)}</span></h1>${parts}</div><script>(function(){function fit(){var f=document.getElementById('fit');if(!f)return;var vw=window.innerWidth,vh=window.innerHeight;var portrait=vh>vw;var lng=Math.max(vw,vh),sht=Math.min(vw,vh);f.style.transform='none';f.style.width=lng+'px';var w=f.offsetWidth,h=f.offsetHeight;var s=Math.min(lng/w,sht/h);f.style.transform=(portrait?'rotate(90deg) ':'')+'scale('+s+')';}function setRound(i){var fx=document.getElementById('fit');if(fx)fx.className=(i>=0?'solo':'');var rds=document.querySelectorAll('#fit .rd');for(var k=0;k<rds.length;k++){rds[k].style.display=(i<0||k===i)?'':'none';}var bs=document.querySelectorAll('#ctrl .rbtn');for(var j=0;j<bs.length;j++){bs[j].className='rbtn'+((bs[j].getAttribute('data-i')==String(i))?' active':'');}fit();}Array.prototype.forEach.call(document.querySelectorAll('#ctrl .rbtn'),function(b){b.onclick=function(){setRound(parseInt(b.getAttribute('data-i')));};});window.addEventListener('resize',fit);window.addEventListener('orientationchange',function(){setTimeout(fit,100);});window.addEventListener('load',fit);if(document.fonts&&document.fonts.ready){document.fonts.ready.then(fit);}setTimeout(fit,250);})();<\/script></body></html>`;
     try{
       const blob=new Blob([html],{type:"text/html"});
       const url=URL.createObjectURL(blob);
@@ -2283,17 +2283,17 @@ function WorkoutDetailsEditor({className,showToast}){
     }
     setLegacy("");setSaving(false);setEditing(false);showToast("Workout saved ✓");
   }
-  if(!loaded)return React.createElement("div",{style:{color:"#c3d1ac",fontSize:11,padding:"12px 0"}},"Loading...");
+  if(!loaded)return React.createElement("div",{style:{color:"#111111",fontSize:11,padding:"12px 0"}},"Loading...");
   if(!editing){
     let curSec=null;
     return React.createElement("div",null,
       React.createElement("div",{style:{display:"flex",gap:8,marginBottom:12}},
-        React.createElement("button",{onClick:()=>setEditing(true),style:{flex:1,background:"#f6f7f5",color:"#d9e2cc",border:"1px solid #d9e2cc",borderRadius:6,padding:"9px 0",fontFamily:"'Bebas Neue',sans-serif",fontSize:13,letterSpacing:"0.12em",cursor:"pointer"}},"✎ EDIT WORKOUT"),
+        React.createElement("button",{onClick:()=>setEditing(true),style:{flex:1,background:"#f6f7f5",color:"#111111",border:"1px solid #111111",borderRadius:6,padding:"9px 0",fontFamily:"'Bebas Neue',sans-serif",fontSize:13,letterSpacing:"0.12em",cursor:"pointer"}},"✎ EDIT WORKOUT"),
         rows.length>0&&React.createElement("button",{onClick:openDisplay,style:{flex:1,background:"#eef7e0",color:"#8cc63e",border:"1px solid #bfe08a",borderRadius:6,padding:"9px 0",fontFamily:"'Bebas Neue',sans-serif",fontSize:13,letterSpacing:"0.12em",cursor:"pointer"}},"📺 TV VIEW"),
         rows.length>0&&React.createElement("button",{onClick:()=>{const u="tv.html?w="+encodeURIComponent(className);const w=window.open(u,"_blank");if(!w)window.location.href=u;},title:"Opens the full-screen TV page with a Cast button (uses the last SAVED version)",style:{flex:1,background:"#12331a",color:"#3ddc84",border:"1px solid #1d5a34",borderRadius:6,padding:"9px 0",fontFamily:"'Bebas Neue',sans-serif",fontSize:13,letterSpacing:"0.12em",cursor:"pointer"}},"▸ CAST TO TV")
       ),
       legacy&&React.createElement("div",{style:{whiteSpace:"pre-wrap",fontSize:12,color:"#aaa",lineHeight:1.6,marginBottom:12}},legacy),
-      rows.length===0&&!legacy&&React.createElement("div",{style:{fontSize:11,color:"#c3d1ac",letterSpacing:"0.1em",padding:"16px 0",textAlign:"center"}},"NO WORKOUT YET · TAP EDIT TO BUILD IT"),
+      rows.length===0&&!legacy&&React.createElement("div",{style:{fontSize:11,color:"#111111",letterSpacing:"0.1em",padding:"16px 0",textAlign:"center"}},"NO WORKOUT YET · TAP EDIT TO BUILD IT"),
       ...rows.map(r=>{
         if(r.hdr!=null){
           curSec=r.id;const isC=collapsed.has(r.id);
@@ -2313,24 +2313,24 @@ function WorkoutDetailsEditor({className,showToast}){
               React.createElement("span",{style:{fontFamily:"'Bebas Neue',sans-serif",fontSize:15,letterSpacing:"0.04em",color:"#181818"}},r.exercise),
               r.maori&&React.createElement("span",{style:{fontSize:11,fontStyle:"italic",color:"#8cc63e",marginLeft:8}},r.maori)
             ),
-            repsBox&&React.createElement("span",{style:{fontSize:11,color:"#181818",border:"1px solid #d9e2cc",borderRadius:5,padding:"3px 10px",flexShrink:0,whiteSpace:"nowrap",fontWeight:600}},repsBox)
+            repsBox&&React.createElement("span",{style:{fontSize:11,color:"#181818",border:"1px solid #111111",borderRadius:5,padding:"3px 10px",flexShrink:0,whiteSpace:"nowrap",fontWeight:600}},repsBox)
           ),
           hasW&&React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:6}},
             [["COMMITMENT",r.c],["CONSISTENCY",r.o],["DETERMINATION",r.d]].map(lv=>React.createElement("div",{key:lv[0],style:{background:"#f6f7f5",border:"1px solid #edefea",borderRadius:5,padding:"6px 5px",textAlign:"center"}},
               React.createElement("div",{style:{fontSize:7,letterSpacing:"0.06em",color:"#555",fontWeight:600,marginBottom:3}},lv[0]),
-              React.createElement("div",{style:{fontSize:11,color:"#d9e2cc",lineHeight:1.35,whiteSpace:"pre-wrap"}},lv[1]||"")
+              React.createElement("div",{style:{fontSize:11,color:"#111111",lineHeight:1.35,whiteSpace:"pre-wrap"}},lv[1]||"")
             ))
           ),
           r.notes&&React.createElement("div",{style:{fontSize:10,color:"#777",marginTop:6,lineHeight:1.5}},r.notes)
         );
       }),
       rows.length>0&&React.createElement("div",{style:{display:"flex",gap:8,marginTop:12}},
-        React.createElement("button",{onClick:()=>setEditing(true),style:{flex:1,background:"#f6f7f5",color:"#d9e2cc",border:"1px solid #d9e2cc",borderRadius:6,padding:"9px 0",fontFamily:"'Bebas Neue',sans-serif",fontSize:13,letterSpacing:"0.12em",cursor:"pointer"}},"✎ EDIT WORKOUT"),
+        React.createElement("button",{onClick:()=>setEditing(true),style:{flex:1,background:"#f6f7f5",color:"#111111",border:"1px solid #111111",borderRadius:6,padding:"9px 0",fontFamily:"'Bebas Neue',sans-serif",fontSize:13,letterSpacing:"0.12em",cursor:"pointer"}},"✎ EDIT WORKOUT"),
         React.createElement("button",{onClick:openDisplay,style:{flex:1,background:"#eef7e0",color:"#8cc63e",border:"1px solid #bfe08a",borderRadius:6,padding:"9px 0",fontFamily:"'Bebas Neue',sans-serif",fontSize:13,letterSpacing:"0.12em",cursor:"pointer"}},"📺 TV VIEW")
       )
     );
   }
-  const inS={background:"#f6f7f5",border:"1px solid #d9e2cc",borderRadius:4,color:"#d9e2cc",fontSize:13,fontFamily:"'DM Sans',sans-serif",padding:"7px 9px",outline:"none",boxSizing:"border-box"};
+  const inS={background:"#f6f7f5",border:"1px solid #111111",borderRadius:4,color:"#111111",fontSize:13,fontFamily:"'DM Sans',sans-serif",padding:"7px 9px",outline:"none",boxSizing:"border-box"};
   const exNames=Object.keys(lib.maori).sort();
   const listId="exlist-"+className.replace(/[^A-Za-z0-9]/g,"");
   const durOpts=[...new Set([...DUR_CHOICES])];
@@ -2340,7 +2340,7 @@ function WorkoutDetailsEditor({className,showToast}){
     React.createElement("datalist",{id:listId},exNames.map(n=>React.createElement("option",{key:n,value:n}))),
     React.createElement("button",{onClick:save,disabled:saving,style:{width:"100%",background:"#8cc63e",color:"#000",border:"none",borderRadius:6,padding:"11px 0",fontFamily:"'Bebas Neue',sans-serif",fontSize:14,letterSpacing:"0.1em",cursor:"pointer",marginBottom:8}},saving?"SAVING...":"SAVE WORKOUT"),
     React.createElement("div",{style:{display:"flex",gap:8,marginBottom:8}},
-      React.createElement("button",{onClick:addRow,style:{flex:2,background:"none",border:"1px dashed #d9e2cc",borderRadius:6,color:"#666",fontSize:10,letterSpacing:"0.1em",padding:"9px",cursor:"pointer"}},"+ ADD EXERCISE"),
+      React.createElement("button",{onClick:addRow,style:{flex:2,background:"none",border:"1px dashed #111111",borderRadius:6,color:"#666",fontSize:10,letterSpacing:"0.1em",padding:"9px",cursor:"pointer"}},"+ ADD EXERCISE"),
       React.createElement("button",{onClick:addSection,style:{flex:1,background:"none",border:"1px dashed #bfe08a",borderRadius:6,color:"#8cc63e",fontSize:10,letterSpacing:"0.08em",padding:"9px",cursor:"pointer"}},"+ SECTION")
     ),
     hdrIds.length>0&&React.createElement("button",{onClick:()=>{const anyOpen=hdrIds.some(id=>!collapsed.has(id));setCollapsed(anyOpen?new Set(hdrIds):new Set());},style:{width:"100%",background:"none",border:"1px solid #edefea",borderRadius:6,color:"#777",fontSize:9,letterSpacing:"0.12em",padding:"7px",cursor:"pointer",marginBottom:10}},"COLLAPSE / EXPAND ALL ROUNDS"),
@@ -2349,7 +2349,7 @@ function WorkoutDetailsEditor({className,showToast}){
       React.createElement("div",{style:{fontSize:9,letterSpacing:"0.12em",color:"#a80",fontWeight:600,marginBottom:6}},"PREVIOUS (TEXT) — kept until you save"),
       React.createElement("div",{style:{whiteSpace:"pre-wrap",fontSize:12,color:"#aaa",lineHeight:1.6}},legacy)
     ),
-    rows.length===0&&React.createElement("div",{style:{fontSize:11,color:"#c3d1ac",letterSpacing:"0.06em",padding:"6px 0 12px",textAlign:"center"}},"No exercises yet — add your first below."),
+    rows.length===0&&React.createElement("div",{style:{fontSize:11,color:"#111111",letterSpacing:"0.06em",padding:"6px 0 12px",textAlign:"center"}},"No exercises yet — add your first below."),
     ...rows.map((r,idx)=>{
       if(r.hdr!=null){editSec=r.id;const isC=collapsed.has(r.id);
       return React.createElement("div",{key:r.id,style:{display:"flex",gap:6,alignItems:"center",marginTop:6,marginBottom:6,outline:dragOverId===r.id?"2px solid #8cc63e":"none",borderRadius:4},...dropProps(r.id)},
@@ -2357,12 +2357,12 @@ function WorkoutDetailsEditor({className,showToast}){
           React.createElement("button",{onClick:()=>setCollapsed(p=>{const n=new Set(p);n.has(r.id)?n.delete(r.id):n.add(r.id);return n;}),style:{background:"none",border:"none",color:"#888",fontSize:14,cursor:"pointer",transition:"transform .2s",transform:isC?"rotate(-90deg)":"rotate(0deg)",padding:"0 2px",flexShrink:0}},"▾"),
           React.createElement("input",{value:r.hdr,onChange:e=>setRow(r.id,"hdr",e.target.value.toUpperCase()),placeholder:"SECTION (e.g. ROUND 1, WARM UP)",style:{...inS,flex:1,fontFamily:"'Bebas Neue',sans-serif",letterSpacing:"0.12em",fontSize:14,color:"#8cc63e",background:"#eef7e0",borderColor:"#bfe08a"}}),
           React.createElement("input",{value:r.dur||"",onChange:e=>setRow(r.id,"dur",e.target.value),placeholder:"TIME",title:"Round time shown on TV — leave blank to auto-total the station times",style:{...inS,width:60,fontFamily:"'DM Sans',sans-serif",fontSize:11,textAlign:"center",color:"#cfe3f5",background:"#eef7e0",borderColor:"#bfe08a",flexShrink:0}}),
-          React.createElement("button",{onClick:()=>setRow(r.id,"hideTv",!r.hideTv),title:"Hide this round's title on the TV view",style:{background:"none",border:"1px solid "+(r.hideTv?"#8a2515":"#d9e2cc"),borderRadius:4,color:r.hideTv?"#e06040":"#666",fontSize:9,letterSpacing:"0.06em",fontWeight:600,padding:"5px 7px",cursor:"pointer",fontFamily:"'DM Sans',sans-serif",flexShrink:0}},r.hideTv?"TV OFF":"TV"),
+          React.createElement("button",{onClick:()=>setRow(r.id,"hideTv",!r.hideTv),title:"Hide this round's title on the TV view",style:{background:"none",border:"1px solid "+(r.hideTv?"#8a2515":"#111111"),borderRadius:4,color:r.hideTv?"#e06040":"#666",fontSize:9,letterSpacing:"0.06em",fontWeight:600,padding:"5px 7px",cursor:"pointer",fontFamily:"'DM Sans',sans-serif",flexShrink:0}},r.hideTv?"TV OFF":"TV"),
           React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:1}},
             React.createElement("button",{onClick:()=>moveRow(r.id,-1),disabled:idx===0,style:{background:"none",border:"none",color:idx===0?"#edefea":"#666",cursor:idx===0?"default":"pointer",fontSize:10,lineHeight:1,padding:"0 4px"}},"▲"),
             React.createElement("button",{onClick:()=>moveRow(r.id,1),disabled:idx===rows.length-1,style:{background:"none",border:"none",color:idx===rows.length-1?"#edefea":"#666",cursor:idx===rows.length-1?"default":"pointer",fontSize:10,lineHeight:1,padding:"0 4px"}},"▼")
           ),
-          React.createElement("button",{onClick:()=>removeRow(r.id),style:{background:"none",border:"1px solid #d9e2cc",borderRadius:4,color:"#8a2515",fontSize:12,padding:"4px 8px",cursor:"pointer"}},"✕")
+          React.createElement("button",{onClick:()=>removeRow(r.id),style:{background:"none",border:"1px solid #111111",borderRadius:4,color:"#8a2515",fontSize:12,padding:"4px 8px",cursor:"pointer"}},"✕")
         );}
       if(editSec&&collapsed.has(editSec))return null;
       return React.createElement("div",{key:r.id,style:{background:"#f6f7f5",border:"1px solid #edefea",borderRadius:8,padding:"10px",marginBottom:8,outline:dragOverId===r.id?"2px solid #8cc63e":"none"},...dropProps(r.id)},
@@ -2376,7 +2376,7 @@ function WorkoutDetailsEditor({className,showToast}){
           React.createElement("button",{onClick:()=>moveRow(r.id,-1),disabled:idx===0,style:{background:"none",border:"none",color:idx===0?"#edefea":"#666",cursor:idx===0?"default":"pointer",fontSize:10,lineHeight:1,padding:"0 4px"}},"▲"),
           React.createElement("button",{onClick:()=>moveRow(r.id,1),disabled:idx===rows.length-1,style:{background:"none",border:"none",color:idx===rows.length-1?"#edefea":"#666",cursor:idx===rows.length-1?"default":"pointer",fontSize:10,lineHeight:1,padding:"0 4px"}},"▼")
         ),
-        React.createElement("button",{onClick:()=>removeRow(r.id),style:{background:"none",border:"1px solid #d9e2cc",borderRadius:4,color:"#8a2515",fontSize:12,padding:"4px 8px",cursor:"pointer"}},"✕")
+        React.createElement("button",{onClick:()=>removeRow(r.id),style:{background:"none",border:"1px solid #111111",borderRadius:4,color:"#8a2515",fontSize:12,padding:"4px 8px",cursor:"pointer"}},"✕")
       ),
       React.createElement("input",{value:r.maori,onChange:e=>setRow(r.id,"maori",e.target.value),placeholder:"Māori name (auto-fills)",style:{...inS,width:"100%",marginBottom:6,color:"#8cc63e",fontStyle:"italic"}}),
       React.createElement("div",{style:{fontSize:8,letterSpacing:"0.08em",color:"#555",fontWeight:600,marginBottom:3}},"REPS"),
@@ -2391,7 +2391,7 @@ function WorkoutDetailsEditor({className,showToast}){
     );
     }),
     React.createElement("div",{style:{display:"flex",gap:8,marginBottom:8}},
-      React.createElement("button",{onClick:addRow,style:{flex:2,background:"none",border:"1px dashed #d9e2cc",borderRadius:6,color:"#666",fontSize:10,letterSpacing:"0.1em",padding:"9px",cursor:"pointer"}},"+ ADD EXERCISE"),
+      React.createElement("button",{onClick:addRow,style:{flex:2,background:"none",border:"1px dashed #111111",borderRadius:6,color:"#666",fontSize:10,letterSpacing:"0.1em",padding:"9px",cursor:"pointer"}},"+ ADD EXERCISE"),
       React.createElement("button",{onClick:addSection,style:{flex:1,background:"none",border:"1px dashed #bfe08a",borderRadius:6,color:"#8cc63e",fontSize:10,letterSpacing:"0.08em",padding:"9px",cursor:"pointer"}},"+ SECTION")
     ),
     React.createElement("button",{onClick:save,disabled:saving,style:{width:"100%",background:"#8cc63e",color:"#000",border:"none",borderRadius:6,padding:"11px 0",fontFamily:"'Bebas Neue',sans-serif",fontSize:14,letterSpacing:"0.1em",cursor:"pointer"}},saving?"SAVING...":"SAVE WORKOUT")
@@ -2475,14 +2475,14 @@ function LibraryDetailsEditor({showToast,allWorkoutNames}){
     setSaving(false);
     showToast("Library saved · "+updated+" workout"+(updated===1?"":"s")+" updated ✓");
   }
-  if(!loaded)return React.createElement("div",{style:{color:"#c3d1ac",fontSize:11,padding:"12px 0"}},"Loading library…");
-  const inS={background:"#f6f7f5",border:"1px solid #d9e2cc",borderRadius:5,color:"#181818",fontSize:12,padding:"7px 9px",outline:"none",fontFamily:"inherit"};
+  if(!loaded)return React.createElement("div",{style:{color:"#111111",fontSize:11,padding:"12px 0"}},"Loading library…");
+  const inS={background:"#f6f7f5",border:"1px solid #111111",borderRadius:5,color:"#181818",fontSize:12,padding:"7px 9px",outline:"none",fontFamily:"inherit"};
   const ql=q.trim().toUpperCase();
   const filtered=(items||[]).filter(it=>!ql||(it.name||it.ex).toUpperCase().includes(ql)||(it.maori||"").toUpperCase().includes(ql));
   return React.createElement("div",null,
     React.createElement("div",{style:{fontSize:11,color:"#777",lineHeight:1.5,marginBottom:10}},"Edit the master exercise library. Saving updates every SAVED workout that uses each exercise + duration."),
     React.createElement("input",{value:q,onChange:e=>setQ(e.target.value),placeholder:"Search exercise…",style:{...inS,width:"100%",marginBottom:12}}),
-    filtered.length===0&&React.createElement("div",{style:{fontSize:11,color:"#c3d1ac",textAlign:"center",padding:"16px 0"}},"No exercises match."),
+    filtered.length===0&&React.createElement("div",{style:{fontSize:11,color:"#111111",textAlign:"center",padding:"16px 0"}},"No exercises match."),
     filtered.map(it=>{
       const isOpen=!!open[it.ex];
       return React.createElement("div",{key:it.ex,style:{border:"1px solid #edefea",borderRadius:8,marginBottom:8,overflow:"hidden"}},
@@ -2501,7 +2501,7 @@ function LibraryDetailsEditor({showToast,allWorkoutNames}){
           React.createElement("input",{value:it.name||"",onChange:e=>setField(it.ex,"name",e.target.value.toUpperCase()),placeholder:"Exercise name",style:{...inS,width:"100%",marginBottom:12,fontFamily:"'Bebas Neue',sans-serif",letterSpacing:"0.05em",fontSize:14}}),
           React.createElement("div",{style:{fontSize:8,letterSpacing:"0.08em",color:"#555",fontWeight:600,marginBottom:3}},"MĀORI NAME"),
           React.createElement("input",{value:it.maori,onChange:e=>setField(it.ex,"maori",e.target.value),placeholder:"—",style:{...inS,width:"100%",marginBottom:12,color:"#8cc63e",fontStyle:"italic"}}),
-          it.durs.length===0&&React.createElement("div",{style:{fontSize:10,color:"#c3d1ac",marginBottom:8}},"No durations yet — add one below."),
+          it.durs.length===0&&React.createElement("div",{style:{fontSize:10,color:"#111111",marginBottom:8}},"No durations yet — add one below."),
           it.durs.map(d=>React.createElement("div",{key:d.dur,style:{marginBottom:12,paddingBottom:12,borderBottom:"1px solid #f6f7f5"}},
             React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:6}},
               React.createElement("div",{style:{fontFamily:"'Bebas Neue',sans-serif",fontSize:13,letterSpacing:"0.1em",color:"#888"}},d.dur),
@@ -2654,11 +2654,11 @@ function CoachingView({showToast}){
     const hasExtras=extraNames.length>0;
     return React.createElement("div",{key:label,style:{marginBottom:groupSelected?0:16}},
       React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8}},
-        React.createElement("div",{style:{fontSize:10,letterSpacing:"0.18em",color:"#c3d1ac",fontWeight:600}},label),
+        React.createElement("div",{style:{fontSize:10,letterSpacing:"0.18em",color:"#111111",fontWeight:600}},label),
         React.createElement("div",{style:{display:"flex",gap:10}},
           (hasExtras||isCustom)&&React.createElement("button",{
             onClick:()=>setEditGroup(isEditing?null:label),
-            style:{background:"none",border:"none",color:isEditing?"#e06040":"#c3d1ac",fontSize:10,
+            style:{background:"none",border:"none",color:isEditing?"#e06040":"#111111",fontSize:10,
                    letterSpacing:"0.12em",fontFamily:"'Bebas Neue',sans-serif",cursor:"pointer",padding:"0 2px"}
           },isEditing?"DONE":"EDIT"),
           isCustom&&isEditing&&React.createElement("button",{
@@ -2707,7 +2707,7 @@ function CoachingView({showToast}){
           React.createElement("button",{
             onClick:()=>addClass(label,base),
             disabled:adding[label],
-            style:{width:"100%",height:44,background:"#f6f7f5",color:"#c3d1ac",border:"1px dashed #d9e2cc",
+            style:{width:"100%",height:44,background:"#f6f7f5",color:"#111111",border:"1px dashed #111111",
                    borderRadius:8,fontSize:20,cursor:"pointer",
                    display:"flex",alignItems:"center",justifyContent:"center",transition:"color .15s"}
           },adding[label]?"…":"+")
@@ -2740,7 +2740,7 @@ function CoachingView({showToast}){
       React.createElement("div",{style:{fontSize:10,letterSpacing:"0.18em",color:"#555",fontWeight:600}},
         "COACHING NOTES & WORKOUTS"),
       React.createElement("button",{onClick:()=>setShowLib(v=>!v),
-        style:{background:showLib?"#eef7e0":"none",border:"1px solid "+(showLib?"#bfe08a":"#d9e2cc"),borderRadius:6,color:showLib?"#8cc63e":"#666",fontFamily:"'Bebas Neue',sans-serif",fontSize:11,letterSpacing:"0.1em",padding:"6px 11px",cursor:"pointer",flexShrink:0}},
+        style:{background:showLib?"#eef7e0":"none",border:"1px solid "+(showLib?"#bfe08a":"#111111"),borderRadius:6,color:showLib?"#8cc63e":"#666",fontFamily:"'Bebas Neue',sans-serif",fontSize:11,letterSpacing:"0.1em",padding:"6px 11px",cursor:"pointer",flexShrink:0}},
         showLib?"← BACK":"LIBRARY DETAILS")
     ),
     showLib
@@ -2751,8 +2751,8 @@ function CoachingView({showToast}){
     !addingRow
       ? React.createElement("button",{
           onClick:()=>setAddingRow(true),
-          style:{width:"100%",marginTop:8,padding:"12px",background:"#f6f7f5",color:"#c3d1ac",
-                 border:"1px dashed #d9e2cc",borderRadius:8,fontFamily:"'Bebas Neue',sans-serif",
+          style:{width:"100%",marginTop:8,padding:"12px",background:"#f6f7f5",color:"#111111",
+                 border:"1px dashed #111111",borderRadius:8,fontFamily:"'Bebas Neue',sans-serif",
                  fontSize:13,letterSpacing:"0.12em",cursor:"pointer"}},"+ ADD WORKOUT TYPE")
       : React.createElement("div",{style:{marginTop:8,background:"#f6f7f5",border:"1px solid #edefea",borderRadius:8,padding:14}},
           React.createElement("div",{style:{fontSize:10,letterSpacing:"0.14em",color:"#555",marginBottom:8}},"NEW WORKOUT TYPE NAME"),
@@ -2762,7 +2762,7 @@ function CoachingView({showToast}){
             onKeyDown:e=>e.key==="Enter"&&addRow(),
             placeholder:"e.g. HIIT",
             autoFocus:true,
-            style:{width:"100%",background:"#f6f7f5",border:"1px solid #d9e2cc",borderRadius:6,
+            style:{width:"100%",background:"#f6f7f5",border:"1px solid #111111",borderRadius:6,
                    color:"#181818",fontSize:14,fontFamily:"'Bebas Neue',sans-serif",letterSpacing:"0.1em",
                    padding:"10px 12px",marginBottom:10}
           }),
@@ -2772,7 +2772,7 @@ function CoachingView({showToast}){
                      fontFamily:"'Bebas Neue',sans-serif",fontSize:14,letterSpacing:"0.1em",cursor:"pointer"}},
               savingRow?"SAVING...":"ADD"),
             React.createElement("button",{onClick:()=>{setAddingRow(false);setNewRowName("");},
-              style:{flex:1,background:"#f6f7f5",color:"#888",border:"1px solid #d9e2cc",borderRadius:6,
+              style:{flex:1,background:"#f6f7f5",color:"#888",border:"1px solid #111111",borderRadius:6,
                      padding:"10px 0",fontFamily:"'Bebas Neue',sans-serif",fontSize:14,letterSpacing:"0.1em",cursor:"pointer"}},
               "CANCEL")
           )
@@ -2989,12 +2989,12 @@ function ProgressTab({session,isAdmin,showToast,milestoneConfig,bookings,saveMil
   const enabledExercises=exercises.filter(e=>e.enabled);
   const CS={
     card:{background:"#f6f7f5",border:"1px solid #888",borderRadius:7,padding:"12px 14px",marginBottom:7},
-    sectionHdr:{fontFamily:"'Bebas Neue',sans-serif",fontSize:16,letterSpacing:"0.1em",color:"#181818",marginBottom:12,paddingTop:28,marginTop:10,borderTop:"1px solid #d9e2cc"},
+    sectionHdr:{fontFamily:"'Bebas Neue',sans-serif",fontSize:16,letterSpacing:"0.1em",color:"#181818",marginBottom:12,paddingTop:28,marginTop:10,borderTop:"1px solid #111111"},
     label:{fontSize:9,letterSpacing:"0.14em",color:"#555",fontWeight:600,display:"block",marginBottom:4},
-    input:{width:"100%",background:"#f6f7f5",border:"1px solid #d9e2cc",borderRadius:4,padding:"9px 10px",color:"#181818",fontFamily:"'DM Sans',sans-serif",fontSize:14,outline:"none",boxSizing:"border-box",marginBottom:8},
+    input:{width:"100%",background:"#f6f7f5",border:"1px solid #111111",borderRadius:4,padding:"9px 10px",color:"#181818",fontFamily:"'DM Sans',sans-serif",fontSize:14,outline:"none",boxSizing:"border-box",marginBottom:8},
     saveBtn:{background:"#8cc63e",color:"#000",border:"none",borderRadius:3,fontFamily:"'Bebas Neue',sans-serif",fontSize:13,letterSpacing:"0.12em",padding:"9px 18px",cursor:"pointer"},
-    cancelBtn:{background:"none",border:"1px solid #d9e2cc",color:"#666",borderRadius:3,fontFamily:"'Bebas Neue',sans-serif",fontSize:13,letterSpacing:"0.12em",padding:"9px 14px",cursor:"pointer"},
-    editBtn:{background:"none",border:"1px solid #d9e2cc",color:"#888",fontSize:9,letterSpacing:"0.12em",padding:"4px 10px",borderRadius:3,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",fontWeight:600,flexShrink:0,whiteSpace:"nowrap"}
+    cancelBtn:{background:"none",border:"1px solid #111111",color:"#666",borderRadius:3,fontFamily:"'Bebas Neue',sans-serif",fontSize:13,letterSpacing:"0.12em",padding:"9px 14px",cursor:"pointer"},
+    editBtn:{background:"none",border:"1px solid #111111",color:"#888",fontSize:9,letterSpacing:"0.12em",padding:"4px 10px",borderRadius:3,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",fontWeight:600,flexShrink:0,whiteSpace:"nowrap"}
   };
   if(loading)return React.createElement("div",{className:"sp-loading"},"LOADING...");
   return React.createElement("div",{style:{padding:"14px 16px 80px",overflowY:"auto",flex:1}},
@@ -3007,7 +3007,7 @@ function ProgressTab({session,isAdmin,showToast,milestoneConfig,bookings,saveMil
         style:{width:"100%",background:"#f6f7f5",border:"1px solid #edefea",borderRadius:showMilAdmin?"8px 8px 0 0":8,padding:"12px 14px",display:"flex",alignItems:"center",justifyContent:"space-between",cursor:"pointer",textAlign:"left"}
       },
         React.createElement("div",{style:{fontFamily:"'Bebas Neue',sans-serif",fontSize:16,letterSpacing:"0.1em",color:"#aaa"}},"MILESTONE SETTINGS"),
-        React.createElement("div",{style:{color:"#c3d1ac",fontSize:13,transform:showMilAdmin?"rotate(180deg)":"none",lineHeight:1,transition:"transform .2s"}},"▾")
+        React.createElement("div",{style:{color:"#111111",fontSize:13,transform:showMilAdmin?"rotate(180deg)":"none",lineHeight:1,transition:"transform .2s"}},"▾")
       ),
       showMilAdmin&&React.createElement("div",{style:{background:"#f6f7f5",border:"1px solid #edefea",borderTop:"none",borderRadius:"0 0 8px 8px",padding:"4px 14px 14px"}},
         React.createElement(MilestoneAdminPanel,{milestoneConfig,saveMilestoneConfig,showToast})
@@ -3019,10 +3019,10 @@ function ProgressTab({session,isAdmin,showToast,milestoneConfig,bookings,saveMil
         style:{width:"100%",background:"#f6f7f5",border:"1px solid #edefea",borderRadius:showExAdmin?"8px 8px 0 0":8,padding:"12px 14px",display:"flex",alignItems:"center",justifyContent:"space-between",cursor:"pointer",textAlign:"left"}
       },
         React.createElement("div",{style:{fontFamily:"'Bebas Neue',sans-serif",fontSize:16,letterSpacing:"0.1em",color:"#aaa"}},"EXERCISE SETTINGS"),
-        React.createElement("div",{style:{color:"#c3d1ac",fontSize:13,transform:showExAdmin?"rotate(180deg)":"none",lineHeight:1,transition:"transform .2s"}},"▾")
+        React.createElement("div",{style:{color:"#111111",fontSize:13,transform:showExAdmin?"rotate(180deg)":"none",lineHeight:1,transition:"transform .2s"}},"▾")
       ),
       showExAdmin&&React.createElement("div",{style:{background:"#f6f7f5",border:"1px solid #edefea",borderTop:"none",borderRadius:"0 0 8px 8px",padding:"4px 14px 14px"}},
-        exercises.length===0&&React.createElement("div",{style:{fontSize:10,color:"#c3d1ac",textAlign:"center",padding:"12px 0",letterSpacing:"0.14em"}},"NO EXERCISES YET"),
+        exercises.length===0&&React.createElement("div",{style:{fontSize:10,color:"#111111",textAlign:"center",padding:"12px 0",letterSpacing:"0.14em"}},"NO EXERCISES YET"),
         exercises.map((ex,i)=>
           React.createElement("div",{key:ex.id,style:{display:"flex",alignItems:"center",gap:8,padding:"9px 0",borderBottom:"1px solid #f6f7f5"}},
             React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:1,flexShrink:0}},
@@ -3034,9 +3034,9 @@ function ProgressTab({session,isAdmin,showToast,milestoneConfig,bookings,saveMil
                   value:exNameDraft,onChange:e=>setExNameDraft(e.target.value),
                   onKeyDown:e=>{if(e.key==="Enter")saveExName(ex);if(e.key==="Escape")setEditingExName(null);},
                   autoFocus:true,
-                  style:{flex:1,background:"#f6f7f5",border:"1px solid #c3d1ac",borderRadius:4,padding:"5px 8px",color:"#181818",fontFamily:"'Bebas Neue',sans-serif",fontSize:14,letterSpacing:"0.06em",outline:"none"}
+                  style:{flex:1,background:"#f6f7f5",border:"1px solid #111111",borderRadius:4,padding:"5px 8px",color:"#181818",fontFamily:"'Bebas Neue',sans-serif",fontSize:14,letterSpacing:"0.06em",outline:"none"}
                 })
-              :React.createElement("div",{style:{flex:1,fontFamily:"'Bebas Neue',sans-serif",fontSize:15,letterSpacing:"0.06em",color:ex.enabled?"#d9e2cc":"#c3d1ac"}},ex.name),
+              :React.createElement("div",{style:{flex:1,fontFamily:"'Bebas Neue',sans-serif",fontSize:15,letterSpacing:"0.06em",color:ex.enabled?"#111111":"#111111"}},ex.name),
             editingExName===ex.id
               ?React.createElement(React.Fragment,null,
                   React.createElement("button",{onClick:()=>saveExName(ex),style:{...CS.editBtn,color:"#181818",borderColor:"#555"}},"SAVE"),
@@ -3046,14 +3046,14 @@ function ProgressTab({session,isAdmin,showToast,milestoneConfig,bookings,saveMil
                   React.createElement("button",{onClick:()=>{setEditingExName(ex.id);setExNameDraft(ex.name);},style:CS.editBtn},"RENAME"),
                   React.createElement("button",{
                     onClick:()=>toggleExercise(ex),
-                    style:{...CS.editBtn,color:ex.enabled?"#4aaa66":"#555",borderColor:ex.enabled?"#2a4a2a":"#d9e2cc"}
+                    style:{...CS.editBtn,color:ex.enabled?"#4aaa66":"#555",borderColor:ex.enabled?"#2a4a2a":"#111111"}
                   },ex.enabled?"ON":"OFF"),
                   React.createElement("button",{onClick:()=>deleteExercise(ex),style:{...CS.editBtn,color:"#8a2515",borderColor:"#3a1208"}},"DELETE")
                 )
           )
         ),
         !addingEx
-          ?React.createElement("button",{onClick:()=>setAddingEx(true),style:{width:"100%",background:"none",border:"1px dashed #d9e2cc",borderRadius:6,padding:"10px",color:"#555",fontSize:10,letterSpacing:"0.14em",cursor:"pointer",marginTop:10}},"+ ADD EXERCISE")
+          ?React.createElement("button",{onClick:()=>setAddingEx(true),style:{width:"100%",background:"none",border:"1px dashed #111111",borderRadius:6,padding:"10px",color:"#555",fontSize:10,letterSpacing:"0.14em",cursor:"pointer",marginTop:10}},"+ ADD EXERCISE")
           :React.createElement("div",{style:{marginTop:10}},
               React.createElement("input",{
                 value:newExName,onChange:e=>setNewExName(e.target.value.toUpperCase()),
@@ -3070,10 +3070,10 @@ function ProgressTab({session,isAdmin,showToast,milestoneConfig,bookings,saveMil
     ),
     React.createElement("div",{style:{...CS.sectionHdr,cursor:"pointer",userSelect:"none",display:"flex",alignItems:"center",justifyContent:"space-between"},onClick:()=>setShowPBSection(v=>!v)},
       "MY PERSONAL BESTS",
-      React.createElement("span",{style:{color:"#c3d1ac",fontSize:13,transform:showPBSection?"rotate(180deg)":"none",transition:"transform .2s",lineHeight:1}},"▾")
+      React.createElement("span",{style:{color:"#111111",fontSize:13,transform:showPBSection?"rotate(180deg)":"none",transition:"transform .2s",lineHeight:1}},"▾")
     ),
     showPBSection&&(enabledExercises.length===0
-      ?React.createElement("div",{style:{fontSize:10,color:"#c3d1ac",textAlign:"center",padding:"24px 0",letterSpacing:"0.14em"}},"NO EXERCISES AVAILABLE\nAsk your coach to add exercises.")
+      ?React.createElement("div",{style:{fontSize:10,color:"#111111",textAlign:"center",padding:"24px 0",letterSpacing:"0.14em"}},"NO EXERCISES AVAILABLE\nAsk your coach to add exercises.")
       :enabledExercises.map(ex=>{
           const pb=myPBs[ex.id];
           const isEditing=editingPB===ex.id;
@@ -3111,7 +3111,7 @@ function ProgressTab({session,isAdmin,showToast,milestoneConfig,bookings,saveMil
                             React.createElement("div",{style:{fontSize:10,color:"#555",letterSpacing:"0.08em"}},fmtDate(pb.achieved_date))
                           )
                         )
-                      :React.createElement("div",{style:{fontSize:10,color:"#c3d1ac",letterSpacing:"0.1em",marginTop:2}},"NOT RECORDED YET")
+                      :React.createElement("div",{style:{fontSize:10,color:"#111111",letterSpacing:"0.1em",marginTop:2}},"NOT RECORDED YET")
                   ),
                   React.createElement("button",{
                     onClick:()=>{setPBDraft({weight_kg:pb?.weight_kg||"",achieved_date:pb?.achieved_date||toDS(new Date())});setEditingPB(ex.id);},
@@ -3122,7 +3122,7 @@ function ProgressTab({session,isAdmin,showToast,milestoneConfig,bookings,saveMil
         })),
     React.createElement("div",{style:{...CS.sectionHdr,cursor:"pointer",userSelect:"none",display:"flex",alignItems:"center",justifyContent:"space-between"},onClick:()=>setShowCBSection(v=>!v)},
       "COMMUNITY PERSONAL BESTS",
-      React.createElement("span",{style:{color:"#c3d1ac",fontSize:13,transform:showCBSection?"rotate(180deg)":"none",transition:"transform .2s",lineHeight:1}},"▾")
+      React.createElement("span",{style:{color:"#111111",fontSize:13,transform:showCBSection?"rotate(180deg)":"none",transition:"transform .2s",lineHeight:1}},"▾")
     ),
     showCBSection&&(enabledExercises.length===0
       ?null
@@ -3169,12 +3169,12 @@ function ProgressTab({session,isAdmin,showToast,milestoneConfig,bookings,saveMil
                           ),
                           cb.holder_name&&React.createElement("div",{style:{fontSize:10,letterSpacing:"0.08em",color:"#181818"}},cb.holder_name.toUpperCase())
                         )
-                      :React.createElement("div",{style:{fontSize:10,color:"#c3d1ac",letterSpacing:"0.1em",marginTop:2}},"NO RECORD SET")
+                      :React.createElement("div",{style:{fontSize:10,color:"#111111",letterSpacing:"0.1em",marginTop:2}},"NO RECORD SET")
                   ),
                   cb&&cb.weight_kg&&React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8,marginLeft:8,flexShrink:0}},
                     holderPhotos[cb.holder_email]
-                      ?React.createElement("img",{src:holderPhotos[cb.holder_email],style:{width:40,height:40,borderRadius:"50%",objectFit:"cover",border:"2px solid #d9e2cc"},alt:""})
-                      :React.createElement("div",{style:{width:40,height:40,borderRadius:"50%",background:"#edefea",border:"2px solid #d9e2cc",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'Bebas Neue',sans-serif",fontSize:15,color:"#aaa",flexShrink:0}},cb.holder_name?(cb.holder_name.split(" ").map(w=>w[0]).join("").slice(0,2).toUpperCase()):"?")
+                      ?React.createElement("img",{src:holderPhotos[cb.holder_email],style:{width:40,height:40,borderRadius:"50%",objectFit:"cover",border:"2px solid #111111"},alt:""})
+                      :React.createElement("div",{style:{width:40,height:40,borderRadius:"50%",background:"#edefea",border:"2px solid #111111",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'Bebas Neue',sans-serif",fontSize:15,color:"#aaa",flexShrink:0}},cb.holder_name?(cb.holder_name.split(" ").map(w=>w[0]).join("").slice(0,2).toUpperCase()):"?")
                   ),
                   isAdmin&&React.createElement("button",{
                     onClick:()=>{setCBDraft({weight_kg:cb?.weight_kg||"",holder_name:cb?.holder_name||"",holder_email:cb?.holder_email||"",achieved_date:cb?.achieved_date||toDS(new Date())});setEditingCB(ex.id);},
@@ -3196,7 +3196,7 @@ function ProgressTab({session,isAdmin,showToast,milestoneConfig,bookings,saveMil
             React.createElement("span",null,"MILESTONES"),
             specials.length===0&&React.createElement("span",{style:{fontFamily:"'DM Sans',sans-serif",fontWeight:300,fontSize:11,color:"#888",letterSpacing:"0.04em",textTransform:"none"}},"Well done — you've completed your first class! 🎉")
           ),
-          React.createElement("span",{style:{color:"#c3d1ac",fontSize:13,transform:showMilSection?"rotate(180deg)":"none",transition:"transform .2s",lineHeight:1}},"▾")
+          React.createElement("span",{style:{color:"#111111",fontSize:13,transform:showMilSection?"rotate(180deg)":"none",transition:"transform .2s",lineHeight:1}},"▾")
         ),
         showMilSection&&React.createElement(React.Fragment,null,...sorted.map((e,i)=>{
           const isFirstClass=e.classes.toString().toLowerCase()==="first";
@@ -3221,8 +3221,8 @@ function ProgressTab({session,isAdmin,showToast,milestoneConfig,bookings,saveMil
               ),
               React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8,marginLeft:8,flexShrink:0}},
                 milestoneMemberPhoto
-                  ?React.createElement("img",{src:milestoneMemberPhoto,style:{width:40,height:40,borderRadius:"50%",objectFit:"cover",border:"2px solid #d9e2cc"},alt:""})
-                  :React.createElement("div",{style:{width:40,height:40,borderRadius:"50%",background:"#edefea",border:"2px solid #d9e2cc",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'Bebas Neue',sans-serif",fontSize:15,color:"#aaa",flexShrink:0}},milestoneMemberInit)
+                  ?React.createElement("img",{src:milestoneMemberPhoto,style:{width:40,height:40,borderRadius:"50%",objectFit:"cover",border:"2px solid #111111"},alt:""})
+                  :React.createElement("div",{style:{width:40,height:40,borderRadius:"50%",background:"#edefea",border:"2px solid #111111",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'Bebas Neue',sans-serif",fontSize:15,color:"#aaa",flexShrink:0}},milestoneMemberInit)
               )
             )
           );
@@ -3318,7 +3318,7 @@ function ExSection({sectionName,exercises,isFirst,ctx}){
           React.createElement("div",null,React.createElement("div",{className:"sp-ex-name"},ex.exercise),meta&&React.createElement("div",{className:"sp-ex-meta"},meta)),
           React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8}},
             isAdmin&&React.createElement("button",{className:"sp-ex-edit",onClick:e=>{e.stopPropagation();setEditingId(ex.id);setExEdit({id:ex.id,exercise:ex.exercise,section:ex.section||"Main",sets:ex.sets||"",reps:ex.reps||"",duration:ex.duration||""});}},"Edit"),
-            React.createElement("div",{style:{color:"#c3d1ac",fontSize:13,transition:"transform .2s",transform:isExpanded?"rotate(180deg)":"rotate(0deg)",lineHeight:1}},"▾")
+            React.createElement("div",{style:{color:"#111111",fontSize:13,transition:"transform .2s",transform:isExpanded?"rotate(180deg)":"rotate(0deg)",lineHeight:1}},"▾")
           )
         ),
         isExpanded&&session&&React.createElement("div",{className:"sp-sets-col"},
@@ -3500,8 +3500,8 @@ function StrengthTab({session,isAdmin,showToast,bookings,memberData}){
             ),
             React.createElement("div",{className:"sp-edit-lbl"},"APPLY TO"),
             React.createElement("div",{style:{display:"flex",gap:8,marginBottom:12}},
-              React.createElement("button",{onClick:()=>setNewEx(p=>({...p,scope:"month"})),style:{flex:1,padding:"8px 0",borderRadius:6,border:"1px solid",borderColor:newEx.scope==="month"?"#4ade80":"#d9e2cc",background:newEx.scope==="month"?"rgba(74,222,128,0.15)":"transparent",color:newEx.scope==="month"?"#4ade80":"#555",fontSize:10,fontWeight:600,letterSpacing:"0.1em",cursor:"pointer"}},"THIS MONTH ONLY"),
-              React.createElement("button",{onClick:()=>setNewEx(p=>({...p,scope:"all"})),style:{flex:1,padding:"8px 0",borderRadius:6,border:"1px solid",borderColor:newEx.scope==="all"?"#60a5fa":"#d9e2cc",background:newEx.scope==="all"?"rgba(96,165,250,0.15)":"transparent",color:newEx.scope==="all"?"#60a5fa":"#555",fontSize:10,fontWeight:600,letterSpacing:"0.1em",cursor:"pointer"}},"ALL MONTHS")
+              React.createElement("button",{onClick:()=>setNewEx(p=>({...p,scope:"month"})),style:{flex:1,padding:"8px 0",borderRadius:6,border:"1px solid",borderColor:newEx.scope==="month"?"#4ade80":"#111111",background:newEx.scope==="month"?"rgba(74,222,128,0.15)":"transparent",color:newEx.scope==="month"?"#4ade80":"#555",fontSize:10,fontWeight:600,letterSpacing:"0.1em",cursor:"pointer"}},"THIS MONTH ONLY"),
+              React.createElement("button",{onClick:()=>setNewEx(p=>({...p,scope:"all"})),style:{flex:1,padding:"8px 0",borderRadius:6,border:"1px solid",borderColor:newEx.scope==="all"?"#60a5fa":"#111111",background:newEx.scope==="all"?"rgba(96,165,250,0.15)":"transparent",color:newEx.scope==="all"?"#60a5fa":"#555",fontSize:10,fontWeight:600,letterSpacing:"0.1em",cursor:"pointer"}},"ALL MONTHS")
             ),
             React.createElement("div",{className:"sp-edit-row"},
               React.createElement("div",{style:{flex:1}},React.createElement("div",{className:"sp-edit-lbl"},"SETS"),React.createElement("input",{className:"sp-edit-input",value:newEx.sets,onChange:e=>setNewEx(p=>({...p,sets:e.target.value})),placeholder:"e.g. 3"})),
@@ -3516,9 +3516,9 @@ function StrengthTab({session,isAdmin,showToast,bookings,memberData}){
                 return React.createElement("button",{key:w,
                   onClick:()=>!isPast&&setNewEx(p=>({...p,weeks:p.weeks.includes(w)?p.weeks.filter(x=>x!==w):[...p.weeks,w]})),
                   style:{flex:1,padding:"6px 0",borderRadius:6,border:"1px solid",
-                    borderColor:newEx.weeks.includes(w)?"#4ade80":isPast?"#f6f7f5":"#d9e2cc",
+                    borderColor:newEx.weeks.includes(w)?"#4ade80":isPast?"#f6f7f5":"#111111",
                     background:newEx.weeks.includes(w)?"rgba(74,222,128,0.15)":"transparent",
-                    color:newEx.weeks.includes(w)?"#4ade80":isPast?"#d9e2cc":"#555",
+                    color:newEx.weeks.includes(w)?"#4ade80":isPast?"#111111":"#555",
                     fontSize:12,fontWeight:600,letterSpacing:"0.1em",cursor:isPast?"not-allowed":"pointer"}
                 },`W${w}`)
               })
@@ -3533,7 +3533,7 @@ function StrengthTab({session,isAdmin,showToast,bookings,memberData}){
             const defaultWeeks=monthYear===nowMY?[1,2,3,4].filter(w=>w>=cw):[1,2,3,4];
             setNewEx({exercise:"",section:"Main",sets:"",reps:"",duration:"",weeks:defaultWeeks,scope:"month"});
             setAddingEx(true);
-          },style:{display:"block",width:"100%",marginTop:20,padding:"12px",background:"transparent",border:"1px dashed #d9e2cc",borderRadius:8,color:"#555",fontSize:11,letterSpacing:"0.15em",fontWeight:600,cursor:"pointer"}},"+ ADD EXERCISE")
+          },style:{display:"block",width:"100%",marginTop:20,padding:"12px",background:"transparent",border:"1px dashed #111111",borderRadius:8,color:"#555",fontSize:11,letterSpacing:"0.15em",fontWeight:600,cursor:"pointer"}},"+ ADD EXERCISE")
       )
     )
   );
@@ -3691,37 +3691,37 @@ function MemberWorkoutAdmin({member,memberView}){
   const weekLabel=`${MONTHS[weekStart.getMonth()]} ${weekStart.getDate()} – ${MONTHS[weekEnd.getMonth()]} ${weekEnd.getDate()}`;
   const repChoices=[1,2,3,4,5,6,7,8,10,12];
   const workChoices=[1,2,3,4,5,6];
-  const inS={background:"#f6f7f5",border:"1px solid #d9e2cc",borderRadius:4,color:"#d9e2cc",fontSize:13,fontFamily:"'DM Sans',sans-serif",padding:"7px 9px",outline:"none",boxSizing:"border-box"};
+  const inS={background:"#f6f7f5",border:"1px solid #111111",borderRadius:4,color:"#111111",fontSize:13,fontFamily:"'DM Sans',sans-serif",padding:"7px 9px",outline:"none",boxSizing:"border-box"};
   return React.createElement(React.Fragment,null,
     React.createElement("div",{className:"mp-section"},memberView?"WORKOUT PROGRAM · MEMBER VIEW":"WORKOUT PROGRAM"),
     memberView?React.createElement(MemberWorkoutReview,{email:member.email}):React.createElement(React.Fragment,null,
     React.createElement("div",{style:{fontSize:10,color:"#555",letterSpacing:"0.04em",lineHeight:1.6,marginBottom:4}},"Build this member's weekly program below. Turn the Workouts add-on on in Section Access above to give them the Workouts tab."),
-    React.createElement("div",{style:{fontSize:9,color:"#c3d1ac",letterSpacing:"0.04em",lineHeight:1.6,marginBottom:12}},"Group exercises into separate workouts (W1, W2…) with + ADD WORKOUT — each shows as its own block for the member. Set each to log Weight (kg), Distance (km) or a Tick; reorder within a workout with ▲▼."),
+    React.createElement("div",{style:{fontSize:9,color:"#111111",letterSpacing:"0.04em",lineHeight:1.6,marginBottom:12}},"Group exercises into separate workouts (W1, W2…) with + ADD WORKOUT — each shows as its own block for the member. Set each to log Weight (kg), Distance (km) or a Tick; reorder within a workout with ▲▼."),
     React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:12}},
       React.createElement("button",{onClick:()=>setWeekStart(w=>addDays(w,-7)),style:{background:"none",border:"none",color:"#888",fontSize:22,cursor:"pointer",lineHeight:1,padding:"0 8px"}},"‹"),
       React.createElement("div",{style:{fontFamily:"'Bebas Neue',sans-serif",fontSize:15,letterSpacing:"0.1em",color:"#181818"}},weekLabel),
       React.createElement("button",{onClick:()=>setWeekStart(w=>addDays(w,7)),style:{background:"none",border:"none",color:"#888",fontSize:22,cursor:"pointer",lineHeight:1,padding:"0 8px"}},"›")
     ),
     React.createElement("div",{style:{marginBottom:14}},
-      React.createElement("button",{onClick:()=>{setShowImport(s=>!s);setImportErr("");},style:{width:"100%",background:showImport?"#eef7e0":"none",border:"1px dashed "+(showImport?"#bfe08a":"#d9e2cc"),borderRadius:6,color:"#8cc63e",fontSize:10,letterSpacing:"0.12em",padding:"9px",cursor:"pointer"}},showImport?"✕ CLOSE IMPORT":"⤵ PASTE FROM AI"),
+      React.createElement("button",{onClick:()=>{setShowImport(s=>!s);setImportErr("");},style:{width:"100%",background:showImport?"#eef7e0":"none",border:"1px dashed "+(showImport?"#bfe08a":"#111111"),borderRadius:6,color:"#8cc63e",fontSize:10,letterSpacing:"0.12em",padding:"9px",cursor:"pointer"}},showImport?"✕ CLOSE IMPORT":"⤵ PASTE FROM AI"),
       showImport&&React.createElement("div",{style:{background:"#f6f7f5",border:"1px solid #bfe08a",borderRadius:6,padding:"12px",marginTop:8}},
         React.createElement("div",{style:{fontSize:9,letterSpacing:"0.06em",color:"#89a",lineHeight:1.7,marginBottom:8}},"Paste the AI's workout block below and press Import. It replaces this whole week — you can then edit anything before you Save. Building by hand instead? Just ignore this and use the days below."),
         React.createElement("textarea",{value:importText,onChange:e=>{setImportText(e.target.value);setImportErr("");},placeholder:"Paste the { ... } block from Claude here",rows:5,style:{...inS,width:"100%",fontFamily:"monospace",fontSize:11,lineHeight:1.5,resize:"vertical"}}),
         importErr&&React.createElement("div",{style:{color:"#e06040",fontSize:11,marginTop:6,lineHeight:1.4}},importErr),
         React.createElement("div",{style:{display:"flex",gap:8,marginTop:8}},
-          React.createElement("button",{onClick:()=>{setShowImport(false);setImportText("");setImportErr("");},style:{flex:1,background:"none",border:"1px solid #d9e2cc",borderRadius:4,padding:"9px",color:"#666",fontSize:10,letterSpacing:"0.1em",cursor:"pointer"}},"CANCEL"),
-          React.createElement("button",{onClick:importFromAI,disabled:!importText.trim(),style:{flex:2,background:importText.trim()?"#8cc63e":"#f6f7f5",color:importText.trim()?"#fff":"#c3d1ac",border:"none",borderRadius:4,padding:"9px",fontFamily:"'Bebas Neue',sans-serif",fontSize:13,letterSpacing:"0.12em",cursor:importText.trim()?"pointer":"default"}},"IMPORT & REPLACE WEEK")
+          React.createElement("button",{onClick:()=>{setShowImport(false);setImportText("");setImportErr("");},style:{flex:1,background:"none",border:"1px solid #111111",borderRadius:4,padding:"9px",color:"#666",fontSize:10,letterSpacing:"0.1em",cursor:"pointer"}},"CANCEL"),
+          React.createElement("button",{onClick:importFromAI,disabled:!importText.trim(),style:{flex:2,background:importText.trim()?"#8cc63e":"#f6f7f5",color:importText.trim()?"#fff":"#111111",border:"none",borderRadius:4,padding:"9px",fontFamily:"'Bebas Neue',sans-serif",fontSize:13,letterSpacing:"0.12em",cursor:importText.trim()?"pointer":"default"}},"IMPORT & REPLACE WEEK")
         )
       )
     ),
-    loading?React.createElement("div",{style:{fontSize:10,color:"#c3d1ac",letterSpacing:"0.1em",padding:"10px 0"}},"LOADING...")
+    loading?React.createElement("div",{style:{fontSize:10,color:"#111111",letterSpacing:"0.1em",padding:"10px 0"}},"LOADING...")
     :React.createElement(React.Fragment,null,
       ...MW_DAYS.map(dk=>{
         const items=draft[dk]||[];
         const groups=mwWorkouts(items);
         return React.createElement("div",{key:dk,style:{marginBottom:14,paddingBottom:14,borderBottom:"1px solid #f6f7f5"}},
           React.createElement("div",{style:{fontSize:10,letterSpacing:"0.14em",color:"#888",fontWeight:700,marginBottom:8}},MW_DAY_FULL[dk]),
-          items.length===0&&React.createElement("div",{style:{fontSize:10,color:"#c3d1ac",letterSpacing:"0.08em",marginBottom:8}},"No workout — rest day."),
+          items.length===0&&React.createElement("div",{style:{fontSize:10,color:"#111111",letterSpacing:"0.08em",marginBottom:8}},"No workout — rest day."),
           ...groups.map(g=>React.createElement("div",{key:"w"+g.num,style:{border:"1px solid #edefea",borderRadius:8,padding:"10px",marginBottom:10}},
             React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8,marginBottom:8}},
               React.createElement("div",{style:{fontFamily:"'Bebas Neue',sans-serif",fontSize:15,letterSpacing:"0.08em",color:"#8cc63e",flexShrink:0}},"WORKOUT "+g.num),
@@ -3737,7 +3737,7 @@ function MemberWorkoutAdmin({member,memberView}){
                   React.createElement("button",{onClick:()=>moveItem(dk,it.id,-1),disabled:gi===0,style:{background:"none",border:"none",color:gi===0?"#edefea":"#666",cursor:gi===0?"default":"pointer",fontSize:10,padding:"1px 6px",lineHeight:1}},"▲"),
                   React.createElement("button",{onClick:()=>moveItem(dk,it.id,1),disabled:gi===g.exercises.length-1,style:{background:"none",border:"none",color:gi===g.exercises.length-1?"#edefea":"#666",cursor:gi===g.exercises.length-1?"default":"pointer",fontSize:10,padding:"1px 6px",lineHeight:1}},"▼")
                 ),
-                React.createElement("button",{onClick:()=>removeItem(dk,it.id),style:{background:"none",border:"1px solid #d9e2cc",borderRadius:4,color:"#8a2515",fontSize:12,padding:"4px 9px",cursor:"pointer",flexShrink:0}},"✕")
+                React.createElement("button",{onClick:()=>removeItem(dk,it.id),style:{background:"none",border:"1px solid #111111",borderRadius:4,color:"#8a2515",fontSize:12,padding:"4px 9px",cursor:"pointer",flexShrink:0}},"✕")
               ),
               !isCol&&React.createElement(React.Fragment,null,
               React.createElement("div",{style:{display:"flex",gap:6,marginBottom:6}},
@@ -3762,7 +3762,7 @@ function MemberWorkoutAdmin({member,memberView}){
               )
               )
             );}),
-            React.createElement("button",{onClick:()=>addItem(dk,g.num),style:{width:"100%",background:"none",border:"1px dashed #d9e2cc",borderRadius:5,color:"#666",fontSize:10,letterSpacing:"0.12em",padding:"7px",cursor:"pointer"}},"+ ADD EXERCISE")
+            React.createElement("button",{onClick:()=>addItem(dk,g.num),style:{width:"100%",background:"none",border:"1px dashed #111111",borderRadius:5,color:"#666",fontSize:10,letterSpacing:"0.12em",padding:"7px",cursor:"pointer"}},"+ ADD EXERCISE")
           )),
           React.createElement("button",{onClick:()=>addWorkout(dk),style:{width:"100%",background:"none",border:"1px dashed #bfe08a",borderRadius:5,color:"#8cc63e",fontSize:10,letterSpacing:"0.12em",padding:"8px",cursor:"pointer",marginTop:2}},"+ ADD WORKOUT")
         );
@@ -3879,7 +3879,7 @@ function MemberWorkoutsView({session,memberData}){
         React.createElement("div",{style:{flex:1}},React.createElement("div",{className:"sp-ex-name"},(ex.name||"").toUpperCase()),meta&&React.createElement("div",{className:"sp-ex-meta"},meta),notesEl),
         React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8,flexShrink:0,alignSelf:"center"}},
           filled&&React.createElement("div",{className:"sp-tick sptd",style:{width:22,height:22,fontSize:11,pointerEvents:"none"}},"✓"),
-          React.createElement("div",{style:{color:"#c3d1ac",fontSize:13,transition:"transform .2s",transform:isExpanded?"rotate(180deg)":"rotate(0deg)",lineHeight:1}},"▾")
+          React.createElement("div",{style:{color:"#111111",fontSize:13,transition:"transform .2s",transform:isExpanded?"rotate(180deg)":"rotate(0deg)",lineHeight:1}},"▾")
         )
       ),
       isExpanded&&React.createElement("div",{className:"sp-sets-col"},
@@ -3927,10 +3927,10 @@ function MemberWorkoutsView({session,memberData}){
           React.createElement("div",{style:{fontSize:9,letterSpacing:"0.14em",color:"#666",fontWeight:600,marginBottom:6}},"MY NOTES"),
           React.createElement("textarea",{defaultValue:wNotes[`${dk}__w${w.num}`]||"",placeholder:"Add anything not tracked above — e.g. how did it feel? time, energy, soreness, weather, etc.",rows:3,
             onBlur:e=>saveNote(dk,w.num,e.target.value),
-            style:{width:"100%",background:"#f6f7f5",border:"1px solid #edefea",borderRadius:6,color:"#d9e2cc",fontFamily:"'DM Sans',sans-serif",fontSize:13,lineHeight:1.6,padding:"10px 12px",outline:"none",resize:"vertical",boxSizing:"border-box"}})
+            style:{width:"100%",background:"#f6f7f5",border:"1px solid #edefea",borderRadius:6,color:"#111111",fontFamily:"'DM Sans',sans-serif",fontSize:13,lineHeight:1.6,padding:"10px 12px",outline:"none",resize:"vertical",boxSizing:"border-box"}})
         ));
         const isOpen=openW.has(dk+"_"+w.num);
-        return React.createElement("div",{key:"w"+w.num,style:multiW?{border:"1px solid #d9e2cc",borderRadius:12,background:"#f6f7f5",padding:"0 14px",marginBottom:14,overflow:"hidden"}:null},
+        return React.createElement("div",{key:"w"+w.num,style:multiW?{border:"1px solid #111111",borderRadius:12,background:"#f6f7f5",padding:"0 14px",marginBottom:14,overflow:"hidden"}:null},
           multiW&&React.createElement("div",{onClick:()=>toggleW(dk+"_"+w.num),style:{display:"flex",alignItems:"center",justifyContent:"space-between",cursor:"pointer",padding:"14px 0",borderBottom:isOpen?"1px solid #edefea":"none"}},
             React.createElement("div",{style:{fontFamily:"'Bebas Neue',sans-serif",fontSize:19,letterSpacing:"0.1em",color:"#181818"}},(w.name||("WORKOUT "+w.num)).toUpperCase()),
             React.createElement("div",{style:{display:"flex",alignItems:"center",gap:10}},
@@ -3985,7 +3985,7 @@ function MemberWorkoutReview({email}){
   const workouts=mwWorkouts(exercises);
   const doneCount=exercises.filter(ex=>exDone(dk,ex)).length;
   const arrow={background:"none",border:"none",color:"#888",fontSize:22,cursor:"pointer",lineHeight:1,padding:"0 8px"};
-  const chip={display:"inline-flex",alignItems:"center",justifyContent:"center",minWidth:34,padding:"4px 8px",borderRadius:5,border:"1px solid #d9e2cc",fontSize:11,fontFamily:"'DM Sans',sans-serif",fontWeight:600};
+  const chip={display:"inline-flex",alignItems:"center",justifyContent:"center",minWidth:34,padding:"4px 8px",borderRadius:5,border:"1px solid #111111",fontSize:11,fontFamily:"'DM Sans',sans-serif",fontWeight:600};
   return React.createElement("div",{style:{marginBottom:8}},
     React.createElement("div",{style:{fontSize:10,color:"#555",letterSpacing:"0.04em",lineHeight:1.6,marginBottom:10}},"Read-only view of what this member sees — their logged weights and ticks. Use the arrows to look back at previous weeks."),
     React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:10}},
@@ -3998,7 +3998,7 @@ function MemberWorkoutReview({email}){
         const dayEx=mwNormDay(program[MW_DAYS[i]]);
         const anyDone=dayEx.some(ex=>exDone(MW_DAYS[i],ex));
         return React.createElement("button",{key:i,onClick:()=>setSelDay(i),
-          style:{flex:1,background:i===selDay?"#8cc63e":"#f6f7f5",color:i===selDay?"#fff":(dayEx.length?"#d9e2cc":"#555"),border:"1px solid "+(i===selDay?"#8cc63e":"#edefea"),borderRadius:6,padding:"6px 0 4px",cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}},
+          style:{flex:1,background:i===selDay?"#8cc63e":"#f6f7f5",color:i===selDay?"#fff":(dayEx.length?"#111111":"#555"),border:"1px solid "+(i===selDay?"#8cc63e":"#edefea"),borderRadius:6,padding:"6px 0 4px",cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}},
           React.createElement("div",{style:{fontSize:9,letterSpacing:"0.06em"}},MW_DAYS[i]),
           React.createElement("div",{style:{fontSize:14,fontWeight:700,fontFamily:"'Bebas Neue',sans-serif",lineHeight:1.1}},d.getDate()),
           React.createElement("div",{style:{width:5,height:5,borderRadius:"50%",background:anyDone?"#4aaa66":"transparent",margin:"3px auto 0"}})
@@ -4009,7 +4009,7 @@ function MemberWorkoutReview({email}){
       React.createElement("div",{style:{fontFamily:"'Bebas Neue',sans-serif",fontSize:16,letterSpacing:"0.08em",color:"#181818"}},MW_DAY_FULL[dk]),
       exercises.length>0&&React.createElement("div",{style:{fontSize:11,letterSpacing:"0.06em",fontWeight:600,color:doneCount===exercises.length?"#4aaa66":doneCount>0?"#e0a040":"#666"}},doneCount+" of "+exercises.length+" done")
     ),
-    loading?React.createElement("div",{style:{fontSize:11,color:"#c3d1ac",padding:"12px 0",letterSpacing:"0.1em"}},"LOADING…")
+    loading?React.createElement("div",{style:{fontSize:11,color:"#111111",padding:"12px 0",letterSpacing:"0.1em"}},"LOADING…")
     :exercises.length===0?React.createElement("div",{style:{fontSize:11,color:"#555",padding:"12px 0"}},"No workout set for this day")
     :workouts.map(w=>React.createElement("div",{key:"w"+w.num,style:{border:"1px solid #edefea",borderRadius:8,padding:"10px 12px",marginBottom:10}},
         (workouts.length>1||w.name)&&React.createElement("div",{style:{fontFamily:"'Bebas Neue',sans-serif",fontSize:14,letterSpacing:"0.08em",color:"#8cc63e",marginBottom:6}},(w.name||("WORKOUT "+w.num)).toUpperCase()),
@@ -4020,9 +4020,9 @@ function MemberWorkoutReview({email}){
           const metaParts=[];if(ex.sets)metaParts.push(ex.sets+" sets");if(ex.reps)metaParts.push(ex.reps+" reps");if(ex.duration)metaParts.push(ex.duration);
           const setEls=Array.from({length:setCount}).map((_,idx)=>{
             const base=dk+"__"+ex.id+"__s"+(idx+1);
-            if(ex.log==="tick"){const t=!!ticks[base];return React.createElement("span",{key:idx,style:{...chip,background:t?"#0f2a14":"#f6f7f5",color:t?"#4aaa66":"#555",borderColor:t?"#1d5a34":"#d9e2cc"}},t?"✓":"—");}
+            if(ex.log==="tick"){const t=!!ticks[base];return React.createElement("span",{key:idx,style:{...chip,background:t?"#0f2a14":"#f6f7f5",color:t?"#4aaa66":"#555",borderColor:t?"#1d5a34":"#111111"}},t?"✓":"—");}
             const v=(weights[base]||"").trim();
-            return React.createElement("span",{key:idx,style:{...chip,background:v?"#eef7e0":"#f6f7f5",color:v?"#8cc63e":"#555",borderColor:v?"#bfe08a":"#d9e2cc"}},v?(v+" "+unit):("S"+(idx+1)));
+            return React.createElement("span",{key:idx,style:{...chip,background:v?"#eef7e0":"#f6f7f5",color:v?"#8cc63e":"#555",borderColor:v?"#bfe08a":"#111111"}},v?(v+" "+unit):("S"+(idx+1)));
           });
           return React.createElement("div",{key:ex.id,style:{padding:"8px 0",borderTop:"1px solid #181818"}},
             React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",gap:8}},
@@ -4036,7 +4036,7 @@ function MemberWorkoutReview({email}){
         }),
         wNotes[dk+"__w"+w.num]&&React.createElement("div",{style:{marginTop:8,background:"#f6f7f5",border:"1px solid #edefea",borderRadius:6,padding:"8px 10px"}},
           React.createElement("div",{style:{fontSize:8,letterSpacing:"0.12em",color:"#666",fontWeight:600,marginBottom:3}},"MEMBER'S NOTES"),
-          React.createElement("div",{style:{fontSize:12,color:"#d9e2cc",whiteSpace:"pre-wrap",lineHeight:1.5}},wNotes[dk+"__w"+w.num])
+          React.createElement("div",{style:{fontSize:12,color:"#111111",whiteSpace:"pre-wrap",lineHeight:1.5}},wNotes[dk+"__w"+w.num])
         )
       ))
   );
@@ -4189,6 +4189,7 @@ function App(){
     ...(acc("community")?[{id:"community",label:"NOTICE BOARD",dot:true}]:[]),
     ...(canBook?[{id:"my",label:"MY BOOKINGS"}]:[]),
     ...(classesEnabled&&acc("book")?[{id:"book",label:"CLASSES"}]:[]),
+    ...(strengthEnabled&&acc("strength")?[{id:"strength",label:"STRENGTH"}]:[]),
     ...(wellnessEnabled&&acc("wellness")?[{id:"wellness",label:"WELLNESS"}]:[]),
     ...(acc("progress")?[{id:"progress",label:"PROGRESS"}]:[]),
     ...(workoutsEnabled?[{id:"workouts",label:"WORKOUTS"}]:[]),
@@ -4468,11 +4469,11 @@ function App(){
   if(!ready)return React.createElement("div",{className:"loading-screen"},React.createElement("div",null,"LAMONT APPLICATIONS"),React.createElement("div",{className:"loading-bar"},React.createElement("div",{className:"loading-fill"})));
   if(!session)return React.createElement("div",{className:"auth-page"},
 React.createElement("div",{style:{display:"flex",flexDirection:"column",alignItems:"center",marginBottom:48}},
-  React.createElement("div",{style:{width:62,height:62,borderRadius:"50%",border:"2px solid #d9e2cc",marginBottom:10,overflow:"hidden"}},
+  React.createElement("div",{style:{width:62,height:62,borderRadius:"50%",border:"2px solid #111111",marginBottom:10,overflow:"hidden"}},
     React.createElement("img",{src:"icon-192.png",style:{width:"100%",height:"100%",objectFit:"cover"}})
   ),
   React.createElement("div",{style:{fontFamily:"'Syncopate',sans-serif",fontSize:11,fontWeight:700,color:"#181818",textAlign:"center",letterSpacing:"0.1em",lineHeight:1.3,whiteSpace:"nowrap"}},"SOUL FITNESS"),
-  React.createElement("div",{style:{fontFamily:"'Syncopate',sans-serif",fontSize:6,fontWeight:700,color:"#c3d1ac",textAlign:"center",marginTop:4,letterSpacing:"0.12em",whiteSpace:"nowrap"}},"WHERE COMMUNITY MEETS FITNESS")
+  React.createElement("div",{style:{fontFamily:"'Syncopate',sans-serif",fontSize:6,fontWeight:700,color:"#111111",textAlign:"center",marginTop:4,letterSpacing:"0.12em",whiteSpace:"nowrap"}},"WHERE COMMUNITY MEETS FITNESS")
 ),
     React.createElement("div",{className:"auth-card"},
       React.createElement("div",{className:"auth-title"},authMode==="login"?"Welcome Back":"Join Soul Fitness"),
@@ -4501,8 +4502,8 @@ React.createElement("div",{className:"auth-guest",style:{marginTop:24}},"Not a m
                         
     React.createElement("div",{style:{marginTop:120,textAlign:"center"}},
       React.createElement("div",{className:"foot",style:{fontSize:"7px",letterSpacing:"0.18em"}},"LAMONT FITNESS APPLICATIONS"),
-      React.createElement("div",{style:{marginTop:2,paddingBottom:20,fontSize:"7px",letterSpacing:"0.06em",color:"#000"}},
-        React.createElement("span",null,"POWERED BY "),React.createElement("a",{href:"https://www.lamontcollective.com",target:"_blank",rel:"noopener",style:{color:"#000",textDecoration:"none"}},"WWW.LAMONTCOLLECTIVE.COM")
+      React.createElement("div",{style:{marginTop:2,paddingBottom:20,fontSize:"7px",letterSpacing:"0.06em",color:"#1d9bf0"}},
+        React.createElement("span",null,"POWERED BY "),React.createElement("a",{href:"https://www.lamontcollective.com",target:"_blank",rel:"noopener",style:{color:"#1d9bf0",textDecoration:"none"}},"WWW.LAMONTCOLLECTIVE.COM")
       )
     )
   );
@@ -4517,10 +4518,10 @@ React.createElement("div",{className:"auth-guest",style:{marginTop:24}},"Not a m
         ),
         React.createElement("div",{style:{position:"absolute",left:0,right:0,display:"flex",flexDirection:"column",alignItems:"center",pointerEvents:"none"}},
           memberPhoto
-            ?React.createElement("img",{src:memberPhoto,alt:"profile",style:{display:"block",width:62,height:62,borderRadius:"50%",objectFit:"cover",border:"2px solid #d9e2cc",marginBottom:8,pointerEvents:"auto"}})
-            :React.createElement("div",{style:{width:62,height:62,borderRadius:"50%",background:"#f6f7f5",border:"2px solid #d9e2cc",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'Bebas Neue',sans-serif",fontSize:22,color:"#777",marginBottom:8}},memberInit),
+            ?React.createElement("img",{src:memberPhoto,alt:"profile",style:{display:"block",width:62,height:62,borderRadius:"50%",objectFit:"cover",border:"2px solid #111111",marginBottom:8,pointerEvents:"auto"}})
+            :React.createElement("div",{style:{width:62,height:62,borderRadius:"50%",background:"#f6f7f5",border:"2px solid #111111",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'Bebas Neue',sans-serif",fontSize:22,color:"#777",marginBottom:8}},memberInit),
           React.createElement("div",{style:{fontFamily:"'Syncopate',sans-serif",fontSize:9,fontWeight:700,color:"#181818",textAlign:"center",letterSpacing:"0.1em",lineHeight:1.3,whiteSpace:"nowrap"}},"SOUL FITNESS"),
-          React.createElement("div",{style:{fontFamily:"'Syncopate',sans-serif",fontSize:5,color:"#c3d1ac",textAlign:"center",marginTop:4,letterSpacing:"0.12em",fontWeight:700,whiteSpace:"nowrap"}},"WHERE COMMUNITY MEETS FITNESS")
+          React.createElement("div",{style:{fontFamily:"'Syncopate',sans-serif",fontSize:5,color:"#111111",textAlign:"center",marginTop:4,letterSpacing:"0.12em",fontWeight:700,whiteSpace:"nowrap"}},"WHERE COMMUNITY MEETS FITNESS")
         ),
         React.createElement("div",{style:{flex:1,display:"flex",justifyContent:"flex-end",alignItems:"center",zIndex:1},onClick:openProf},
           React.createElement("div",{style:{display:"flex",flexDirection:"column",alignItems:"center",gap:4,cursor:"pointer"}},
@@ -4537,7 +4538,7 @@ React.createElement("div",{className:"auth-guest",style:{marginTop:24}},"Not a m
         React.createElement("span",{style:{color:"#555",fontSize:7,letterSpacing:"0.22em",fontWeight:600}},"SWIPE FOR MORE"),
         React.createElement("span",{style:{color:"#666",fontSize:11,lineHeight:1}},"›")
       ),
-      React.createElement("div",{className:"no-sb",style:{display:"flex",marginLeft:-20,marginRight:-20,width:"calc(100% + 40px)",borderTop:"1px solid #c3d1ac",borderBottom:"1px solid #c3d1ac",background:"#f6f7f5",overflowX:"auto"},onClick:e=>e.stopPropagation()},
+      React.createElement("div",{className:"no-sb",style:{display:"flex",marginLeft:-20,marginRight:-20,width:"calc(100% + 40px)",borderTop:"1px solid #111111",borderBottom:"1px solid #111111",background:"#f6f7f5",overflowX:"auto"},onClick:e=>e.stopPropagation()},
         NAV_TABS.map((t,ti)=>React.createElement(React.Fragment,{key:t.id},
           React.createElement("button",{"data-tab":t.id,
             style:{flex:"1 0 auto",minWidth:56,padding:"10px 10px",background:tab===t.id?"#edefea":"none",border:"none",borderTop:`1px solid ${tab===t.id?"#fff":"transparent"}`,borderBottom:`1px solid ${tab===t.id?"#fff":"transparent"}`,borderLeft:"1px solid transparent",borderRight:"1px solid transparent",marginTop:-1,marginBottom:-1,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",fontSize:"8.5px",letterSpacing:"0.1em",color:tab===t.id?"#fff":"#555",fontWeight:600,whiteSpace:"nowrap",position:"relative"},
@@ -4545,7 +4546,7 @@ React.createElement("div",{className:"auth-guest",style:{marginTop:24}},"Not a m
             t.label,
             t.dot&&unreadPosts>0&&tab!=="community"&&React.createElement("div",{className:"tab-dot"})
           ),
-          ti<NAV_TABS.length-1&&React.createElement("div",{style:{width:1,flexShrink:0,background:"#d9e2cc"}})
+          ti<NAV_TABS.length-1&&React.createElement("div",{style:{width:1,flexShrink:0,background:"#111111"}})
         ))
       )
     ),
@@ -4569,7 +4570,7 @@ React.createElement("div",{className:"auth-guest",style:{marginTop:24}},"Not a m
         React.createElement("div",{className:"day-hdr",style:{textAlign:"center"}},React.createElement("span",null,DAY_LONG[selDay].toUpperCase()),React.createElement("em",null,` · ${times.length} CLASSES`)),
         !isAdmin&&React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8,margin:"0 0 12px"}},
           React.createElement("span",{style:{fontSize:9,letterSpacing:"0.12em",color:"#555",fontWeight:600,flexShrink:0}},"REPEAT WEEKLY"),
-          React.createElement("select",{value:repeatWeeks,onChange:e=>setRepeatWeeks(parseInt(e.target.value)),style:{flex:1,background:"#f6f7f5",border:"1px solid "+(repeatWeeks>1?"#bfe08a":"#d9e2cc"),borderRadius:4,color:repeatWeeks>1?"#8cc63e":"#d9e2cc",fontSize:12,padding:"7px 8px",fontFamily:"'DM Sans',sans-serif",outline:"none",cursor:"pointer"}},
+          React.createElement("select",{value:repeatWeeks,onChange:e=>setRepeatWeeks(parseInt(e.target.value)),style:{flex:1,background:"#f6f7f5",border:"1px solid "+(repeatWeeks>1?"#bfe08a":"#111111"),borderRadius:4,color:repeatWeeks>1?"#8cc63e":"#111111",fontSize:12,padding:"7px 8px",fontFamily:"'DM Sans',sans-serif",outline:"none",cursor:"pointer"}},
             React.createElement("option",{value:1},"This class only"),
             React.createElement("option",{value:2},"2 weeks"),
             React.createElement("option",{value:3},"3 weeks"),
@@ -4726,13 +4727,13 @@ React.createElement("div",{className:"auth-guest",style:{marginTop:24}},"Not a m
           t.label,
           t.dot&&unreadPosts>0&&tab!=="community"&&React.createElement("div",{className:"tab-dot"})
         ),
-        ti<NAV_TABS.length-1&&React.createElement("div",{style:{width:1,flexShrink:0,background:"#d9e2cc"}})
+        ti<NAV_TABS.length-1&&React.createElement("div",{style:{width:1,flexShrink:0,background:"#111111"}})
       ))
     ),
     React.createElement("div",{style:{textAlign:"center"}},
       React.createElement("div",{className:"foot",style:{fontSize:"7px",letterSpacing:"0.18em"}},"LAMONT FITNESS APPLICATIONS"),
-      React.createElement("div",{style:{marginTop:2,paddingBottom:20,fontSize:"7px",letterSpacing:"0.06em",color:"#000"}},
-        React.createElement("span",null,"POWERED BY "),React.createElement("a",{href:"https://www.lamontcollective.com",target:"_blank",rel:"noopener",style:{color:"#000",textDecoration:"none"}},"WWW.LAMONTCOLLECTIVE.COM")
+      React.createElement("div",{style:{marginTop:2,paddingBottom:20,fontSize:"7px",letterSpacing:"0.06em",color:"#1d9bf0"}},
+        React.createElement("span",null,"POWERED BY "),React.createElement("a",{href:"https://www.lamontcollective.com",target:"_blank",rel:"noopener",style:{color:"#1d9bf0",textDecoration:"none"}},"WWW.LAMONTCOLLECTIVE.COM")
       )
     ),
     React.createElement("div",{className:`toast${toast.show?" show":""}`},toast.msg),
@@ -4766,8 +4767,8 @@ React.createElement("div",{className:"auth-guest",style:{marginTop:24}},"Not a m
         React.createElement("label",{className:"fl"},"CONTACT PHONE"),
         React.createElement("input",{className:"fi",type:"tel",placeholder:"Emergency contact phone",value:profForm.emergencyPhone||"",onChange:e=>{setProfForm(f=>({...f,emergencyPhone:e.target.value}));setProfErr("");setProfOk("");}}),
         React.createElement("div",{className:"prof-section"},"HEALTH INFORMATION"),
-        React.createElement("a",{href:"/register.html",style:{display:"block",width:"100%",background:"transparent",color:"#aaa",border:"1px solid #d9e2cc",fontFamily:"'Bebas Neue',sans-serif",fontSize:15,letterSpacing:"0.18em",padding:"15px",borderRadius:3,textAlign:"center",textDecoration:"none",marginBottom:4}},"UPDATE HEALTH SCREENING FORM"),
-        React.createElement("div",{style:{fontSize:10,color:"#c3d1ac",letterSpacing:"0.06em",marginBottom:4}},"Update your medical conditions, fitness level, or consents"),
+        React.createElement("a",{href:"/register.html",style:{display:"block",width:"100%",background:"transparent",color:"#aaa",border:"1px solid #111111",fontFamily:"'Bebas Neue',sans-serif",fontSize:15,letterSpacing:"0.18em",padding:"15px",borderRadius:3,textAlign:"center",textDecoration:"none",marginBottom:4}},"UPDATE HEALTH SCREENING FORM"),
+        React.createElement("div",{style:{fontSize:10,color:"#111111",letterSpacing:"0.06em",marginBottom:4}},"Update your medical conditions, fitness level, or consents"),
         React.createElement("div",{className:"prof-section"},"CHANGE PASSWORD"),
         React.createElement("label",{className:"fl"},"NEW PASSWORD"),
         React.createElement("input",{className:"fi",type:"password",placeholder:"Leave blank to keep current",value:profForm.newPw,onChange:e=>{setProfForm(f=>({...f,newPw:e.target.value}));setProfErr("");setProfOk("");}}),
