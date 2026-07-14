@@ -576,7 +576,7 @@ function MemberProfileOverlay({member,bookings,onClose,currentUserIsAdmin,isMast
       await sbDelete("coaching_notes",q);
       setAccTabs(null);
     }else{
-      const existing=await sbGet("coaching_notes",q+"&select=id");
+      const existing=await sbGet("coaching_notes",q+"&select=class_name");
       const body={content:JSON.stringify({tabs:nextTabs}),updated_at:Date.now()};
       if(existing&&existing.length)await sbPatch("coaching_notes",q,body);
       else await sbPost("coaching_notes",{class_name:"__ACCESS__"+member.email,...body});
@@ -1420,7 +1420,7 @@ function AdminView({bookings,setBookings,showToast,isAdmin,isMaster,mFlags,saveM
     const nv=!masterHidden;setMasterHidden(nv);setMhSaving(true);
     const key="__MASTER_HIDDEN__";const q="class_name=eq."+encodeURIComponent(key);
     try{
-      const ex=await sbGet("coaching_notes",q+"&select=id");
+      const ex=await sbGet("coaching_notes",q+"&select=class_name");
       if(ex&&ex.length)await sbPatch("coaching_notes",q,{content:nv?"1":"0",updated_at:Date.now()});
       else await sbPost("coaching_notes",{class_name:key,content:nv?"1":"0",updated_at:Date.now()});
       if(showToast)showToast(nv?"You are now hidden from members":"You are now visible");
@@ -1854,7 +1854,7 @@ function StepListEditor({storageKey,defaultSteps,toastMsg,showToast}){
   async function save(){
     setSaving(true);
     const json=JSON.stringify(draft);
-    const existing=await sbGet("coaching_notes",`class_name=eq.${encodeURIComponent(storageKey)}&select=id`);
+    const existing=await sbGet("coaching_notes",`class_name=eq.${encodeURIComponent(storageKey)}&select=class_name`);
     if(existing&&existing.length){await sbPatch("coaching_notes",`class_name=eq.${encodeURIComponent(storageKey)}`,{content:json,updated_at:Date.now()});}
     else{await sbPost("coaching_notes",{class_name:storageKey,content:json,updated_at:Date.now()});}
     setSteps(draft.map(s=>({...s})));setSaving(false);setEditing(false);
@@ -2116,7 +2116,7 @@ function CoachingNoteEditor({className,showToast}){
   async function save(){
     setSaving(true);
     const json=JSON.stringify(draft);
-    const existing=await sbGet("coaching_notes",`class_name=eq.${encodeURIComponent(className)}&select=id`);
+    const existing=await sbGet("coaching_notes",`class_name=eq.${encodeURIComponent(className)}&select=class_name`);
     if(existing&&existing.length){await sbPatch("coaching_notes",`class_name=eq.${encodeURIComponent(className)}`,{content:json,updated_at:Date.now()});}
     else{await sbPost("coaching_notes",{class_name:className,content:json,updated_at:Date.now()});}
     setSections(draft.map(s=>({...s})));setSaving(false);setEditing(false);
@@ -2271,7 +2271,7 @@ function WorkoutDetailsEditor({className,showToast}){
   async function save(){
     setSaving(true);
     const clean=rows.map(r=>r.hdr!=null?{hdr:(r.hdr||"").trim().toUpperCase(),hideTv:!!r.hideTv,dur:(r.dur||"").trim()}:{duration:r.duration,exercise:(r.exercise||"").trim().toUpperCase(),maori:(r.maori||"").trim(),reps:(r.reps||"").trim(),c:(r.c||"").trim(),o:(r.o||"").trim(),d:(r.d||"").trim(),notes:(r.notes||"").trim(),station:(r.station||"").trim()}).filter(r=>r.hdr!=null?r.hdr!=="":r.exercise!=="");
-    const ex0=await sbGet("coaching_notes","class_name=eq."+encodeURIComponent(storageKey)+"&select=id");
+    const ex0=await sbGet("coaching_notes","class_name=eq."+encodeURIComponent(storageKey)+"&select=class_name");
     const body={content:JSON.stringify(clean),updated_at:Date.now()};
     if(ex0&&ex0.length)await sbPatch("coaching_notes","class_name=eq."+encodeURIComponent(storageKey),body);
     else await sbPost("coaching_notes",{class_name:storageKey,...body});
@@ -2285,7 +2285,7 @@ function WorkoutDetailsEditor({className,showToast}){
     });
     if(changed){
       const nl={maori:nm,presc:np};setLib(nl);
-      const l0=await sbGet("coaching_notes","class_name=eq."+encodeURIComponent(LIB_KEY)+"&select=id");
+      const l0=await sbGet("coaching_notes","class_name=eq."+encodeURIComponent(LIB_KEY)+"&select=class_name");
       const lb={content:JSON.stringify(nl),updated_at:Date.now()};
       if(l0&&l0.length)await sbPatch("coaching_notes","class_name=eq."+encodeURIComponent(LIB_KEY),lb);
       else await sbPost("coaching_notes",{class_name:LIB_KEY,...lb});
@@ -2454,7 +2454,7 @@ function LibraryDetailsEditor({showToast,allWorkoutNames}){
       it.durs.forEach(d=>{presc[nm+"|"+d.dur]={reps:(d.reps||"").trim(),c:(d.c||"").trim(),o:(d.o||"").trim(),d:(d.d||"").trim()};});
     });
     const newLib={maori,presc};
-    const ex=await sbGet("coaching_notes","class_name=eq."+encodeURIComponent(LIB_KEY)+"&select=id");
+    const ex=await sbGet("coaching_notes","class_name=eq."+encodeURIComponent(LIB_KEY)+"&select=class_name");
     if(ex&&ex.length)await sbPatch("coaching_notes","class_name=eq."+encodeURIComponent(LIB_KEY),{content:JSON.stringify(newLib),updated_at:Date.now()});
     else await sbPost("coaching_notes",{class_name:LIB_KEY,content:JSON.stringify(newLib),updated_at:Date.now()});
     let updated=0;
@@ -2585,7 +2585,7 @@ function CoachingView({showToast}){
   },[]);
   async function saveCustomGroups(groups){
     const key="__CUSTOM_GROUPS__";
-    const existing=await sbGet("coaching_notes","class_name=eq."+encodeURIComponent(key)+"&select=id");
+    const existing=await sbGet("coaching_notes","class_name=eq."+encodeURIComponent(key)+"&select=class_name");
     if(existing&&existing.length){
       await sbPatch("coaching_notes","class_name=eq."+encodeURIComponent(key),{content:JSON.stringify(groups),updated_at:Date.now()});
     }else{
@@ -2624,7 +2624,7 @@ function CoachingView({showToast}){
     const newName=label+" "+nextNum;
     const newExtras=[...existing,newName];
     const key="__EXTRA__"+label;
-    const dbRows=await sbGet("coaching_notes","class_name=eq."+encodeURIComponent(key)+"&select=id");
+    const dbRows=await sbGet("coaching_notes","class_name=eq."+encodeURIComponent(key)+"&select=class_name");
     if(dbRows&&dbRows.length){
       await sbPatch("coaching_notes","class_name=eq."+encodeURIComponent(key),{content:JSON.stringify(newExtras),updated_at:Date.now()});
     }else{
@@ -2639,7 +2639,7 @@ function CoachingView({showToast}){
     const isBase=(base||[]).includes(cn);
     const newExtras=isBase?(extras[label]||[]).filter(n=>n!==cn):(extras[label]||[]).filter(n=>n!==cn);
     const key="__EXTRA__"+label;
-    const dbRows=await sbGet("coaching_notes","class_name=eq."+encodeURIComponent(key)+"&select=id");
+    const dbRows=await sbGet("coaching_notes","class_name=eq."+encodeURIComponent(key)+"&select=class_name");
     if(dbRows&&dbRows.length){
       await sbPatch("coaching_notes","class_name=eq."+encodeURIComponent(key),{content:JSON.stringify(newExtras),updated_at:Date.now()});
     }else{
@@ -3673,7 +3673,7 @@ function MemberWorkoutAdmin({member,memberView,isMaster,mfPasteAI}){
   function mwDropProps(dk,id){return {"data-mwid":id,onDragOver:e=>{e.preventDefault();if(mwDragId&&mwDragId!==id)setMwDragOverId(id);},onDrop:e=>{e.preventDefault();mwFinishDrag(dk);}};}
   async function upsertWeek(k,contentObj){
     const json=JSON.stringify(contentObj);
-    const existing=await sbGet("coaching_notes",`class_name=eq.${encodeURIComponent(k)}&select=id`);
+    const existing=await sbGet("coaching_notes",`class_name=eq.${encodeURIComponent(k)}&select=class_name`);
     if(existing&&existing.length){await sbPatch("coaching_notes",`class_name=eq.${encodeURIComponent(k)}`,{content:json,updated_at:Date.now()});}
     else{await sbPost("coaching_notes",{class_name:k,content:json,updated_at:Date.now()});}
   }
@@ -3859,7 +3859,7 @@ function MemberWorkoutsView({session,memberData}){
     const next={...wNotes};if(v)next[nk]=v;else delete next[nk];
     setWNotes(next);
     const q=`class_name=eq.${encodeURIComponent(notesKey)}`;
-    const existing=await sbGet("coaching_notes",q+"&select=id");
+    const existing=await sbGet("coaching_notes",q+"&select=class_name");
     if(existing&&existing.length){await sbPatch("coaching_notes",q,{content:JSON.stringify(next),updated_at:Date.now()});}
     else{await sbPost("coaching_notes",{class_name:notesKey,content:JSON.stringify(next),updated_at:Date.now()});}
   }
@@ -4448,7 +4448,7 @@ function App(){
   async function saveMFlag(key,val){
     const next={...mFlags,[key]:val};setMFlags(next);
     const q="class_name=eq."+encodeURIComponent("__MFLAGS__");
-    const ex=await sbGet("coaching_notes",q+"&select=id");
+    const ex=await sbGet("coaching_notes",q+"&select=class_name");
     if(ex&&ex.length)await sbPatch("coaching_notes",q,{content:JSON.stringify(next),updated_at:Date.now()});
     else await sbPost("coaching_notes",{class_name:"__MFLAGS__",content:JSON.stringify(next),updated_at:Date.now()});
   }
@@ -4459,7 +4459,7 @@ function App(){
   async function saveDowName(dow,name){
     const newDn={...dowNames,[dow]:name.toUpperCase()};
     setDowNames(newDn);
-    const existing=await sbGet("coaching_notes","class_name=eq.__DOW_NAMES__&select=id");
+    const existing=await sbGet("coaching_notes","class_name=eq.__DOW_NAMES__&select=class_name");
     if(existing&&existing.length){await sbPatch("coaching_notes","class_name=eq.__DOW_NAMES__",{content:JSON.stringify(newDn),updated_at:Date.now()});}
     else{await sbPost("coaching_notes",{class_name:"__DOW_NAMES__",content:JSON.stringify(newDn),updated_at:Date.now()});}
   }
@@ -4471,13 +4471,13 @@ function App(){
       if(hide.length||add.length)clean[dk]={hide,add};
     });
     setWellSlots(clean);
-    const existing=await sbGet("coaching_notes","class_name=eq.__WELL_SLOTS__&select=id");
+    const existing=await sbGet("coaching_notes","class_name=eq.__WELL_SLOTS__&select=class_name");
     if(existing&&existing.length){await sbPatch("coaching_notes","class_name=eq.__WELL_SLOTS__",{content:JSON.stringify(clean),updated_at:Date.now()});}
     else{await sbPost("coaching_notes",{class_name:"__WELL_SLOTS__",content:JSON.stringify(clean),updated_at:Date.now()});}
   }
   async function saveMilestoneConfig(cfg){
     setMilestoneConfig(cfg);
-    const existing=await sbGet("coaching_notes","class_name=eq.__MILESTONE_CONFIG__&select=id");
+    const existing=await sbGet("coaching_notes","class_name=eq.__MILESTONE_CONFIG__&select=class_name");
     if(existing&&existing.length){await sbPatch("coaching_notes","class_name=eq.__MILESTONE_CONFIG__",{content:JSON.stringify(cfg),updated_at:Date.now()});}
     else{await sbPost("coaching_notes",{class_name:"__MILESTONE_CONFIG__",content:JSON.stringify(cfg),updated_at:Date.now()});}
   }
