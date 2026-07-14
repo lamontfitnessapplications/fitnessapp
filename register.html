@@ -107,7 +107,7 @@ async function sbPost(t,d){try{const r=await fetch(`${SB_URL}/rest/v1/${t}`,{met
 const hashPw = s=>{let h=5381;for(let i=0;i<s.length;i++)h=((h<<5)+h)^s.charCodeAt(i);return(h>>>0).toString(36);};
 const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const today = ()=>{const d=new Date();return`${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`;};
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx6ZLt0EiEsOANs67XTdpuP_mOWgcBGjCTJMPXSX4qaMONYHZ1hoTtDVl20cqy7BI0b/exec";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwNjMPu-sLin3TBQXGUdZzTaFHn_UrdOx9H2wNdFnBaresNMnMclTpVw7lWM-DQlTho/exec";
 async function sendWelcomeEmailViaScript(to, firstName, tempPassword) {
   try {
     const params = new URLSearchParams({action:"welcome",to,firstName,tempPassword});
