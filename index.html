@@ -66,7 +66,7 @@ html,body{background:#ffffff;min-height:100vh}
 .c-time{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:0.03em;color:#181818;min-width:72px}
 .c-mid{flex:1;display:flex;flex-direction:column;gap:5px}
 .c-bars{display:flex;gap:2px}
-.c-bar{flex:1;height:2px;border-radius:1px;background:#d7edba;transition:background .3s}
+.c-bar{flex:1;height:2px;border-radius:1px;background:#8cc63e;transition:background .3s}
 .c-bar.ct{background:#8cc63e}.cb-mine .c-bar.ct{background:#4aaa66}
 .c-sub{font-size:10px;letter-spacing:0.1em;color:#999;font-weight:500}
 .c-sub.cl{color:#e06040}
@@ -1049,7 +1049,7 @@ function WellnessView({session,showToast,bookings,isAdmin,memberData,wellSlots,c
           React.createElement("div",{className:`well-slot${ismine?" ws-mine":""}${past?" ws-past":""}`,style:{cursor:isAdmin?"pointer":"default"},onClick:isAdmin?()=>setExpandedWell(isExpanded?null:time):undefined},
             React.createElement("div",{className:"well-slot-time"},fmt12(time)),
             React.createElement("div",{className:"well-slot-mid"},
-              React.createElement("div",{className:"well-slot-name"},"SAUNA + COLD PLUNGE"),
+              React.createElement("div",{className:"well-slot-name"},"SAUNA & COLD PLUNGE"),
               React.createElement("div",{className:`well-slot-status${ismine?" wss-mine":taken?" wss-taken":""}`},ismine?"Your booking ✓":taken?"Booked":tooSoon?"Closes 24h before":"Available")
             ),
             isAdmin&&React.createElement("div",{style:{fontSize:10,color:"#555",marginRight:4,flexShrink:0}},isExpanded?"▴":"▾"),
@@ -1436,7 +1436,7 @@ function AdminView({bookings,setBookings,showToast,isAdmin,getMaxSpots,saveClass
     }
   },[admSeg]);
   const admDK=toDS(admDate);const admDOW=admDate.getDay();const admIsSat=admDOW===6;
-  const standardTimes=admDOW===0?[]:admIsSat?SAT_TIMES:WD_TIMES;
+  const standardTimes=(DEFAULT_SCHEDULE[admDOW]||[]).map(x=>x.t);
   const extraTimes=Object.keys(classLimits||{}).filter(k=>k.startsWith(admDK+':')).map(k=>k.slice(admDK.length+1)).filter(t=>!standardTimes.includes(t));
   const admTimes=[...standardTimes,...extraTimes].sort();const admVisibleTimes=admTimes.filter(t=>(classLimits[admDK+':'+t]??MAX_SPOTS)>0);
   const dayBks=bookings.filter(b=>b.date_key===admDK);
@@ -1477,7 +1477,7 @@ function AdminView({bookings,setBookings,showToast,isAdmin,getMaxSpots,saveClass
             React.createElement("div",null,React.createElement("div",{className:"adm-mc-name"},(mb.name||"").toUpperCase())),
             mb.photo
               ?React.createElement("img",{src:mb.photo,style:{width:32,height:32,borderRadius:"50%",objectFit:"cover",border:"1px solid #111111",flexShrink:0},alt:""})
-              :React.createElement("div",{style:{width:32,height:32,borderRadius:"50%",background:"#f6f7f5",border:"1px solid #111111",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'Bebas Neue',sans-serif",fontSize:12,color:"#666",flexShrink:0}},initials(mb.name||"?"))
+              :React.createElement("div",{style:{width:32,height:32,borderRadius:"50%",background:"#ffffff",border:"1px solid #111111",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'Bebas Neue',sans-serif",fontSize:12,color:"#666",flexShrink:0}},initials(mb.name||"?"))
           ),
           React.createElement("div",{className:"adm-mc-detail"},React.createElement("span",null,mb.email)),
           mb.phone&&React.createElement("div",{className:"adm-mc-detail"},React.createElement("span",null,mb.phone)),
@@ -1552,7 +1552,7 @@ function AdminView({bookings,setBookings,showToast,isAdmin,getMaxSpots,saveClass
           return React.createElement("div",{key:time,style:{background:"#f6f7f5",border:"1px solid #111111",borderRadius:8,marginBottom:8,padding:"12px 14px",display:"flex",alignItems:"center",justifyContent:"space-between"}},
             React.createElement("div",null,
               React.createElement("div",{style:{fontFamily:"'Bebas Neue',sans-serif",fontSize:16,color:"#555",letterSpacing:"0.08em"}},fmt12(time)),
-              (slotNames?.[admDK+":"+time]||dowNames?.[admDOW])&&React.createElement("div",{style:{fontSize:7,letterSpacing:"0.1em",color:"#111111",fontWeight:600,marginTop:2,fontFamily:"'DM Sans',sans-serif"}},slotNames?.[admDK+":"+time]||dowNames?.[admDOW]),
+              (slotNames?.[admDK+":"+time]||defaultSlotName(admDK,time)||dowNames?.[admDOW])&&React.createElement("div",{style:{fontSize:7,letterSpacing:"0.1em",color:"#111111",fontWeight:600,marginTop:2,fontFamily:"'DM Sans',sans-serif"}},slotNames?.[admDK+":"+time]||defaultSlotName(admDK,time)||dowNames?.[admDOW]),
               React.createElement("div",{style:{fontSize:8,letterSpacing:"0.15em",color:"#111111",fontWeight:600,marginTop:3}},"HIDDEN FROM MEMBERS")
             ),
             React.createElement("div",{style:{display:"flex",gap:8,alignItems:"center"}},
@@ -1579,7 +1579,7 @@ function AdminView({bookings,setBookings,showToast,isAdmin,getMaxSpots,saveClass
           React.createElement("div",{className:"adm-class-hdr",onClick:()=>!isEditingThis&&!isEditingTimeThis&&!isEditingNameThis&&setExpanded(p=>({...p,[time]:!p[time]}))},
             React.createElement("div",{style:{display:"flex",flexDirection:"column",minWidth:68}},
                 React.createElement("div",{className:"adm-class-time",style:{minWidth:"unset"}},fmt12(time)),
-                (slotNames?.[admDK+':'+time]||dowNames?.[admDOW])&&React.createElement("div",{style:{fontSize:7,letterSpacing:"0.1em",color:"#555",fontWeight:600,marginTop:2,fontFamily:"'DM Sans',sans-serif"}},slotNames?.[admDK+':'+time]||dowNames?.[admDOW])
+                (slotNames?.[admDK+':'+time]||defaultSlotName(admDK,time)||dowNames?.[admDOW])&&React.createElement("div",{style:{fontSize:8,letterSpacing:"0.1em",color:"#111111",fontWeight:600,marginTop:2,fontFamily:"'DM Sans',sans-serif"}},slotNames?.[admDK+':'+time]||defaultSlotName(admDK,time)||dowNames?.[admDOW])
               ),
             React.createElement("div",{className:"adm-class-mid"},
               React.createElement("div",{className:`adm-class-count${taken>=slotMax?" full":taken>0?" has-bk":""}`},`${taken} / ${slotMax}${taken>=slotMax?" · FULL":""}`),
@@ -1624,7 +1624,7 @@ function AdminView({bookings,setBookings,showToast,isAdmin,getMaxSpots,saveClass
           isEditingNameThis&&React.createElement("div",{style:{padding:"12px 14px",borderTop:"1px solid #111111",display:"flex",alignItems:"center",gap:8}},
             React.createElement("div",{style:{fontSize:9,color:"#555",letterSpacing:"0.12em",fontWeight:600,flexShrink:0}},"CLASS NAME"),
             React.createElement("input",{type:"text",value:nameInput,onChange:e=>setNameInput(e.target.value),
-              placeholder:slotNames?.[admDK+":"+time]||dowNames?.[admDOW]||"e.g. POWER HOUR",
+              placeholder:slotNames?.[admDK+":"+time]||defaultSlotName(admDK,time)||dowNames?.[admDOW]||"e.g. POWER HOUR",
               style:{flex:1,background:"#f6f7f5",border:"1px solid #111111",borderRadius:4,padding:"7px 8px",color:"#181818",fontFamily:"'DM Sans',sans-serif",fontSize:14,outline:"none"}
             }),
             React.createElement("button",{
@@ -4511,7 +4511,7 @@ React.createElement("div",{className:"auth-guest",style:{marginTop:24}},"Not a m
   );
   return React.createElement("div",{className:"app",onTouchStart:handleTouchStart,onTouchEnd:handleTouchEnd},
     cropSrc&&React.createElement(ImageCropper,{imageSrc:cropSrc,onSave:handleCropSave,onCancel:()=>setCropSrc(null)}),
-    React.createElement("div",{className:"hdr",style:{paddingBottom:0,backgroundImage:"linear-gradient(rgba(8,8,8,0.80),rgba(8,8,8,0.80)),url(\"https://raw.githubusercontent.com/lamontteam365/team365-booking/main/images/671a9a90865c3673c895b473f6d1feed.jpg\")",backgroundSize:"cover",backgroundPosition:"center top"}},
+    React.createElement("div",{className:"hdr",style:{paddingBottom:0,background:"#ffffff"}},
       React.createElement("div",{style:{display:"flex",alignItems:"center",padding:"30px 4px 30px",position:"relative",minHeight:140}},
         React.createElement("div",{style:{flex:1,paddingLeft:0,zIndex:1}},
           React.createElement("div",{style:{fontFamily:"'Syncopate',sans-serif",fontSize:8,fontWeight:700,color:"#181818",letterSpacing:"0.04em",lineHeight:1.3,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}},session.name.toUpperCase()),
@@ -4521,7 +4521,7 @@ React.createElement("div",{className:"auth-guest",style:{marginTop:24}},"Not a m
         React.createElement("div",{style:{position:"absolute",left:0,right:0,display:"flex",flexDirection:"column",alignItems:"center",pointerEvents:"none"}},
           memberPhoto
             ?React.createElement("img",{src:memberPhoto,alt:"profile",style:{display:"block",width:62,height:62,borderRadius:"50%",objectFit:"cover",border:"2px solid #111111",marginBottom:8,pointerEvents:"auto"}})
-            :React.createElement("div",{style:{width:62,height:62,borderRadius:"50%",background:"#f6f7f5",border:"2px solid #111111",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'Bebas Neue',sans-serif",fontSize:22,color:"#777",marginBottom:8}},memberInit),
+            :React.createElement("div",{style:{width:62,height:62,borderRadius:"50%",background:"#ffffff",border:"2px solid #111111",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'Bebas Neue',sans-serif",fontSize:22,color:"#777",marginBottom:8}},memberInit),
           React.createElement("div",{style:{fontFamily:"'Syncopate',sans-serif",fontSize:9,fontWeight:700,color:"#181818",textAlign:"center",letterSpacing:"0.1em",lineHeight:1.3,whiteSpace:"nowrap"}},"SOUL FITNESS"),
           React.createElement("div",{style:{fontFamily:"'Syncopate',sans-serif",fontSize:5,color:"#181818",textAlign:"center",marginTop:4,letterSpacing:"0.12em",fontWeight:700,whiteSpace:"nowrap"}},"WHERE COMMUNITY MEETS FITNESS")
         ),
@@ -4595,7 +4595,7 @@ React.createElement("div",{className:"auth-guest",style:{marginTop:24}},"Not a m
             React.createElement("div",{className:`c-row${userBkd?" cb":""}${past?" cp":""}`,style:{cursor:isAdmin?"pointer":"default"},onClick:isAdmin?()=>setExpandedClass(isExpanded?null:time):undefined},
               React.createElement("div",{style:{display:"flex",flexDirection:"column",minWidth:72}},
                 React.createElement("div",{className:"c-time",style:{minWidth:"unset"}},fmt12(time)),
-                (slotNames[`${selDK}:${time}`]||defaultSlotName(selDK,time)||getDayClassName(selDK))&&React.createElement("div",{style:{fontSize:7,letterSpacing:"0.12em",color:"#555",fontWeight:600,marginTop:1,fontFamily:"'DM Sans',sans-serif"}},slotNames[`${selDK}:${time}`]||defaultSlotName(selDK,time)||getDayClassName(selDK))
+                (slotNames[`${selDK}:${time}`]||defaultSlotName(selDK,time)||getDayClassName(selDK))&&React.createElement("div",{style:{fontSize:8,letterSpacing:"0.12em",color:"#111111",fontWeight:600,marginTop:1,fontFamily:"'DM Sans',sans-serif"}},slotNames[`${selDK}:${time}`]||defaultSlotName(selDK,time)||getDayClassName(selDK))
               ),
               React.createElement("div",{className:"c-mid"},
                 React.createElement("div",{className:`c-bars${userBkd?" cb-mine":""}`},Array.from({length:maxSp}).map((_,i)=>React.createElement("div",{key:i,className:`c-bar${i<taken?" ct":""}`}))),
