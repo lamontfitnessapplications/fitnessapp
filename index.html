@@ -4485,11 +4485,13 @@ React.createElement("div",{className:"auth-guest",style:{marginTop:24}},"Not a m
     cropSrc&&React.createElement(ImageCropper,{imageSrc:cropSrc,onSave:handleCropSave,onCancel:()=>setCropSrc(null)}),
     React.createElement("div",{className:"hdr",style:{paddingBottom:0,backgroundImage:"linear-gradient(rgba(8,8,8,0.80),rgba(8,8,8,0.80)),url(\"https://raw.githubusercontent.com/lamontteam365/team365-booking/main/images/671a9a90865c3673c895b473f6d1feed.jpg\")",backgroundSize:"cover",backgroundPosition:"center top"}},
       React.createElement("div",{style:{display:"flex",alignItems:"flex-start",padding:"26px 4px 26px",position:"relative",minHeight:140}},
-        React.createElement("div",{style:{flex:1,paddingLeft:0,zIndex:1,marginTop:40,position:"relative"}},
+        React.createElement("div",{style:{flex:1,paddingLeft:0,zIndex:1,marginTop:40}},
+          React.createElement("div",{style:{display:"inline-block",position:"relative"}},
           React.createElement("img",{src:"soulfitness300px.png",alt:"Soul Fitness",style:{position:"absolute",top:-30,left:0,right:0,margin:"0 auto",display:"block",width:44,height:"auto",pointerEvents:"none"}}),
           React.createElement("div",{style:{fontFamily:"'Syncopate',sans-serif",fontSize:7,fontWeight:700,color:"#ffffff",letterSpacing:"0.04em",lineHeight:1.3,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}},session.name.toUpperCase()),
           React.createElement("div",{style:{fontFamily:"'Syncopate',sans-serif",fontSize:7,color:"#8cc63e",letterSpacing:"0.04em",marginTop:4,lineHeight:1.4,whiteSpace:"nowrap"}},((memberData?.membership_type||"").replace(/\s*[-–]\s*\d[\s\S]*$/i,"").replace(/\s*\bMEMBER\b\s*$/i,"").trim()).toUpperCase()),
           memberData?.joined_at?React.createElement("div",{style:{fontFamily:"'Syncopate',sans-serif",fontSize:7,color:"#777",letterSpacing:"0.04em",marginTop:3,whiteSpace:"nowrap"}},("JOINED "+new Date(memberData.joined_at).toLocaleDateString("en-US",{month:"short",year:"numeric"})).toUpperCase()):null
+          )
         ),
         React.createElement("div",{style:{position:"absolute",left:0,right:0,display:"flex",flexDirection:"column",alignItems:"center",pointerEvents:"none"}},
           memberPhoto
