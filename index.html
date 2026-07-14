@@ -4760,4 +4760,10 @@ React.createElement("div",{className:"auth-guest",style:{marginTop:24}},"Not a m
   );
 }
 /* Team 365 — section toggles + per-member workouts */
-ReactDOM.createRoot(document.getElementById("root")).render(React.createEle
+ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(App));
+if("serviceWorker"in navigator){
+  window.addEventListener("load",()=>{navigator.serviceWorker.register("/sw.js");});
+}
+</script>
+</body>
+</html>
