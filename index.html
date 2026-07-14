@@ -3303,7 +3303,10 @@ function ExSection({sectionName,exercises,isFirst,ctx}){
             React.createElement("button",{className:"sp-edit-cancel",onClick:()=>setEditingId(null)},"Cancel"),
             React.createElement("button",{className:"sp-edit-save",onClick:saveExercise,disabled:savingEx},savingEx?"SAVING...":"SAVE")
           ),
-          React.createElement("button",{onClick:()=>deleteExercise(ex.id),style:{width:"100%",marginTop:8,padding:"8px",background:"transparent",border:"1px solid #e53e3e",borderRadius:0,color:"#e53e3e",fontSize:10,letterSpacing:"0.15em",fontWeight:600,cursor:"pointer"}},"DELETE EXERCISE")
+          React.createElement("div",{style:{display:"flex",gap:8,marginTop:8}},
+            React.createElement("button",{onClick:()=>deleteExercise(ex.id),style:{flex:1,padding:"8px",background:"transparent",border:"1px solid #e53e3e",borderRadius:0,color:"#e53e3e",fontSize:10,letterSpacing:"0.1em",fontWeight:600,cursor:"pointer"}},"DELETE THIS WEEK"),
+            React.createElement("button",{onClick:()=>deleteSeries(ex),style:{flex:1,padding:"8px",background:"#e53e3e",border:"1px solid #e53e3e",borderRadius:0,color:"#fff",fontSize:10,letterSpacing:"0.1em",fontWeight:600,cursor:"pointer"}},"DELETE SERIES")
+          )
         );
       }
       if(isCore||isMobility){
@@ -3454,14 +3457,21 @@ function StrengthTab({session,isAdmin,showToast,bookings,memberData}){
   }
   const sections={};
   program.forEach(ex=>{if(!sections[ex.section])sections[ex.section]=[];sections[ex.section].push(ex);});
-  const sectionOrder=["Core","Main","Mobility","Accessories"];
+  const sectionOrder=["Warm Up","Core","Main","Mobility","Accessories"];
   const currentWeek=autoWeek();
   async function deleteExercise(id){
-    if(!window.confirm("Delete this exercise?"))return;
+    if(!window.confirm("Delete this exercise from this week only?"))return;
     await sbDelete("strength_program",`id=eq.${id}`);
     setProgram(prev=>prev.filter(ex=>ex.id!==id));
     setEditingId(null);
     showToast("Exercise deleted");
+  }
+  async function deleteSeries(ex){
+    if(!window.confirm("Delete '"+ex.exercise+"' from every week of this program?"))return;
+    await sbDelete("strength_program",`session_type=eq.${encodeURIComponent(sessType)}&section=eq.${encodeURIComponent(ex.section)}&exercise=eq.${encodeURIComponent(ex.exercise)}`);
+    setEditingId(null);
+    await loadData();
+    showToast("Series deleted");
   }
   const released=isWorkoutReleased(monthYear,weekNum,isAdmin);
   return React.createElement("div",{className:"sp-wrap"},
@@ -3503,6 +3513,7 @@ function StrengthTab({session,isAdmin,showToast,bookings,memberData}){
             React.createElement("input",{className:"sp-edit-input",value:newEx.exercise,onChange:e=>setNewEx(p=>({...p,exercise:e.target.value})),placeholder:"e.g. DEADLIFT"}),
             React.createElement("div",{className:"sp-edit-lbl"},"SECTION"),
             React.createElement("select",{className:"sp-edit-input",value:newEx.section,onChange:e=>setNewEx(p=>({...p,section:e.target.value}))},
+              React.createElement("option",{value:"Warm Up"},"Warm Up"),
               React.createElement("option",{value:"Core"},"Core"),
               React.createElement("option",{value:"Main"},"Main"),
               React.createElement("option",{value:"Mobility"},"Mobility"),
