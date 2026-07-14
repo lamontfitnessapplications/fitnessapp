@@ -108,6 +108,7 @@ const hashPw = s=>{let h=5381;for(let i=0;i<s.length;i++)h=((h<<5)+h)^s.charCode
 const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const today = ()=>{const d=new Date();return`${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`;};
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwNjMPu-sLin3TBQXGUdZzTaFHn_UrdOx9H2wNdFnBaresNMnMclTpVw7lWM-DQlTho/exec";
+const PLAN = (new URLSearchParams(location.search).get("plan")||"trial").toLowerCase();
 async function sendWelcomeEmailViaScript(to, firstName, tempPassword) {
   try {
     const params = new URLSearchParams({action:"welcome",to,firstName,tempPassword});
@@ -258,8 +259,9 @@ async function handleSubmit(){
     tempPw = Math.random().toString(36).slice(2,10);
     ok = await sbPost("members", {email,photo:"",password:hashPw(tempPw),joined_at:Date.now(),workouts_enabled:true,...regData});
     if(ok){
-      // New health-screening signups start with Notice Board + the Workouts add-on; admin grants the rest from their profile.
-      sbPost("coaching_notes",{class_name:"__ACCESS__"+email,content:JSON.stringify({tabs:["community"]}),updated_at:Date.now()});
+      // FITNESS members get full access (no restriction row). TRIAL members start with Notice Board only;
+      // the admin can upgrade them to Fitness from their profile.
+      if(PLAN!=="fitness") sbPost("coaching_notes",{class_name:"__ACCESS__"+email,content:JSON.stringify({tabs:["community"]}),updated_at:Date.now()});
       sendWelcomeEmailViaScript(email, firstName, tempPw);
       logHealthToSheets(healthData);
     }
