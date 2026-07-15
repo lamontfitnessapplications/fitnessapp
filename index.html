@@ -934,10 +934,11 @@ function MemberProfileOverlay({member,bookings,onClose,currentUserIsAdmin,isMast
           ),
           adjOk&&React.createElement("div",{style:{fontSize:10,color:"#4aaa88",marginTop:6,letterSpacing:"0.04em"}},"Saved ✓")
         ),
-        React.createElement("button",{
+        member.email!==ADMIN_EMAIL&&React.createElement("button",{
           onClick:toggleAdmin,disabled:togglingAdmin,
           style:{width:"100%",background:"transparent",border:`1px solid ${memberIsAdmin?"#4a2a2a":"#2a4a2a"}`,color:memberIsAdmin?"#e06040":"#4aaa66",fontFamily:"'Bebas Neue',sans-serif",fontSize:14,letterSpacing:"0.15em",padding:"14px",borderRadius:0,cursor:"pointer",marginTop:4,marginBottom:8}
         },togglingAdmin?"...":(memberIsAdmin?"REMOVE ADMIN ACCESS":"GRANT ADMIN ACCESS")),
+        member.email===ADMIN_EMAIL&&React.createElement("div",{style:{fontSize:10,color:"#4a8aaa",letterSpacing:"0.06em",lineHeight:1.6,marginTop:4,marginBottom:8,padding:"10px 12px",border:"1px solid #223",background:"#0b0e12"}},"🔒 Master admin — admin access is locked and cannot be removed."),
         React.createElement("button",{
           disabled:resettingPw,
           onClick:async()=>{
