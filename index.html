@@ -1485,7 +1485,7 @@ function AdminView({bookings,setBookings,showToast,isAdmin,isMaster,mFlags,saveM
       React.createElement("button",{"data-adm":"members",className:`adm-seg-btn${admSeg==="members"?" aas":""}`,onClick:()=>setAdmSeg("members")},"MEMBERS"),
       React.createElement("button",{"data-adm":"classes",className:`adm-seg-btn${admSeg==="classes"?" aas":""}`,onClick:()=>setAdmSeg("classes")},"CLASSES"),
       (isMaster||mFlags.welladm)&&React.createElement("button",{"data-adm":"wellness",className:`adm-seg-btn${admSeg==="wellness"?" aas":""}`,onClick:()=>setAdmSeg("wellness")},"WELLNESS"),
-      isMaster&&React.createElement("button",{"data-adm":"sections",className:`adm-seg-btn${admSeg==="sections"?" aas":""}`,onClick:()=>setAdmSeg("sections")},"SECTIONS"),
+      React.createElement("button",{"data-adm":"sections",className:`adm-seg-btn${admSeg==="sections"?" aas":""}`,onClick:()=>setAdmSeg("sections")},"SECTIONS"),
       React.createElement("button",{"data-adm":"onboarding",className:`adm-seg-btn${admSeg==="onboarding"?" aas":""}`,onClick:()=>setAdmSeg("onboarding")},"ONBOARDING")
     ),
     admSeg==="members"&&(!membersLoaded?React.createElement("div",{className:"no-bk"},"LOADING...")
@@ -1807,13 +1807,13 @@ undoData&&React.createElement("div",{style:{display:"flex",alignItems:"center",j
         );
       })()
     ),
-    admSeg==="sections"&&isMaster&&React.createElement(React.Fragment,null,
+    admSeg==="sections"&&React.createElement(React.Fragment,null,
       React.createElement("div",{style:{fontSize:10,letterSpacing:"0.18em",color:"#555",fontWeight:600,margin:"16px 0 10px"}},"SECTION VISIBILITY"),
       React.createElement("div",{style:{fontSize:11,color:"#666",letterSpacing:"0.04em",lineHeight:1.7,marginBottom:16}},"Turn a section on or off. When a section is off, its tab is hidden from members throughout the app. Admin management for each section stays available here."),
       [
         {key:"classes",title:"CLASSES",enabled:classesEnabled,save:saveClassesSetting},
         {key:"strength",title:"STRENGTH",enabled:strengthEnabled,save:saveStrengthSetting},
-        {key:"wellness",title:"WELLNESS",enabled:wellnessEnabled,save:saveWellnessSetting}
+        ...((isMaster||mFlags.welladm)?[{key:"wellness",title:"WELLNESS",enabled:wellnessEnabled,save:saveWellnessSetting}]:[])
       ].map(s=>React.createElement("div",{key:s.key,style:{background:"#141414",border:"1px solid #222",borderRadius:0,padding:"12px 16px",marginBottom:8}},
         React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between"}},
           React.createElement("div",null,
@@ -4108,7 +4108,7 @@ function App(){
     }catch(e){}
   },[tab]);
   const isMaster=session?.email===ADMIN_EMAIL;
-  const ADMIN_SEG_ORDER=isMaster?["members","classes","wellness","sections","onboarding"]:["members","classes","wellness","onboarding"];
+  const ADMIN_SEG_ORDER=["members","classes","wellness","sections","onboarding"];
   const [admSeg,setAdmSeg]=useState(()=>lsGet("t365-admseg","members"));
   useEffect(()=>{lsSet("t365-admseg",admSeg);},[admSeg]);
   // Keep the active admin sub-section scrolled into view when it changes
