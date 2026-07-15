@@ -1,0 +1,13 @@
+{
+  "name": "Soul Fitness",
+  "short_name": "Soul Fitness",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#080808",
+  "theme_color": "#080808",
+  "icons": [
+    { "src": "loginprofile.jpg", "sizes": "192x192", "type": "image/jpeg", "purpose": "any" },
+    { "src": "loginprofile.jpg", "sizes": "512x512", "type": "image/jpeg", "purpose": "any" }
+  ]
+}
