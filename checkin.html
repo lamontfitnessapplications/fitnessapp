@@ -4,174 +4,326 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="mobile-web-app-capable" content="yes"/>
 <meta name="theme-color" content="#080808"/>
-<title>Soul Fitness · Check In Kiosk</title>
+<link rel="manifest" href="/checkin-manifest.json"/>
+<link rel="apple-touch-icon" href="/loginprofile.jpg"/>
+<link rel="icon" type="image/png" href="/loginprofile.jpg"/>
+<title>Soul Fitness · Check In</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Syncopate:wght@700&display=swap" rel="stylesheet"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&family=Syncopate:wght@700&display=swap" rel="stylesheet"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html,body{background:#080808;min-height:100vh}
-body{font-family:'DM Sans',sans-serif;color:#fff}
-.hero{
-  background-image:linear-gradient(rgba(8,8,8,0.72),rgba(8,8,8,0.88)),url("Soulbackground.jpg");
-  background-size:cover;background-position:center top;
-  padding:30px 28px 22px;text-align:center;display:flex;flex-direction:column;align-items:center;
-  border-bottom:1px solid #444;
+html,body{background:#080808;min-height:100vh;font-family:'DM Sans',sans-serif;color:#fff}
+
+/* Full-width tablet layout — no max-width cap */
+.app{
+  width:100%;
+  min-height:100vh;
+  min-height:100dvh;
+  display:flex;
+  flex-direction:column;
+  background:#080808;
 }
-.hero-circle{width:70px;height:70px;border-radius:50%;border:2px solid #8cc63e;background:#111;overflow:hidden;margin-bottom:12px;display:flex;align-items:center;justify-content:center}
-.hero-circle img{width:100%;height:100%;object-fit:cover}
-.hero-name{font-family:'Syncopate',sans-serif;font-size:12px;font-weight:700;letter-spacing:0.18em;color:#fff;margin-bottom:5px}
+
+/* ── Hero header ── */
+.hero{
+  background-image:linear-gradient(rgba(8,8,8,0.45),rgba(8,8,8,0.68)),
+    url("Soulbackground.jpg");
+  background-size:cover;
+  background-position:center top;
+  padding:36px 28px 28px;
+  text-align:center;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  border-bottom:1px solid #1a1a1a;
+}
+.hero-circle{
+  width:88px;height:88px;border-radius:50%;
+  border:2px solid #8cc63e;background:#111;
+  overflow:hidden;margin-bottom:16px;
+  display:flex;align-items:center;justify-content:center;
+}
+.hero-circle img{width:100%;height:100%;object-fit:cover;}
+.hero-name{font-family:'Syncopate',sans-serif;font-size:13px;font-weight:700;letter-spacing:0.18em;color:#fff;margin-bottom:5px}
+.hero-tag{font-family:'Syncopate',sans-serif;font-size:6px;font-weight:700;letter-spacing:0.2em;color:#555;margin-bottom:14px}
 .hero-badge{font-size:9px;letter-spacing:0.18em;color:#8cc63e;background:#16280d;border:1px solid #3f6b1e;border-radius:0;padding:4px 14px}
-.wrap{max-width:520px;margin:0 auto;padding:22px 16px 60px}
-.date{font-size:10px;letter-spacing:0.16em;color:#888;font-weight:600;margin-bottom:16px;text-align:center}
-.sec-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.1em;color:#fff;margin-bottom:14px}
-.cls{background:#0e0e0e;border:1px solid #666;border-radius:0;padding:16px 18px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;transition:border-color .15s}
-.cls:active{border-color:#8cc63e}
-.cls-time{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:0.05em;color:#fff;line-height:1}
-.cls-name{font-size:11px;letter-spacing:0.08em;color:#8cc63e;font-weight:600;margin-top:4px;text-transform:uppercase}
-.cls-count{font-size:11px;letter-spacing:0.06em;color:#999;text-align:right;white-space:nowrap}
-.cls-count b{color:#4aaa66;font-weight:700}
-.chev{color:#666;font-size:22px;margin-left:4px}
-.back{display:inline-flex;align-items:center;gap:8px;background:none;border:none;color:#8cc63e;font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:0.14em;font-weight:600;cursor:pointer;padding:0;margin-bottom:16px}
-.rhdr{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:16px}
-.rhdr-time{font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:0.06em;color:#fff}
-.rhdr-name{font-size:11px;letter-spacing:0.08em;color:#8cc63e;font-weight:600;text-transform:uppercase}
-.rhdr-count{font-size:11px;letter-spacing:0.06em;color:#999}
-.rhdr-count b{color:#4aaa66}
-.mrow{background:#0e0e0e;border:1px solid #666;border-radius:0;padding:15px 16px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;transition:all .12s}
-.mrow.on{background:#12220a;border-color:#8cc63e}
-.mname{font-size:15px;letter-spacing:0.03em;color:#eee;font-weight:500}
-.mrow.on .mname{color:#fff}
-.tick{width:30px;height:30px;border-radius:50%;border:2px solid #777;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:'Bebas Neue',sans-serif;font-size:18px;color:transparent;transition:all .12s}
-.mrow.on .tick{background:#8cc63e;border-color:#8cc63e;color:#0a0a0a}
-.empty{text-align:center;color:#777;font-size:13px;letter-spacing:0.04em;padding:40px 0;line-height:1.7}
-.refresh{width:100%;background:transparent;border:1px solid #666;color:#aaa;font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:0.16em;font-weight:600;padding:13px;border-radius:0;cursor:pointer;margin-top:18px}
+
+/* ── Day nav ── */
+.day-nav{display:flex;align-items:center;padding:18px 24px 0}
+.day-arrow{background:none;border:none;color:#888;cursor:pointer;font-size:32px;padding:4px 16px;line-height:1;transition:color .15s}
+.day-arrow:not(:disabled):hover{color:#fff}
+.day-label{flex:1;text-align:center}
+.day-label-main{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:0.06em;color:#fff;line-height:1}
+.day-label-sub{font-size:9px;letter-spacing:0.2em;color:#555;font-weight:600;margin-top:3px}
+.today-btn{font-size:9px;letter-spacing:0.12em;color:#8cc63e;background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;padding:4px 8px}
+
+/* ── Classes list ── */
+.cls-wrap{
+  flex:1;
+  padding:18px 24px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  overflow-y:auto;
+}
+.no-classes{text-align:center;padding:64px 0;font-size:12px;letter-spacing:0.16em;color:#444;line-height:2.4}
+
+/* ── Class card ── */
+.c-row{
+  display:flex;align-items:center;gap:16px;
+  padding:14px 20px;
+  background:#141414;border:1px solid #888;border-radius:0;
+  transition:border-color .15s;cursor:pointer;
+}
+.c-row:hover{border-color:#999}
+.c-row.expanded{border-color:#8cc63e;border-bottom-left-radius:0;border-bottom-right-radius:0}
+.c-time{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:0.03em;color:#fff;min-width:96px;line-height:1}
+.c-class-name{font-size:8px;letter-spacing:0.12em;color:#aaa;font-weight:600;margin-top:4px;font-family:'DM Sans',sans-serif}
+.c-mid{flex:1;display:flex;flex-direction:column;gap:7px}
+.c-bars{display:flex;gap:3px}
+.c-bar{flex:1;height:3px;border-radius:0;background:#2a2a2a}
+.c-bar.ct{background:#fff}
+.c-sub{font-size:11px;letter-spacing:0.1em;color:#999;font-weight:500}
+.c-chevron{font-size:14px;color:#555;flex-shrink:0;transition:transform .2s}
+.c-row.expanded .c-chevron{transform:rotate(180deg)}
+
+/* ── Expanded member list ── */
+.members-panel{
+  background:#141414;
+  border:1px solid #8cc63e;border-top:none;
+  border-bottom-left-radius:0;border-bottom-right-radius:0;
+  overflow:hidden;margin-top:-1px;
+}
+.members-panel-empty{text-align:center;padding:22px;font-size:11px;letter-spacing:0.14em;color:#333;font-weight:500}
+.member-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 20px;
+  border-bottom:1px solid #0f0f0f;
+}
+.member-row:last-child{border-bottom:none}
+.member-row.checked{background:#0a1a0e}
+.member-info{display:flex;flex-direction:column;gap:3px}
+.member-name{font-size:16px;color:#fff;font-weight:500;letter-spacing:0.02em}
+.member-checkin-time{font-size:10px;color:#4aaa66;letter-spacing:0.08em;margin-top:1px}
+.checkin-btn{
+  font-size:10px;letter-spacing:0.1em;font-weight:600;
+  font-family:'DM Sans',sans-serif;border:none;border-radius:0;
+  padding:10px 20px;cursor:pointer;transition:all .15s;
+}
+.checkin-btn.do{background:#8cc63e;color:#08140a}
+.checkin-btn.do:hover{background:#79b02f}
+.checkin-btn.undo{background:#1a1a1a;color:#666;border:1px solid #2a2a2a}
+.checkin-btn.undo:hover{color:#e06040;border-color:#e06040}
+.checkin-tick{color:#4aaa66;font-size:18px;margin-right:8px;flex-shrink:0}
+
+/* ── Footer ── */
+.kiosk-footer{padding:18px 28px;border-top:1px solid #111;text-align:center}
+.footer-tagline{font-family:'DM Sans',sans-serif;font-size:7px;letter-spacing:0.18em;color:#fff;font-weight:400;margin-bottom:7px}
+.footer-powered{font-size:8px;letter-spacing:0.06em;color:#555;margin-bottom:10px}
+.footer-powered a{color:#8cc63e;text-decoration:none}
+.refresh-row{display:flex;align-items:center;justify-content:center;gap:10px}
+.refresh-lbl{font-size:9px;letter-spacing:0.14em;color:#888;font-weight:500}
+.refresh-btn{font-size:9px;letter-spacing:0.1em;color:#8cc63e;background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600}
+
+/* ── Toast ── */
+.toast{
+  position:fixed;bottom:36px;left:50%;transform:translateX(-50%);
+  background:#fff;color:#000;
+  font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:0.15em;
+  padding:12px 28px;border-radius:0;
+  pointer-events:none;transition:opacity .3s;z-index:200;
+  white-space:nowrap;opacity:0;
+}
+.toast.show{opacity:1}
 </style>
 </head>
 <body>
-<div id="root"><div class="empty" style="padding-top:120px">Loading today's classes…</div></div>
+<div id="root"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 <script>
+const { useState, useEffect, useCallback } = React;
 const SB_URL = "https://tqidngxpbzkzdekhizyp.supabase.co";
 const SB_KEY = "sb_publishable_UTl_mZYy0xvuOUhNNOM6Mg_s6XOZlto";
 const SB_HDR = {"apikey":SB_KEY,"Authorization":`Bearer ${SB_KEY}`,"Content-Type":"application/json","Prefer":"return=minimal"};
 async function sbGet(t,q=""){try{const r=await fetch(`${SB_URL}/rest/v1/${t}?${q}`,{headers:SB_HDR});return r.ok?await r.json():[];}catch{return[];}}
 async function sbPatch(t,q,d){try{const r=await fetch(`${SB_URL}/rest/v1/${t}?${q}`,{method:"PATCH",headers:SB_HDR,body:JSON.stringify(d)});return r.ok;}catch{return false;}}
-
-// Class-name resolution (mirrors the app): custom slot name -> default schedule -> day name
-const DEFAULT_SCHEDULE={1:[{t:"05:00",n:"Mixed Performance"},{t:"06:00",n:"Mixed Performance"},{t:"07:00",n:"Mixed Performance"},{t:"16:00",n:"Mixed Performance"},{t:"17:00",n:"S&C Lower Body"},{t:"18:00",n:"S&C Lower Body"}],2:[{t:"16:00",n:"Teens S&C Upper"},{t:"17:00",n:"Team-Up"},{t:"18:00",n:"Teens/Girls S&C Upper"}],3:[{t:"05:00",n:"S&C Upper"},{t:"06:00",n:"S&C Upper"},{t:"07:00",n:"S&C Upper"},{t:"16:00",n:"S&C Upper"},{t:"17:00",n:"Boxing"},{t:"18:00",n:"S&C Upper"}],4:[{t:"16:00",n:"Teens S&C Lower"},{t:"17:00",n:"Teens/Girls S&C Upper"}],5:[{t:"05:00",n:"Levels"},{t:"06:00",n:"Levels"},{t:"07:00",n:"Levels"},{t:"16:00",n:"Levels"},{t:"17:00",n:"Teens Sports"}],6:[{t:"06:00",n:"Hero WOD"},{t:"07:30",n:"Boxing"},{t:"08:30",n:"Body Pump - Upper"}],0:[]};
-let DOW_NAMES={1:"RISE UP",2:"STRENGTH LOWER",3:"ASCEND",4:"STRENGTH UPPER",5:"ELEVATE",6:"SUMMIT",0:""};
-let slotNames={}; // time -> custom name for today (from class_limits)
-function defaultSlotName(time){const d=new Date().getDay();const f=(DEFAULT_SCHEDULE[d]||[]).find(x=>x.t===time);return f?f.n:"";}
-function resolveName(time){return slotNames[time]||defaultSlotName(time)||DOW_NAMES[new Date().getDay()]||"";}
-
 const MONTHS=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-const DAYS=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
-function todayKey(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;}
-function todayLabel(){const d=new Date();return `${DAYS[d.getDay()]} ${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`;}
-function fmt12(t){const [h,m]=t.split(":").map(Number);const ap=h<12?"am":"pm";const hh=h%12||12;return `${hh}:${String(m).padStart(2,"0")}${ap}`;}
-function esc(s){return (s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
-
-const root=document.getElementById("root");
-let all=[];
-let view="classes";
-let curTime=null;
-
-function heroHtml(){
-  return `<div class="hero">
-    <div class="hero-circle"><img src="loginprofile.jpg" onerror="this.style.display='none'" alt="Soul Fitness"/></div>
-    <div class="hero-name">SOUL FITNESS</div>
-    <div class="hero-badge">CHECK IN KIOSK</div>
-  </div>`;
+const MAX_SPOTS=25;
+// Soul Fitness schedule: custom slot name -> default schedule (per time) -> day name
+const DEFAULT_SCHEDULE={1:[{t:"05:00",n:"Mixed Performance"},{t:"06:00",n:"Mixed Performance"},{t:"07:00",n:"Mixed Performance"},{t:"16:00",n:"Mixed Performance"},{t:"17:00",n:"S&C Lower Body"},{t:"18:00",n:"S&C Lower Body"}],2:[{t:"16:00",n:"Teens S&C Upper"},{t:"17:00",n:"Team-Up"},{t:"18:00",n:"Teens/Girls S&C Upper"}],3:[{t:"05:00",n:"S&C Upper"},{t:"06:00",n:"S&C Upper"},{t:"07:00",n:"S&C Upper"},{t:"16:00",n:"S&C Upper"},{t:"17:00",n:"Boxing"},{t:"18:00",n:"S&C Upper"}],4:[{t:"16:00",n:"Teens S&C Lower"},{t:"17:00",n:"Teens/Girls S&C Upper"}],5:[{t:"05:00",n:"Levels"},{t:"06:00",n:"Levels"},{t:"07:00",n:"Levels"},{t:"16:00",n:"Levels"},{t:"17:00",n:"Teens Sports"}],6:[{t:"06:00",n:"Hero WOD"},{t:"07:30",n:"Boxing"},{t:"08:30",n:"Body Pump - Upper"}],0:[]};
+const DEFAULT_DOW_NAMES={1:"RISE UP",2:"STRENGTH LOWER",3:"ASCEND",4:"STRENGTH UPPER",5:"ELEVATE",6:"SUMMIT",0:""};
+function toDS(d){return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;}
+function fmt12(t){if(!t)return"";const[h,m]=t.split(":").map(Number);const ampm=h<12?"AM":"PM";const h12=h===0?12:h>12?h-12:h;return`${h12}:${String(m).padStart(2,"0")} ${ampm}`;}
+function addDays(d,n){const r=new Date(d);r.setDate(r.getDate()+n);return r;}
+function isToday(d){const n=new Date();return d.getFullYear()===n.getFullYear()&&d.getMonth()===n.getMonth()&&d.getDate()===n.getDate();}
+function getToday(){const d=new Date();if(d.getDay()===0){d.setDate(d.getDate()+1);}return d;}
+function App(){
+  const today=getToday();
+  const [selDate,setSelDate]=useState(today);
+  const [bookings,setBookings]=useState([]);
+  const [classLimits,setClassLimits]=useState({});
+  const [slotNames,setSlotNames]=useState({});
+  const [dowNames,setDowNames]=useState(DEFAULT_DOW_NAMES);
+  const [loading,setLoading]=useState(true);
+  const [expandedSlot,setExpandedSlot]=useState(null);
+  const [busy,setBusy]=useState({});
+  const [toast,setToast]=useState({show:false,msg:""});
+  const [lastRefresh,setLastRefresh]=useState(new Date());
+  useEffect(()=>{
+    sbGet("coaching_notes","class_name=eq.__DOW_NAMES__&select=content&limit=1").then(rows=>{
+      if(rows&&rows[0]){try{const dn=JSON.parse(rows[0].content);setDowNames(p=>({...p,...dn}));}catch{}}
+    });
+  },[]);
+  const selDK=toDS(selDate);
+  const isTodaySel=isToday(selDate);
+  const dayOfWeek=selDate.getDay();
+  const loadData=useCallback(async()=>{
+    setLoading(true);
+    const dk=toDS(selDate);
+    const [bks,limits]=await Promise.all([
+      sbGet("bookings",`date_key=eq.${dk}&select=id,name,email,time,checked_in,checked_in_at&order=time.asc,name.asc`),
+      sbGet("class_limits",`date_key=eq.${dk}&select=time_slot,max_spots,name`)
+    ]);
+    setBookings(bks||[]);
+    const cl={};const sn={};
+    (limits||[]).forEach(r=>{
+      cl[r.time_slot]=r.max_spots;
+      if(r.name)sn[r.time_slot]=r.name;
+    });
+    setClassLimits(cl);
+    setSlotNames(sn);
+    setLastRefresh(new Date());
+    setLoading(false);
+  },[selDate]);
+  useEffect(()=>{loadData();},[loadData]);
+  useEffect(()=>{const id=setInterval(()=>loadData(),180000);return()=>clearInterval(id);},[loadData]);
+  const baseTimes=(DEFAULT_SCHEDULE[dayOfWeek]||[]).map(x=>x.t);
+  const bookingTimes=bookings.map(b=>b.time);
+  const allTimes=[...new Set([...baseTimes,...Object.keys(classLimits),...bookingTimes])].sort().filter(t=>(classLimits[t]??MAX_SPOTS)>0);
+  function defaultSlotName(time,dow){const f=(DEFAULT_SCHEDULE[dow]||[]).find(x=>x.t===time);return f?f.n:"";}
+  function getClassName(time){
+    return slotNames[time]||defaultSlotName(time,dayOfWeek)||dowNames[dayOfWeek]||"";
+  }
+  async function toggleCheckIn(bk){
+    if(busy[bk.id])return;
+    setBusy(p=>({...p,[bk.id]:true}));
+    const newVal=!bk.checked_in;
+    const ok=await sbPatch("bookings",`id=eq.${bk.id}`,{checked_in:newVal,checked_in_at:newVal?Date.now():null});
+    if(ok){
+      setBookings(prev=>prev.map(b=>b.id===bk.id?{...b,checked_in:newVal,checked_in_at:newVal?Date.now():null}:b));
+      showToast(newVal?`${bk.name} checked in ✓`:`${bk.name} undone`);
+    }else{showToast("Error — try again");}
+    setBusy(p=>({...p,[bk.id]:false}));
+  }
+  function showToast(msg){setToast({show:true,msg});setTimeout(()=>setToast({show:false,msg:""}),2200);}
+  function changeDay(delta){
+    let next=addDays(selDate,delta);
+    if(next.getDay()===0)next=addDays(next,delta>0?1:-1);
+    setSelDate(next);setExpandedSlot(null);
+  }
+  const DAY_NAMES=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  const FULL_MONTHS=["January","February","March","April","May","June","July","August","September","October","November","December"];
+  const refreshStr=`${lastRefresh.getHours()}:${String(lastRefresh.getMinutes()).padStart(2,"0")}`;
+  return React.createElement("div",{className:"app"},
+    React.createElement("div",{className:"hero"},
+      React.createElement("div",{className:"hero-circle"},
+        React.createElement("img",{
+          src:"loginprofile.jpg",
+          onError:e=>{e.target.style.display="none";},alt:"Soul Fitness"
+        })
+      ),
+      React.createElement("div",{className:"hero-name"},"SOUL FITNESS"),
+      React.createElement("div",{className:"hero-tag"},"WHERE COMMUNITY MEETS FITNESS"),
+      React.createElement("div",{className:"hero-badge"},"CHECK IN KIOSK")
+    ),
+    React.createElement("div",{className:"day-nav"},
+      React.createElement("button",{className:"day-arrow",onClick:()=>changeDay(-1)},"‹"),
+      React.createElement("div",{className:"day-label"},
+        React.createElement("div",{className:"day-label-main"},isTodaySel?"TODAY":DAY_NAMES[selDate.getDay()].toUpperCase()),
+        React.createElement("div",{className:"day-label-sub"},`${selDate.getDate()} ${FULL_MONTHS[selDate.getMonth()]} ${selDate.getFullYear()}`)
+      ),
+      React.createElement("button",{className:"day-arrow",onClick:()=>changeDay(1)},"›")
+    ),
+    !isTodaySel&&React.createElement("div",{style:{textAlign:"center",padding:"4px 0 0"}},
+      React.createElement("button",{className:"today-btn",onClick:()=>{setSelDate(today);setExpandedSlot(null);}},"← BACK TO TODAY")
+    ),
+    loading
+      ?React.createElement("div",{className:"cls-wrap"},React.createElement("div",{className:"no-classes"},"LOADING..."))
+      :React.createElement("div",{className:"cls-wrap"},
+          allTimes.length===0
+            ?React.createElement("div",{className:"no-classes"},"NO CLASSES SCHEDULED")
+            :allTimes.map(time=>{
+                const list=bookings.filter(b=>b.time===time);
+                const taken=list.length;
+                const maxSp=classLimits[time]||MAX_SPOTS;
+                const checkedCount=list.filter(b=>b.checked_in).length;
+                const isExpanded=expandedSlot===time;
+                const className=getClassName(time);
+                return React.createElement("div",{key:time},
+                  React.createElement("div",{
+                    className:`c-row${isExpanded?" expanded":""}`,
+                    onClick:()=>setExpandedSlot(isExpanded?null:time)
+                  },
+                    React.createElement("div",{style:{display:"flex",flexDirection:"column",minWidth:96}},
+                      React.createElement("div",{className:"c-time"},fmt12(time)),
+                      className&&React.createElement("div",{className:"c-class-name"},className)
+                    ),
+                    React.createElement("div",{className:"c-mid"},
+                      React.createElement("div",{className:"c-bars"},
+                        Array.from({length:maxSp}).map((_,i)=>React.createElement("div",{key:i,className:`c-bar${i<taken?" ct":""}`}))
+                      ),
+                      React.createElement("div",{className:"c-sub"},
+                        taken===0?"No bookings yet":`${checkedCount} of ${taken} checked in`
+                      )
+                    ),
+                    React.createElement("div",{className:"c-chevron"},"▾")
+                  ),
+                  isExpanded&&React.createElement("div",{className:"members-panel"},
+                    list.length===0
+                      ?React.createElement("div",{className:"members-panel-empty"},"NO BOOKINGS FOR THIS CLASS")
+                      :list.map(bk=>React.createElement("div",{
+                            key:bk.id,
+                            className:`member-row${bk.checked_in?" checked":""}`
+                          },
+                          React.createElement("div",{style:{display:"flex",alignItems:"center"}},
+                            bk.checked_in&&React.createElement("span",{className:"checkin-tick"},"✓"),
+                            React.createElement("div",{className:"member-info"},
+                              React.createElement("div",{className:"member-name"},bk.name),
+                              bk.checked_in&&bk.checked_in_at&&React.createElement("div",{className:"member-checkin-time"},
+                                `Checked in ${new Date(bk.checked_in_at).getHours()}:${String(new Date(bk.checked_in_at).getMinutes()).padStart(2,"0")}`
+                              )
+                            )
+                          ),
+                          React.createElement("button",{
+                            className:`checkin-btn ${bk.checked_in?"undo":"do"}`,
+                            onClick:()=>toggleCheckIn(bk),
+                            disabled:!!busy[bk.id]
+                          },busy[bk.id]?"...":bk.checked_in?"Undo":"Check In")
+                        ))
+                  )
+                );
+              })
+        ),
+    React.createElement("div",{className:"kiosk-footer"},
+      React.createElement("div",{className:"footer-tagline"},"LAMONT FITNESS APPLICATIONS"),
+      React.createElement("div",{className:"footer-powered"},
+        "POWERED BY ",
+        React.createElement("a",{href:"https://www.lamontcollective.com",target:"_blank",rel:"noopener"},"WWW.LAMONTCOLLECTIVE.COM")
+      ),
+      React.createElement("div",{className:"refresh-row"},
+        React.createElement("div",{className:"refresh-lbl"},`LAST UPDATED ${refreshStr}`),
+        React.createElement("button",{className:"refresh-btn",onClick:loadData},"REFRESH")
+      )
+    ),
+    React.createElement("div",{className:`toast${toast.show?" show":""}`},toast.msg)
+  );
 }
-
-async function loadAll(){
-  const [bk, lim, dn] = await Promise.all([
-    sbGet("bookings",`date_key=eq.${todayKey()}&select=id,name,time,session_type,checked_in&order=time.asc`),
-    sbGet("class_limits",`date_key=eq.${todayKey()}&select=time_slot,name`),
-    sbGet("coaching_notes","class_name=eq.__DOW_NAMES__&select=content")
-  ]);
-  all = bk||[];
-  slotNames = {};
-  (lim||[]).forEach(r=>{ if(r.name) slotNames[r.time_slot]=r.name; });
-  if(dn&&dn.length){ try{const o=JSON.parse(dn[0].content); if(o&&typeof o==="object") DOW_NAMES={...DOW_NAMES,...o}; }catch(e){} }
-  if(view==="roster"&&curTime) renderRoster(curTime); else renderClasses();
-}
-
-function timesList(){
-  const map={};
-  all.forEach(b=>{ (map[b.time]=map[b.time]||[]).push(b); });
-  return Object.keys(map).sort().map(t=>({time:t, list:map[t]}));
-}
-
-function renderClasses(){
-  view="classes"; curTime=null;
-  const groups=timesList();
-  const body = groups.length
-    ? groups.map(g=>{
-        const inCount=g.list.filter(b=>b.checked_in).length;
-        const nm=resolveName(g.time)||g.list[0].session_type||"";
-        return `<div class="cls" onclick="openRoster('${g.time}')">
-          <div>
-            <div class="cls-time">${fmt12(g.time)}</div>
-            ${nm?`<div class="cls-name">${esc(nm)}</div>`:""}
-          </div>
-          <div style="display:flex;align-items:center">
-            <div class="cls-count"><b>${inCount}</b> in · ${g.list.length} booked</div>
-            <div class="chev">›</div>
-          </div>
-        </div>`;
-      }).join("")
-    : `<div class="empty">No classes booked for today yet.</div>`;
-  root.innerHTML = heroHtml() + `<div class="wrap">
-    <div class="date">${todayLabel().toUpperCase()}</div>
-    <div class="sec-title">TODAY'S CLASSES</div>
-    ${body}
-    <button class="refresh" onclick="loadAll()">↻ REFRESH</button>
-  </div>`;
-}
-
-function openRoster(t){ curTime=t; renderRoster(t); }
-
-function renderRoster(t){
-  view="roster"; curTime=t;
-  const list=all.filter(b=>b.time===t).sort((a,b)=>(a.name||"").localeCompare(b.name||""));
-  const nm=resolveName(t)||(list[0]?list[0].session_type||"":"");
-  const inCount=list.filter(b=>b.checked_in).length;
-  const rows=list.map(b=>`
-    <div class="mrow ${b.checked_in?"on":""}" data-id="${b.id}" onclick="toggle(${b.id})">
-      <div class="mname">${esc(b.name||"—")}</div>
-      <div class="tick">✓</div>
-    </div>`).join("");
-  root.innerHTML = heroHtml() + `<div class="wrap">
-    <button class="back" onclick="renderClasses()">‹ ALL CLASSES</button>
-    <div class="rhdr">
-      <div>
-        <div class="rhdr-time">${fmt12(t)}</div>
-        ${nm?`<div class="rhdr-name">${esc(nm)}</div>`:""}
-      </div>
-      <div class="rhdr-count"><b>${inCount}</b> / ${list.length} checked in</div>
-    </div>
-    ${rows||`<div class="empty">No one booked into this class.</div>`}
-    <button class="refresh" onclick="loadAll()">↻ REFRESH</button>
-  </div>`;
-}
-
-async function toggle(id){
-  const b=all.find(x=>x.id===id); if(!b)return;
-  const nv=!b.checked_in;
-  b.checked_in=nv;
-  renderRoster(curTime);
-  const ok=await sbPatch("bookings",`id=eq.${id}`,{checked_in:nv});
-  if(!ok){ b.checked_in=!nv; renderRoster(curTime); }
-}
-
-window.openRoster=openRoster;
-window.renderClasses=renderClasses;
-window.renderRoster=renderRoster;
-window.toggle=toggle;
-window.loadAll=loadAll;
-
-loadAll();
+ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(App));
 </script>
 </body>
 </html>
