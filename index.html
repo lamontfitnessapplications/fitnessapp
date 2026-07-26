@@ -442,8 +442,7 @@ async function sbPost(t,d){try{const r=await fetch(`${SB_URL}/rest/v1/${t}`,{met
 async function sbPatch(t,q,d){try{const r=await fetch(`${SB_URL}/rest/v1/${t}?${q}`,{method:"PATCH",headers:SB_HDR,body:JSON.stringify(d)});return r.ok;}catch{return false;}}
 async function sbDelete(t,q){
   try{
-    const headers={"apikey":SB_KEY,"Authorization":`Bearer ${SB_KEY}`,"Content-Type":"application/json"};
-    const r=await fetch(`${SB_URL}/rest/v1/${t}?${q}`,{method:"DELETE",headers});
+    const r=await fetch(`${SB_URL}/rest/v1/${t}?${q}`,{method:"DELETE",headers:SB_HDR});
     return r.ok;
   }catch{return false;}
 }
