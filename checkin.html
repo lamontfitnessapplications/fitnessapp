@@ -150,8 +150,13 @@ const { useState, useEffect, useCallback } = React;
 const SB_URL = "https://tqidngxpbzkzdekhizyp.supabase.co";
 const SB_KEY = "sb_publishable_UTl_mZYy0xvuOUhNNOM6Mg_s6XOZlto";
 const SB_HDR = {"apikey":SB_KEY,"Authorization":`Bearer ${SB_KEY}`,"Content-Type":"application/json","Prefer":"return=minimal"};
-async function sbGet(t,q=""){try{const r=await fetch(`${SB_URL}/rest/v1/${t}?${q}`,{headers:SB_HDR});return r.ok?await r.json():[];}catch{return[];}}
-async function sbPatch(t,q,d){try{const r=await fetch(`${SB_URL}/rest/v1/${t}?${q}`,{method:"PATCH",headers:SB_HDR,body:JSON.stringify(d)});return r.ok;}catch{return false;}}
+let AUTH_TOKEN=null;
+function setAuthToken(t){AUTH_TOKEN=t||null;SB_HDR.Authorization=`Bearer ${t||SB_KEY}`;}
+const RECEPTION_EMAIL="reception@soulfitness.local", RECEPTION_PW="SoulFitness-Kiosk";
+async function receptionLogin(){try{const r=await fetch(`${SB_URL}/auth/v1/token?grant_type=password`,{method:"POST",headers:{"apikey":SB_KEY,"Content-Type":"application/json"},body:JSON.stringify({email:RECEPTION_EMAIL,password:RECEPTION_PW})});const j=await r.json();if(r.ok&&j.access_token)setAuthToken(j.access_token);}catch(e){}}
+const AUTH_READY=receptionLogin();
+async function sbGet(t,q=""){try{await AUTH_READY;const r=await fetch(`${SB_URL}/rest/v1/${t}?${q}`,{headers:SB_HDR});return r.ok?await r.json():[];}catch{return[];}}
+async function sbPatch(t,q,d){try{await AUTH_READY;const r=await fetch(`${SB_URL}/rest/v1/${t}?${q}`,{method:"PATCH",headers:SB_HDR,body:JSON.stringify(d)});return r.ok;}catch{return false;}}
 const MONTHS=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const MAX_SPOTS=25;
 // Soul Fitness schedule: custom slot name -> default schedule (per time) -> day name

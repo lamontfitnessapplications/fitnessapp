@@ -429,7 +429,14 @@ async function notifyWellnessBooking(name, email, dateKey, time) {
 }
 const SB_URL = "https://tqidngxpbzkzdekhizyp.supabase.co";
 const SB_KEY = "sb_publishable_UTl_mZYy0xvuOUhNNOM6Mg_s6XOZlto";
+let AUTH_TOKEN = null;
 const SB_HDR = {"apikey":SB_KEY,"Authorization":`Bearer ${SB_KEY}`,"Content-Type":"application/json","Prefer":"return=minimal"};
+function setAuthToken(t){AUTH_TOKEN=t||null;SB_HDR.Authorization=`Bearer ${t||SB_KEY}`;}
+async function authLogin(email,password){try{const r=await fetch(`${SB_URL}/auth/v1/token?grant_type=password`,{method:"POST",headers:{"apikey":SB_KEY,"Content-Type":"application/json"},body:JSON.stringify({email,password})});const j=await r.json();if(!r.ok||!j.access_token)return{error:(j.error_description||j.msg||j.error||"Login failed")};setAuthToken(j.access_token);try{localStorage.setItem("t365-refresh",j.refresh_token||"");}catch(e){}return{ok:true,user:j.user};}catch(e){return{error:"Network error"};}}
+async function authSignup(email,password){try{const r=await fetch(`${SB_URL}/auth/v1/signup`,{method:"POST",headers:{"apikey":SB_KEY,"Content-Type":"application/json"},body:JSON.stringify({email,password})});const j=await r.json();if(!r.ok)return{error:(j.error_description||j.msg||j.error||"Sign up failed")};if(j.access_token){setAuthToken(j.access_token);try{localStorage.setItem("t365-refresh",j.refresh_token||"");}catch(e){}}return{ok:true};}catch(e){return{error:"Network error"};}}
+async function authRefresh(){try{var rt=localStorage.getItem("t365-refresh");if(!rt)return false;const r=await fetch(`${SB_URL}/auth/v1/token?grant_type=refresh_token`,{method:"POST",headers:{"apikey":SB_KEY,"Content-Type":"application/json"},body:JSON.stringify({refresh_token:rt})});const j=await r.json();if(!r.ok||!j.access_token){setAuthToken(null);try{localStorage.removeItem("t365-refresh");}catch(e){}return false;}setAuthToken(j.access_token);try{localStorage.setItem("t365-refresh",j.refresh_token||"");}catch(e){}return true;}catch(e){return false;}}
+function authLogout(){setAuthToken(null);try{localStorage.removeItem("t365-refresh");}catch(e){}}
+async function migrateLogin(email,password){try{const r=await fetch(`${SB_URL}/functions/v1/dynamic-api`,{method:"POST",headers:{"apikey":SB_KEY,"Authorization":`Bearer ${SB_KEY}`,"Content-Type":"application/json"},body:JSON.stringify({email,password})});const j=await r.json().catch(()=>({}));if(j&&j.ok)return{ok:true};if(j&&j.error==="wrong_password")return{wrong:true};return{error:(j&&j.error)||"failed"};}catch(e){return{error:"network"};}}
 async function sbGet(t,q=""){try{const r=await fetch(`${SB_URL}/rest/v1/${t}?${q}`,{headers:SB_HDR});return r.ok?await r.json():[];}catch{return[];}}
 async function sbPost(t,d){try{const r=await fetch(`${SB_URL}/rest/v1/${t}`,{method:"POST",headers:SB_HDR,body:JSON.stringify(d)});return r.ok;}catch{return false;}}
 async function sbPatch(t,q,d){try{const r=await fetch(`${SB_URL}/rest/v1/${t}?${q}`,{method:"PATCH",headers:SB_HDR,body:JSON.stringify(d)});return r.ok;}catch{return false;}}
@@ -484,7 +491,7 @@ function openAddToCalendar(opts){
   const recur=(opts.recurWeeks&&opts.recurWeeks>1)?("RRULE:FREQ=WEEKLY;COUNT="+opts.recurWeeks):"";
   let g="https://calendar.google.com/calendar/render?action=TEMPLATE&text="+encodeURIComponent(opts.title)+"&dates="+s+"/"+e+"&details="+encodeURIComponent(det)+"&location="+encodeURIComponent(loc);
   if(recur)g+="&recur="+encodeURIComponent(recur);
-  const ics="BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Team365//Booking//EN\r\nCALSCALE:GREGORIAN\r\nBEGIN:VEVENT\r\nUID:"+Date.now()+"-"+Math.random().toString(36).slice(2)+"@team365\r\nDTSTAMP:"+calUTC(new Date())+"\r\nDTSTART:"+s+"\r\nDTEND:"+e+"\r\nSUMMARY:"+icsEsc(opts.title)+"\r\nLOCATION:"+icsEsc(loc)+"\r\nDESCRIPTION:"+icsEsc(det)+"\r\n"+(recur?recur+"\r\n":"")+"END:VEVENT\r\nEND:VCALENDAR\r\n";
+  const ics="BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Team365//Booking//EN\r\nCALSCALE:GREGORIAN\r\nBEGIN:VEVENT\r\nUID:"+Date.now()+"-"+Math.random().toString(36).slice(2)+"@soulfitness\r\nDTSTAMP:"+calUTC(new Date())+"\r\nDTSTART:"+s+"\r\nDTEND:"+e+"\r\nSUMMARY:"+icsEsc(opts.title)+"\r\nLOCATION:"+icsEsc(loc)+"\r\nDESCRIPTION:"+icsEsc(det)+"\r\n"+(recur?recur+"\r\n":"")+"END:VEVENT\r\nEND:VCALENDAR\r\n";
   const label=start.toLocaleDateString([],{weekday:"short",month:"short",day:"numeric"})+" · "+fmt12(opts.time)+(recur?(" · "+opts.recurWeeks+" weeks"):"");
   const ov=document.createElement("div");
   ov.style.cssText="position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.72);display:flex;align-items:center;justify-content:center;padding:24px";
@@ -957,6 +964,7 @@ function MemberProfileOverlay({member,bookings,onClose,currentUserIsAdmin,mfWk,i
       ),
       currentUserIsAdmin&&(isMaster||mfWk!==false)&&React.createElement(MemberWorkoutAdmin,{member,memberView:wkMemberView,isMaster,mfPasteAI}),
       currentUserIsAdmin&&React.createElement(RoutinesAdmin,{member}),
+      currentUserIsAdmin&&React.createElement(MemberPBAdmin,{member}),
       currentUserIsAdmin&&React.createElement(React.Fragment,null,
         React.createElement("div",{className:"mp-section"},"ADMIN CONTROLS"),
         React.createElement("div",{style:{background:"#0e0e0e",border:"1px solid #222",borderRadius:0,padding:"12px 14px",marginBottom:8}},
@@ -976,9 +984,10 @@ function MemberProfileOverlay({member,bookings,onClose,currentUserIsAdmin,mfWk,i
           disabled:resettingPw,
           onClick:async()=>{
             setResettingPw(true);setPwResetOk("");
-            const tmpPw="T365"+String(Math.floor(1000+Math.random()*9000));
-            const hashed=hashPw(tmpPw);
-            await sbPatch("members",`email=eq.${encodeURIComponent(member.email)}`,{password:hashed});
+            const tmpPw="SF"+String(Math.floor(1000+Math.random()*9000));
+            let srvOk=false;
+            try{const sr=await fetch(`${SB_URL}/functions/v1/dynamic-api`,{method:"POST",headers:{"apikey":SB_KEY,"Authorization":`Bearer ${AUTH_TOKEN||SB_KEY}`,"Content-Type":"application/json"},body:JSON.stringify({action:"adminSetPassword",email:member.email,password:tmpPw})});const sj=await sr.json().catch(()=>({}));srvOk=!!(sj&&sj.ok);}catch(e){}
+            if(!srvOk){setResettingPw(false);setPwResetOk("Reset failed. Please try again.");return;}
             const firstName=member.name?member.name.split(" ")[0]:"there";
             const params=new URLSearchParams({action:"adminReset",to:member.email,firstName,tempPassword:tmpPw});
             try{await fetch(APPS_SCRIPT_URL+"?"+params.toString(),{method:"GET",mode:"no-cors"});}catch(e){}
@@ -2916,7 +2925,7 @@ function ProgressTab({session,isAdmin,showToast,milestoneConfig,bookings,saveMil
       session?sbGet("personal_bests",`email=eq.${encodeURIComponent(session.email)}&select=*`):Promise.resolve([]),
       sbGet("community_bests","select=*"),
       sbGet("personal_bests","select=email,exercise_id,weight_kg,achieved_date"),
-      sbGet("members","select=email")
+      sbGet("members_public","select=email")
     ]);
     setExercises(exData||[]);
     const pbMap={};
@@ -2945,7 +2954,7 @@ function ProgressTab({session,isAdmin,showToast,milestoneConfig,bookings,saveMil
     for(const[exId,top] of Object.entries(topPerEx)){
       const stored=cbMap[exId];
       if(!stored||!stored.weight_kg||parseFloat(top.weight_kg)>parseFloat(stored.weight_kg)){
-        const holderRows=await sbGet("members",`email=eq.${encodeURIComponent(top.email)}&select=name`);
+        const holderRows=await sbGet("members_public",`email=eq.${encodeURIComponent(top.email)}&select=name`);
         const holderName=(holderRows&&holderRows[0]&&holderRows[0].name)||top.email;
         const cbEntry={exercise_id:exId,weight_kg:parseFloat(top.weight_kg),holder_name:holderName,holder_email:top.email,achieved_date:top.achieved_date||"",updated_at:Date.now()};
         if(stored){await sbPatch("community_bests",`exercise_id=eq.${exId}`,cbEntry);}
@@ -2956,7 +2965,7 @@ function ProgressTab({session,isAdmin,showToast,milestoneConfig,bookings,saveMil
     setCommunityBests(cbMap);
     const holderEmails=[...new Set(Object.values(cbMap).filter(c=>c.holder_email).map(c=>c.holder_email))];
     if(holderEmails.length>0){
-      const photoData=await sbGet("members",`email=in.(${holderEmails.join(",")})&select=email,photo`);
+      const photoData=await sbGet("members_public",`email=in.(${holderEmails.join(",")})&select=email,photo`);
       const pMap={};
       (photoData||[]).forEach(m=>{if(m.photo)pMap[m.email]=m.photo;});
       setHolderPhotos(pMap);
@@ -2986,7 +2995,7 @@ function ProgressTab({session,isAdmin,showToast,milestoneConfig,bookings,saveMil
       const allPBs=await sbGet("personal_bests",`exercise_id=eq.${exerciseId}&select=email,weight_kg,achieved_date&order=weight_kg.desc&limit=1`);
       if(allPBs&&allPBs.length>0){
         const top=allPBs[0];
-        const holderRows=await sbGet("members",`email=eq.${encodeURIComponent(top.email)}&select=name`);
+        const holderRows=await sbGet("members_public",`email=eq.${encodeURIComponent(top.email)}&select=name`);
         const holderName=(holderRows&&holderRows[0]&&holderRows[0].name)||top.email;
         const cbData={exercise_id:exerciseId,weight_kg:parseFloat(top.weight_kg),holder_name:holderName,holder_email:top.email,achieved_date:top.achieved_date||"",updated_at:Date.now()};
         const currentCB=communityBests[exerciseId];
@@ -3013,7 +3022,7 @@ function ProgressTab({session,isAdmin,showToast,milestoneConfig,bookings,saveMil
       const currentCB=communityBests[exerciseId];
       if(allPBs&&allPBs.length>0){
         const top=allPBs[0];
-        const holderRows=await sbGet("members",`email=eq.${encodeURIComponent(top.email)}&select=name`);
+        const holderRows=await sbGet("members_public",`email=eq.${encodeURIComponent(top.email)}&select=name`);
         const holderName=(holderRows&&holderRows[0]&&holderRows[0].name)||top.email;
         const cbData={exercise_id:exerciseId,weight_kg:parseFloat(top.weight_kg),holder_name:holderName,holder_email:top.email,achieved_date:top.achieved_date||"",updated_at:Date.now()};
         if(currentCB){await sbPatch("community_bests",`exercise_id=eq.${exerciseId}`,cbData);}
@@ -3646,6 +3655,96 @@ function StrengthTab({session,isAdmin,showToast,bookings,memberData}){
   );
 }
 // ── Per-Member Workout Program (Admin editor, lives in member profile) ────────
+// ── Per-Member Personal Bests (Admin view + edit, lives in member profile) ────
+function MemberPBAdmin({member}){
+  const [exercises,setExercises]=useState([]);
+  const [pbs,setPbs]=useState({});
+  const [loading,setLoading]=useState(true);
+  const [col,setCol]=useState(true);
+  const [editing,setEditing]=useState(null);
+  const [draft,setDraft]=useState({weight_kg:"",achieved_date:""});
+  const [saving,setSaving]=useState(false);
+  const [msg,setMsg]=useState("");
+  useEffect(()=>{load();},[]);
+  async function load(){
+    setLoading(true);
+    const [ex,pb]=await Promise.all([
+      sbGet("exercises","order=order_num.asc,created_at.asc"),
+      sbGet("personal_bests",`email=eq.${encodeURIComponent(member.email)}&select=exercise_id,weight_kg,achieved_date`)
+    ]);
+    setExercises((ex||[]).filter(e=>e.enabled!==false));
+    const m={};(pb||[]).forEach(r=>{m[r.exercise_id]=r;});
+    setPbs(m);setLoading(false);
+  }
+  async function recomputeCB(exId){
+    const top=await sbGet("personal_bests",`exercise_id=eq.${exId}&select=email,weight_kg,achieved_date&order=weight_kg.desc&limit=1`);
+    const cur=await sbGet("community_bests",`exercise_id=eq.${exId}&select=exercise_id`);
+    if(top&&top.length){
+      const t=top[0];
+      const hr=await sbGet("members_public",`email=eq.${encodeURIComponent(t.email)}&select=name`);
+      const hn=(hr&&hr[0]&&hr[0].name)||t.email;
+      const data={exercise_id:exId,weight_kg:parseFloat(t.weight_kg),holder_name:hn,holder_email:t.email,achieved_date:t.achieved_date||"",updated_at:Date.now()};
+      if(cur&&cur.length)await sbPatch("community_bests",`exercise_id=eq.${exId}`,data);
+      else await sbPost("community_bests",data);
+    }else if(cur&&cur.length){await sbDelete("community_bests",`exercise_id=eq.${exId}`);}
+  }
+  async function save(exId){
+    if(!draft.weight_kg)return;
+    setSaving(true);
+    const data={email:member.email,exercise_id:exId,weight_kg:parseFloat(draft.weight_kg),achieved_date:draft.achieved_date||toDS(new Date()),updated_at:Date.now()};
+    const existing=pbs[exId];
+    let ok;
+    if(existing)ok=await sbPatch("personal_bests",`email=eq.${encodeURIComponent(member.email)}&exercise_id=eq.${exId}`,data);
+    else ok=await sbPost("personal_bests",data);
+    if(ok){setPbs(p=>({...p,[exId]:data}));await recomputeCB(exId);setEditing(null);setMsg("Saved ✓");setTimeout(()=>setMsg(""),2000);}
+    else{setMsg("Save failed — try again");setTimeout(()=>setMsg(""),2500);}
+    setSaving(false);
+  }
+  async function remove(exId){
+    if(!window.confirm("Remove this personal best? This cannot be undone."))return;
+    setSaving(true);
+    const ok=await sbDelete("personal_bests",`email=eq.${encodeURIComponent(member.email)}&exercise_id=eq.${exId}`);
+    if(ok){setPbs(p=>{const n={...p};delete n[exId];return n;});await recomputeCB(exId);setEditing(null);setMsg("Removed");setTimeout(()=>setMsg(""),2000);}
+    else{setMsg("Remove failed — try again");setTimeout(()=>setMsg(""),2500);}
+    setSaving(false);
+  }
+  const inS={background:"#141414",border:"1px solid #2a2a2a",borderRadius:0,color:"#ddd",fontSize:13,fontFamily:"'DM Sans',sans-serif",padding:"7px 9px",outline:"none",boxSizing:"border-box"};
+  const fmt=d=>{if(!d)return"—";const x=new Date(d+"T12:00:00");return `${x.getDate()} ${MONTHS[x.getMonth()]} ${x.getFullYear()}`;};
+  return React.createElement(React.Fragment,null,
+    React.createElement("div",{onClick:()=>setCol(v=>!v),style:{width:"100%",display:"flex",alignItems:"center",justifyContent:"space-between",background:"#fff",color:"#000",borderRadius:0,padding:"9px 14px",fontFamily:"'Bebas Neue',sans-serif",fontSize:14,letterSpacing:"0.14em",cursor:"pointer",userSelect:"none",marginTop:16,marginBottom:col?0:10}},
+      React.createElement("span",null,"PERSONAL BESTS"),
+      React.createElement("span",{style:{fontSize:11,transform:col?"rotate(-90deg)":"none",transition:"transform .15s"}},"▾")),
+    col?null:loading?React.createElement("div",{style:{fontSize:10,color:"#444",letterSpacing:"0.1em",padding:"8px 0"}},"LOADING...")
+    :React.createElement(React.Fragment,null,
+      React.createElement("div",{style:{fontSize:10,color:"#555",letterSpacing:"0.04em",lineHeight:1.6,marginBottom:10}},"View and edit this member's personal bests. Saving also updates the community leaderboard."),
+      exercises.length===0?React.createElement("div",{style:{fontSize:11,color:"#555",padding:"6px 0"}},"No exercises set up yet.")
+      :exercises.map(ex=>{
+        const pb=pbs[ex.id];const isEd=editing===ex.id;
+        return React.createElement("div",{key:ex.id,style:{border:"1px solid #222",borderRadius:0,marginBottom:8,padding:"10px 12px"}},
+          React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",gap:8}},
+            React.createElement("div",null,
+              React.createElement("div",{style:{fontSize:12,fontWeight:600,color:"#fff",letterSpacing:"0.04em"}},ex.name),
+              React.createElement("div",{style:{fontSize:10,color:pb?"#4a8aaa":"#666",marginTop:2}},pb?`${pb.weight_kg} kg · ${fmt(pb.achieved_date)}`:"No PB yet")
+            ),
+            !isEd&&React.createElement("button",{onClick:()=>{setEditing(ex.id);setDraft({weight_kg:pb?String(pb.weight_kg):"",achieved_date:pb?(pb.achieved_date||""):""});},style:{background:"transparent",border:"1px solid #2a3a4a",color:"#4a8aaa",borderRadius:0,fontSize:10,letterSpacing:"0.1em",padding:"6px 12px",cursor:"pointer",fontFamily:"'DM Sans',sans-serif",fontWeight:600}},pb?"EDIT":"ADD")
+          ),
+          isEd&&React.createElement("div",{style:{marginTop:10}},
+            React.createElement("div",{style:{display:"flex",gap:8,marginBottom:8}},
+              React.createElement("input",{type:"number",inputMode:"decimal",placeholder:"Weight (kg)",value:draft.weight_kg,onChange:e=>setDraft(d=>({...d,weight_kg:e.target.value})),style:{...inS,flex:1,minWidth:0}}),
+              React.createElement("input",{type:"date",value:draft.achieved_date,onChange:e=>setDraft(d=>({...d,achieved_date:e.target.value})),style:{...inS,flex:1,minWidth:0}})
+            ),
+            React.createElement("div",{style:{display:"flex",gap:8}},
+              React.createElement("button",{onClick:()=>setEditing(null),style:{flex:1,background:"none",border:"1px solid #333",borderRadius:0,padding:"8px",color:"#666",fontSize:10,letterSpacing:"0.1em",cursor:"pointer"}},"CANCEL"),
+              pb&&React.createElement("button",{onClick:()=>remove(ex.id),disabled:saving,style:{flex:1,background:"none",border:"1px solid #3a1008",borderRadius:0,padding:"8px",color:"#8a2515",fontSize:10,letterSpacing:"0.1em",cursor:"pointer"}},"REMOVE"),
+              React.createElement("button",{onClick:()=>save(ex.id),disabled:saving||!draft.weight_kg,style:{flex:2,background:draft.weight_kg?"#1d9bf0":"#1a1a1a",color:draft.weight_kg?"#fff":"#444",border:"none",borderRadius:0,padding:"8px",fontFamily:"'Bebas Neue',sans-serif",fontSize:13,letterSpacing:"0.1em",cursor:draft.weight_kg?"pointer":"default"}},saving?"...":"SAVE")
+            )
+          )
+        );
+      }),
+      msg&&React.createElement("div",{style:{fontSize:10,color:"#4aaa88",letterSpacing:"0.04em",marginTop:6}},msg)
+    )
+  );
+}
 const MW_DAYS=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
 const MW_DAY_FULL={Mon:"MONDAY",Tue:"TUESDAY",Wed:"WEDNESDAY",Thu:"THURSDAY",Fri:"FRIDAY",Sat:"SATURDAY",Sun:"SUNDAY"};
 const mwKey=(email,weekStart)=>"__MW__"+email+"__"+toDS(weekStart);
@@ -3705,6 +3804,21 @@ function MemberWorkoutAdmin({member,memberView,isMaster,mfPasteAI}){
   const [mwDragOverId,setMwDragOverId]=useState(null);
   const [collapsedDays,setCollapsedDays]=useState(new Set(MW_DAYS));
   const [ptCol,setPtCol]=useState(true);
+  const [ptTitle,setPtTitle]=useState("");
+  const [ptTitleGlobal,setPtTitleGlobal]=useState("");
+  const [editGlobalPt,setEditGlobalPt]=useState(false);
+  const ptTitleKey="__PTTITLE__"+member.email;
+  useEffect(()=>{(async()=>{
+    const [d,g]=await Promise.all([
+      sbGet("coaching_notes",`class_name=eq.${encodeURIComponent(ptTitleKey)}&select=content`),
+      sbGet("coaching_notes","class_name=eq.__PTTITLE__GLOBAL&select=content")
+    ]);
+    if(d&&d[0]&&d[0].content!=null)setPtTitle(d[0].content);
+    if(g&&g[0]&&g[0].content!=null)setPtTitleGlobal(g[0].content);
+  })();},[]);
+  async function upsertNote(k,val){const ex=await sbGet("coaching_notes",`class_name=eq.${encodeURIComponent(k)}&select=class_name`);if(ex&&ex.length)await sbPatch("coaching_notes",`class_name=eq.${encodeURIComponent(k)}`,{content:val,updated_at:Date.now()});else await sbPost("coaching_notes",{class_name:k,content:val,updated_at:Date.now()});}
+  async function savePtTitle(v){const val=(v||"").trim();setPtTitle(val);await upsertNote(ptTitleKey,val);}
+  async function saveGlobalPtTitle(v){const val=(v||"").trim();setPtTitleGlobal(val);await upsertNote("__PTTITLE__GLOBAL",val);}
   const [collapsedWorkouts,setCollapsedWorkouts]=useState(new Set());
   const [copyFromDay,setCopyFromDay]=useState(null);
   const [templates,setTemplates]=useState([]);
@@ -3847,8 +3961,20 @@ function MemberWorkoutAdmin({member,memberView,isMaster,mfPasteAI}){
   const allCollapsed=MW_DAYS.every(d=>collapsedDays.has(d));
   const inS={background:"#141414",border:"1px solid #2a2a2a",borderRadius:0,color:"#ddd",fontSize:13,fontFamily:"'DM Sans',sans-serif",padding:"7px 9px",outline:"none",boxSizing:"border-box"};
   return React.createElement(React.Fragment,null,
-    React.createElement("div",{onClick:()=>setPtCol(v=>!v),style:{width:"100%",display:"flex",alignItems:"center",justifyContent:"space-between",background:"#fff",color:"#000",borderRadius:0,padding:"9px 14px",fontFamily:"'Bebas Neue',sans-serif",fontSize:14,letterSpacing:"0.14em",cursor:"pointer",userSelect:"none",marginTop:16,marginBottom:ptCol?0:10}},React.createElement("span",null,memberView?"PT PROGRAM · MEMBER VIEW":"PT PROGRAM"),React.createElement("span",{style:{fontSize:11,transform:ptCol?"rotate(-90deg)":"none",transition:"transform .15s"}},"▾")),
+    React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8,background:"#fff",color:"#000",borderRadius:0,padding:"9px 14px",marginTop:16,marginBottom:ptCol?0:10}},
+      editGlobalPt
+      ?React.createElement("input",{autoFocus:true,defaultValue:ptTitleGlobal,placeholder:"PT PROGRAM",onClick:e=>e.stopPropagation(),onBlur:e=>{saveGlobalPtTitle(e.target.value);setEditGlobalPt(false);},onKeyDown:e=>{if(e.key==="Enter"){saveGlobalPtTitle(e.target.value);setEditGlobalPt(false);}else if(e.key==="Escape")setEditGlobalPt(false);},style:{flex:1,minWidth:0,background:"#eee",border:"1px solid #999",borderRadius:0,color:"#000",fontFamily:"'Bebas Neue',sans-serif",fontSize:14,letterSpacing:"0.14em",padding:"4px 8px",outline:"none"}})
+      :React.createElement("div",{onClick:()=>setPtCol(v=>!v),style:{flex:1,display:"flex",alignItems:"center",gap:8,cursor:"pointer",userSelect:"none",fontFamily:"'Bebas Neue',sans-serif",fontSize:14,letterSpacing:"0.14em"}},
+        React.createElement("span",null,(ptTitle||ptTitleGlobal||"PT PROGRAM")+(memberView?" · MEMBER VIEW":"")),
+        React.createElement("span",{onClick:e=>{e.stopPropagation();setEditGlobalPt(true);},title:"Rename for all members",style:{fontSize:12,opacity:0.5,cursor:"pointer"}},"✎"),
+        React.createElement("span",{style:{marginLeft:"auto",fontSize:11,transform:ptCol?"rotate(-90deg)":"none",transition:"transform .15s"}},"▾")
+      )
+    ),
     !ptCol&&(memberView?React.createElement(MemberWorkoutReview,{email:member.email}):React.createElement(React.Fragment,null,
+    React.createElement("div",{style:{marginBottom:12}},
+      React.createElement("label",{style:{display:"block",fontSize:9,letterSpacing:"0.12em",color:"#666",marginBottom:4}},"THIS MEMBER'S TITLE — OVERRIDES GLOBAL"),
+      React.createElement("input",{value:ptTitle,placeholder:ptTitleGlobal||"PT PROGRAM",onChange:e=>setPtTitle(e.target.value),onBlur:e=>savePtTitle(e.target.value),style:{...inS,width:"100%"}})
+    ),
     React.createElement("div",{style:{fontSize:10,color:"#555",letterSpacing:"0.04em",lineHeight:1.6,marginBottom:4}},"Build this member's weekly program below. Turn the Workouts add-on on in Section Access above to give them the Workouts tab."),
     React.createElement("div",{style:{fontSize:9,color:"#444",letterSpacing:"0.04em",lineHeight:1.6,marginBottom:12}},"Group exercises into separate workouts (W1, W2…) with + ADD WORKOUT — each shows as its own block for the member. Set each to log Weight (kg), Distance (km) or a Tick; reorder within a workout with ▲▼."),
     React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:12}},
@@ -3952,7 +4078,7 @@ function MemberWorkoutAdmin({member,memberView,isMaster,mfPasteAI}){
   );
 }
 // ── Member Workouts Tab (read-only, member-facing) ────────────────────────────
-function MemberWorkoutsView({session,memberData}){
+function MemberWorkoutsView({session,memberData,ttl}){
   const [weekStart,setWeekStart]=useState(()=>mondayOf(new Date()));
   const [selDay,setSelDay]=useState(()=>{const d=new Date().getDay();return d===0?6:d-1;});
   const [program,setProgram]=useState({});
@@ -4073,7 +4199,7 @@ function MemberWorkoutsView({session,memberData}){
     );
   }
   return React.createElement("div",{className:"well-wrap"},
-    React.createElement("div",{className:"well-hdr"},React.createElement("div",{className:"well-title"},"PT PROGRAM")),
+    React.createElement("div",{className:"well-hdr"},React.createElement("div",{className:"well-title"},ttl||"PT PROGRAM")),
     React.createElement("div",{className:"week-nav",style:{paddingTop:0}},
       React.createElement("button",{className:"wk-arrow",onClick:()=>setWeekStart(w=>addDays(w,-7))},"‹"),
       React.createElement("div",{className:"wk-label"},weekLabel),
@@ -4233,13 +4359,35 @@ function RoutinesAdmin({member}){
   const [selM,setSelM]=useState(new Set());
   const [mSearch,setMSearch]=useState("");
   const key="__RT__"+member.email;
+  const [rtTitle,setRtTitle]=useState("");
+  const [rtTitleGlobal,setRtTitleGlobal]=useState("");
+  const [editGlobalRt,setEditGlobalRt]=useState(false);
+  const rtTitleKey="__RTTITLE__"+member.email;
+  useEffect(()=>{(async()=>{
+    const [d,g]=await Promise.all([
+      sbGet("coaching_notes",`class_name=eq.${encodeURIComponent(rtTitleKey)}&select=content`),
+      sbGet("coaching_notes","class_name=eq.__RTTITLE__GLOBAL&select=content")
+    ]);
+    if(d&&d[0]&&d[0].content!=null)setRtTitle(d[0].content);
+    if(g&&g[0]&&g[0].content!=null)setRtTitleGlobal(g[0].content);
+  })();},[]);
+  async function upsertNoteRT(k,val){const ex=await sbGet("coaching_notes",`class_name=eq.${encodeURIComponent(k)}&select=class_name`);if(ex&&ex.length)await sbPatch("coaching_notes",`class_name=eq.${encodeURIComponent(k)}`,{content:val,updated_at:Date.now()});else await sbPost("coaching_notes",{class_name:k,content:val,updated_at:Date.now()});}
+  async function saveRtTitle(v){const val=(v||"").trim();setRtTitle(val);await upsertNoteRT(rtTitleKey,val);}
+  async function saveGlobalRtTitle(v){const val=(v||"").trim();setRtTitleGlobal(val);await upsertNoteRT("__RTTITLE__GLOBAL",val);}
+  const [rtLogs,setRtLogs]=useState({});
+  const [showTimes,setShowTimes]=useState(false);
+  const bestT=rid=>{const a=(rtLogs[rid]||[]).map(e=>e.time).filter(Boolean);if(!a.length)return null;return [...a].sort(rtCmp)[0];};
   useEffect(()=>{load();},[]);
   async function load(){
     setLoading(true);
-    const d=await sbGet("coaching_notes",`class_name=eq.${encodeURIComponent(key)}&select=content`);
+    const [d,l]=await Promise.all([
+      sbGet("coaching_notes",`class_name=eq.${encodeURIComponent(key)}&select=content`),
+      sbGet("coaching_notes",`class_name=eq.${encodeURIComponent("__RTLOG__"+member.email)}&select=content`)
+    ]);
     let arr=[];if(d&&d.length&&d[0].content){try{const o=JSON.parse(d[0].content);arr=Array.isArray(o)?o:(o.routines||[]);}catch{}}
+    let lg={};if(l&&l.length&&l[0].content){try{lg=JSON.parse(l[0].content)||{};}catch{}}
     const mapped=(arr||[]).map(r=>({...r,id:r.id||mwGenId(),exercises:(r.exercises||[]).map(e=>({...e,id:e.id||mwGenId()}))}));
-    setRoutines(mapped);setOpen(new Set(mapped.map(r=>r.id)));setLoading(false);
+    setRoutines(mapped);setRtLogs(lg);setOpen(new Set(mapped.map(r=>r.id)));setLoading(false);
   }
   function moveEx(rid,eid,dir){setRoutines(p=>p.map(r=>{if(r.id!==rid)return r;const a=[...(r.exercises||[])];const i=a.findIndex(e=>e.id===eid);const j=i+dir;if(i<0||j<0||j>=a.length)return r;[a[i],a[j]]=[a[j],a[i]];return{...r,exercises:a};}));}
   function dupEx(rid,eid){setRoutines(p=>p.map(r=>{if(r.id!==rid)return r;const a=[...(r.exercises||[])];const i=a.findIndex(e=>e.id===eid);if(i<0)return r;a.splice(i+1,0,{...a[i],id:mwGenId()});return{...r,exercises:a};}));}
@@ -4263,7 +4411,7 @@ function RoutinesAdmin({member}){
   async function openAssign(){
     const inc=routines.filter(r=>!excl.has(r.id));
     if(!inc.length){setMsg("Tick at least one routine to assign.");setTimeout(()=>setMsg(""),3000);return;}
-    const m=await sbGet("members","select=email,name&order=name.asc");
+    const m=await sbGet("members_public","select=email,name&order=name.asc");
     setMembers(m||[]);setSelM(new Set());setMSearch("");setShowAssign(true);
   }
   function toggleM(email){setSelM(p=>{const n=new Set(p);n.has(email)?n.delete(email):n.add(email);return n;});}
@@ -4286,8 +4434,43 @@ function RoutinesAdmin({member}){
   }
   const inS={background:"#141414",border:"1px solid #2a2a2a",borderRadius:0,color:"#ddd",fontSize:13,fontFamily:"'DM Sans',sans-serif",padding:"7px 9px",outline:"none",boxSizing:"border-box"};
   return React.createElement(React.Fragment,null,
-    React.createElement("div",{onClick:()=>setRtCol(v=>!v),style:{width:"100%",display:"flex",alignItems:"center",justifyContent:"space-between",background:"#fff",color:"#000",borderRadius:0,padding:"9px 14px",fontFamily:"'Bebas Neue',sans-serif",fontSize:14,letterSpacing:"0.14em",cursor:"pointer",userSelect:"none",marginTop:16,marginBottom:rtCol?0:10}},React.createElement("span",null,"ROUTINES"),React.createElement("span",{style:{fontSize:11,transform:rtCol?"rotate(-90deg)":"none",transition:"transform .15s"}},"▾")),
+    React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8,background:"#fff",color:"#000",borderRadius:0,padding:"9px 14px",marginTop:16,marginBottom:rtCol?0:10}},
+      editGlobalRt
+      ?React.createElement("input",{autoFocus:true,defaultValue:rtTitleGlobal,placeholder:"ROUTINES",onClick:e=>e.stopPropagation(),onBlur:e=>{saveGlobalRtTitle(e.target.value);setEditGlobalRt(false);},onKeyDown:e=>{if(e.key==="Enter"){saveGlobalRtTitle(e.target.value);setEditGlobalRt(false);}else if(e.key==="Escape")setEditGlobalRt(false);},style:{flex:1,minWidth:0,background:"#eee",border:"1px solid #999",borderRadius:0,color:"#000",fontFamily:"'Bebas Neue',sans-serif",fontSize:14,letterSpacing:"0.14em",padding:"4px 8px",outline:"none"}})
+      :React.createElement("div",{onClick:()=>setRtCol(v=>!v),style:{flex:1,display:"flex",alignItems:"center",gap:8,cursor:"pointer",userSelect:"none",fontFamily:"'Bebas Neue',sans-serif",fontSize:14,letterSpacing:"0.14em"}},
+        React.createElement("span",null,rtTitle||rtTitleGlobal||"ROUTINES"),
+        React.createElement("span",{onClick:e=>{e.stopPropagation();setEditGlobalRt(true);},title:"Rename for all members",style:{fontSize:12,opacity:0.5,cursor:"pointer"}},"✎"),
+        React.createElement("span",{style:{marginLeft:"auto",fontSize:11,transform:rtCol?"rotate(-90deg)":"none",transition:"transform .15s"}},"▾")
+      )
+    ),
+    !rtCol&&React.createElement("div",{style:{marginBottom:12}},
+      React.createElement("label",{style:{display:"block",fontSize:9,letterSpacing:"0.12em",color:"#666",marginBottom:4}},"THIS MEMBER'S TITLE — OVERRIDES GLOBAL"),
+      React.createElement("input",{value:rtTitle,placeholder:rtTitleGlobal||"ROUTINES",onChange:e=>setRtTitle(e.target.value),onBlur:e=>saveRtTitle(e.target.value),style:{...inS,width:"100%"}})
+    ),
     !rtCol&&React.createElement("div",{style:{fontSize:10,color:"#555",letterSpacing:"0.04em",lineHeight:1.6,marginBottom:10}},"Build timed routines for this member. Turn the Routines add-on on above to show them the tab. Members log their own time each attempt — the history and best time build up for them."),
+    !rtCol&&React.createElement("button",{onClick:()=>setShowTimes(v=>!v),style:{width:"100%",background:showTimes?"#0a1a2a":"none",border:"1px dashed "+(showTimes?"#1d3a5a":"#2a2a2a"),borderRadius:0,color:"#1d9bf0",fontSize:10,letterSpacing:"0.12em",padding:"9px",cursor:"pointer",marginBottom:10}},showTimes?"✕ HIDE MEMBER'S LOGGED TIMES":"⏱ SHOW MEMBER'S LOGGED TIMES"),
+    !rtCol&&showTimes&&React.createElement("div",{style:{marginBottom:12}},
+      routines.length===0
+      ?React.createElement("div",{style:{fontSize:11,color:"#555",padding:"4px 0"}},"No routines yet.")
+      :routines.map(r=>{
+        const times=(rtLogs[r.id]||[]).slice().sort((a,b)=>(a.date<b.date?1:-1));
+        const bt=bestT(r.id);
+        return React.createElement("div",{key:"t_"+r.id,style:{border:"1px solid #222",borderRadius:0,marginBottom:8}},
+          React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",background:"#0e0e0e",padding:"8px 12px"}},
+            React.createElement("span",{style:{fontFamily:"'Bebas Neue',sans-serif",fontSize:13,letterSpacing:"0.08em",color:"#fff"}},(r.title||"ROUTINE").toUpperCase()),
+            bt&&React.createElement("span",{style:{fontFamily:"'DM Sans',sans-serif",fontWeight:600,fontSize:11,color:"#4a8aaa",letterSpacing:"0.04em"}},"BEST "+bt)
+          ),
+          React.createElement("div",{style:{padding:"6px 12px 10px"}},
+            times.length===0
+            ?React.createElement("div",{style:{fontSize:11,color:"#555",padding:"4px 0"}},"No times logged yet.")
+            :times.map((e,i)=>React.createElement("div",{key:i,style:{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"5px 0",borderBottom:"1px solid #161616"}},
+              React.createElement("span",{style:{fontSize:11,color:"#999"}},new Date(e.date+"T12:00:00").toLocaleDateString("en-US",{day:"numeric",month:"short",year:"numeric"})),
+              React.createElement("span",{style:{fontFamily:"'Bebas Neue',sans-serif",fontSize:15,color:"#fff",letterSpacing:"0.05em"}},e.time)
+            ))
+          )
+        );
+      })
+    ),
     rtCol?null:loading?React.createElement("div",{style:{fontSize:10,color:"#444",letterSpacing:"0.1em",padding:"8px 0"}},"LOADING...")
     :React.createElement(React.Fragment,null,
       ...routines.map(r=>{const isOpen=open.has(r.id);return React.createElement("div",{key:r.id,style:{border:"1px solid #222",borderRadius:0,marginBottom:10}},
@@ -4345,7 +4528,7 @@ function RoutinesAdmin({member}){
   );
 }
 // ── Routines (member-facing, timed logging) ───────────────────────────────────
-function RoutinesView({session}){
+function RoutinesView({session,ttl}){
   const [routines,setRoutines]=useState([]);
   const [logs,setLogs]=useState({});
   const [open,setOpen]=useState(new Set());
@@ -4381,7 +4564,7 @@ function RoutinesView({session}){
   }
   const hdrStyle={width:"100%",display:"flex",alignItems:"center",justifyContent:"space-between",background:"#fff",color:"#000",borderRadius:0,padding:"9px 14px",fontFamily:"'Bebas Neue',sans-serif",fontSize:14,letterSpacing:"0.14em",cursor:"pointer",userSelect:"none",marginBottom:10};
   return React.createElement("div",{className:"well-wrap",style:{padding:"14px 16px 80px"}},
-    React.createElement("div",{className:"well-hdr",style:{marginBottom:18}},React.createElement("div",{className:"well-title"},"ROUTINES")),
+    React.createElement("div",{className:"well-hdr",style:{marginBottom:18}},React.createElement("div",{className:"well-title"},ttl||"ROUTINES")),
     loading?React.createElement("div",{style:{fontSize:11,color:"#555",letterSpacing:"0.1em",padding:"20px 0",textAlign:"center"}},"LOADING...")
     :(routines.length===0?React.createElement("div",{style:{fontSize:12,color:"#555",letterSpacing:"0.04em",lineHeight:1.8,textAlign:"center",padding:"40px 20px"}},"No routines yet.\nYour coach will add timed routines here for you to record your times.")
     :React.createElement(React.Fragment,null,...routines.map(r=>{
@@ -4497,6 +4680,22 @@ function App(){
   const routinesEnabled=memberData?.routines_enabled===true;
   const [bookSub,setBookSub]=useState(()=>ssGet("t365-booksub","classes"));
   const [wkSub,setWkSub]=useState(()=>ssGet("t365-wksub","pt"));
+  const [wkTitles,setWkTitles]=useState({pt:"",rt:""});
+  useEffect(()=>{
+    if(!session||!session.email){setWkTitles({pt:"",rt:""});return;}
+    (async()=>{
+      const pk="__PTTITLE__"+session.email,rk="__RTTITLE__"+session.email;
+      const [pr,rr,gp,gr]=await Promise.all([
+        sbGet("coaching_notes",`class_name=eq.${encodeURIComponent(pk)}&select=content`),
+        sbGet("coaching_notes",`class_name=eq.${encodeURIComponent(rk)}&select=content`),
+        sbGet("coaching_notes","class_name=eq.__PTTITLE__GLOBAL&select=content"),
+        sbGet("coaching_notes","class_name=eq.__RTTITLE__GLOBAL&select=content")
+      ]);
+      const perPt=(pr&&pr[0]&&pr[0].content)||"",perRt=(rr&&rr[0]&&rr[0].content)||"";
+      const gPt=(gp&&gp[0]&&gp[0].content)||"",gRt=(gr&&gr[0]&&gr[0].content)||"";
+      setWkTitles({pt:perPt||gPt,rt:perRt||gRt});
+    })();
+  },[session]);
   useEffect(()=>{ssSet("t365-booksub",bookSub);},[bookSub]);
   useEffect(()=>{ssSet("t365-wksub",wkSub);},[wkSub]);
   const [myClsCol,setMyClsCol]=useState(true);
@@ -4504,8 +4703,10 @@ function App(){
   useEffect(()=>{
     (async()=>{
       let joinedAt=0;
+      await authRefresh();
       const s=lsGet("t365-session",null);
-      if(s){
+      if(s&&!AUTH_TOKEN)lsSet("t365-session",null);
+      if(s&&AUTH_TOKEN){
         const mb=await sbGet("members",`email=eq.${encodeURIComponent(s.email)}`);
         if(mb.length){setSession(s);setMemberData(mb[0]);joinedAt=mb[0].joined_at||0;
           const accRow=await sbGet("coaching_notes",`class_name=eq.${encodeURIComponent("__ACCESS__"+s.email)}&select=content`);
@@ -4517,7 +4718,7 @@ function App(){
       const lastRead=lsGet("t365-last-read",0)||joinedAt;
       const recentPosts=await sbGet("posts",`created_at=gt.${lastRead}&select=id`);
       setUnreadPosts((recentPosts||[]).length);
-      const allMembers=await sbGet("members","select=email,name,photo_updated_at,is_admin");
+      const allMembers=await sbGet("members_public","select=email,name,photo_updated_at,is_admin");
       const nameList=[];
       (allMembers||[]).forEach(m=>{if(m.name)nameList.push(m.name);});
       setAllMemberNames(nameList);
@@ -4526,7 +4727,7 @@ function App(){
       const changedP=[];
       (allMembers||[]).forEach(m=>{const v=m.photo_updated_at||0;if(v>0){if(!pcache[m.email]||pcache[m.email].v!==v)changedP.push(m.email);}else if(pcache[m.email])delete pcache[m.email];});
       if(changedP.length){
-        const fp=await sbGet("members",`email=in.(${changedP.map(e=>encodeURIComponent(e)).join(",")})&select=email,photo,photo_updated_at`);
+        const fp=await sbGet("members_public",`email=in.(${changedP.map(e=>encodeURIComponent(e)).join(",")})&select=email,photo,photo_updated_at`);
         (fp||[]).forEach(m=>{pcache[m.email]={v:m.photo_updated_at||0,photo:m.photo||""};});
       }
       const emSet=new Set((allMembers||[]).map(m=>m.email));
@@ -4604,7 +4805,7 @@ function App(){
   const TAB_ORDER=NAV_TABS.map(t=>t.id);
   const bookOpts=[...(showClasses?[{id:"classes",label:"CLASSES"}]:[]),...(showWellness?[{id:"wellness",label:"WELLNESS"}]:[])];
   const effBookSub=bookOpts.some(o=>o.id===bookSub)?bookSub:(bookOpts[0]&&bookOpts[0].id);
-  const wkOpts=[...(showPT?[{id:"pt",label:"PT PROGRAM"}]:[]),...(showStrength?[{id:"strength",label:"S & C CLASSES"}]:[]),...(showRoutines?[{id:"routines",label:"ROUTINES"}]:[])];
+  const wkOpts=[...(showPT?[{id:"pt",label:wkTitles.pt||"PT PROGRAM"}]:[]),...(showStrength?[{id:"strength",label:"S & C CLASSES"}]:[]),...(showRoutines?[{id:"routines",label:wkTitles.rt||"ROUTINES"}]:[])];
   const effWkSub=wkOpts.some(o=>o.id===wkSub)?wkSub:(wkOpts[0]&&wkOpts[0].id);
   const renderSeg=(opts,cur,set)=>opts.length<=1?null:React.createElement("div",{className:"sp-toggle",style:{marginTop:16,marginBottom:16,paddingLeft:20,paddingRight:20}},opts.map(o=>React.createElement("button",{key:o.id,className:`sp-toggle-btn${cur===o.id?" spta":""}`,style:{border:"1px solid #fff"},onClick:()=>set(o.id)},o.label)));
   // If the current tab isn't available to this member, snap to the first available one.
@@ -4646,18 +4847,23 @@ function App(){
     if(password.length<6){setAuthErr("Password must be at least 6 characters.");return;}
     setAuthBusy(true);
     if(authMode==="login"){
+      let auth=await authLogin(em,password);
+      if(auth.error){
+        const mig=await migrateLogin(em,password);
+        if(mig&&mig.ok){auth=await authLogin(em,password);}
+        if(auth.error){setAuthErr(mig&&mig.wrong?"Incorrect password.":"Incorrect email or password.");setAuthBusy(false);return;}
+      }
       const rows=await sbGet("members",`email=eq.${encodeURIComponent(em)}`);
-      if(!rows.length){setAuthErr("No account found with that email.");setAuthBusy(false);return;}
-      const mb=rows[0];
-      if(mb.password!==hashPw(password)){setAuthErr("Incorrect password.");setAuthBusy(false);return;}
+      const mb=rows[0]||{email:em,name:em};
       const s={email:em,name:mb.name};lsSet("t365-session",s);setSession(s);setMemberData(mb);
       if(mb.photo)setMemberPhotos(p=>({...p,[em]:mb.photo}));
       const accRow=await sbGet("coaching_notes",`class_name=eq.${encodeURIComponent("__ACCESS__"+em)}&select=content`);
       if(accRow&&accRow.length&&accRow[0].content){try{const a=JSON.parse(accRow[0].content);if(a&&Array.isArray(a.tabs))setMemberAccess(a.tabs);else setMemberAccess(null);}catch{setMemberAccess(null);}}
       else setMemberAccess(null);
     }else{
-      const existing=await sbGet("members",`email=eq.${encodeURIComponent(em)}`);
-      if(existing.length){setAuthErr("An account already exists with this email.");setAuthBusy(false);return;}
+      const su=await authSignup(em,password);
+      if(su.error){setAuthErr(su.error);setAuthBusy(false);return;}
+      if(!AUTH_TOKEN)await authLogin(em,password);
       const mb={email:em,name:name.trim(),phone:phone.trim(),photo:"",password:hashPw(password),joined_at:Date.now()};
       const ok=await sbPost("members",mb);
       if(!ok){setAuthErr("Something went wrong. Please try again.");setAuthBusy(false);return;}
@@ -4665,18 +4871,18 @@ function App(){
     }
     setAuthBusy(false);
   }
-  function handleLogout(){lsSet("t365-session",null);setSession(null);setMemberData(null);setMemberAccess(null);setShowProf(false);}
+  function handleLogout(){authLogout();lsSet("t365-session",null);setSession(null);setMemberData(null);setMemberAccess(null);setShowProf(false);}
   async function handleForgotPw(){
     const em=fpEmail.toLowerCase().trim();
     if(!em||!/\S+@\S+\.\S+/.test(em)){setFpErr("Please enter a valid email address.");return;}
     setFpBusy(true);setFpErr("");
-    const rows=await sbGet("members",`email=eq.${encodeURIComponent(em)}&select=name`);
-    if(!rows.length){setFpBusy(false);setFpErr("No account found with that email.");return;}
-    const firstName=rows[0].name?rows[0].name.split(" ")[0]:"there";
-    const token=Math.random().toString(36).slice(2)+Date.now().toString(36)+Math.random().toString(36).slice(2);
-    const expiresAt=Date.now()+86400000;
-    await sbDelete("password_resets",`email=eq.${encodeURIComponent(em)}`);
-    await sbPost("password_resets",{email:em,token,expires_at:expiresAt});
+    let firstName="there",token=null;
+    try{
+      const rr=await fetch(`${SB_URL}/functions/v1/dynamic-api`,{method:"POST",headers:{"apikey":SB_KEY,"Authorization":`Bearer ${SB_KEY}`,"Content-Type":"application/json"},body:JSON.stringify({action:"requestReset",email:em})});
+      const jj=await rr.json().catch(()=>({}));
+      if(!jj||!jj.ok){setFpBusy(false);setFpErr("No account found with that email.");return;}
+      firstName=jj.firstName||"there";token=jj.token;
+    }catch(e){setFpBusy(false);setFpErr("Something went wrong. Please try again.");return;}
     const params=new URLSearchParams({action:"passwordReset",to:em,firstName,token});
     try{await fetch(APPS_SCRIPT_URL+"?"+params.toString(),{method:"GET",mode:"no-cors"});}catch(e){}
     setFpBusy(false);setFpMsg("Reset link sent! Check your email. The link expires in 24 hours.");
@@ -4878,6 +5084,7 @@ function App(){
     const upd={name:name.trim(),phone:phone.trim(),photo:photo||"",emergency_name:profForm.emergencyName||"",emergency_phone:profForm.emergencyPhone||""};
     if(photoChanged)upd.photo_updated_at=photoTs;
     if(newPw)upd.password=hashPw(newPw);if(em!==session.email)upd.email=em;
+    if(newPw&&AUTH_TOKEN){try{const ar=await fetch(`${SB_URL}/auth/v1/user`,{method:"PUT",headers:{"apikey":SB_KEY,"Authorization":`Bearer ${AUTH_TOKEN}`,"Content-Type":"application/json"},body:JSON.stringify({password:newPw})});if(!ar.ok){setProfErr("Password update failed. Please try again.");setProfBusy(false);return;}}catch(e){setProfErr("Password update failed. Please try again.");setProfBusy(false);return;}}
     const ok=await sbPatch("members",`email=eq.${encodeURIComponent(session.email)}`,upd);
     if(!ok){setProfErr("Update failed. Please try again.");setProfBusy(false);return;}
     const ns={email:em,name:name.trim()};
@@ -5152,9 +5359,9 @@ React.createElement("div",{className:"auth-guest",style:{marginTop:24}},"Not a m
     effTab==="community"&&acc("community")&&React.createElement(CommunityView,{session,isAdmin,showToast,memberPhotos,allMemberNames,adminEmails}),
     effTab==="workouts"&&React.createElement(React.Fragment,null,
       renderSeg(wkOpts,effWkSub,setWkSub),
-      effWkSub==="pt"&&showPT&&React.createElement(MemberWorkoutsView,{session,memberData}),
+      effWkSub==="pt"&&showPT&&React.createElement(MemberWorkoutsView,{session,memberData,ttl:wkTitles.pt}),
       effWkSub==="strength"&&showStrength&&React.createElement("div",{className:"sp-main-wrap"},React.createElement(StrengthTab,{session,isAdmin,showToast,bookings,memberData})),
-      effWkSub==="routines"&&showRoutines&&React.createElement(RoutinesView,{session})
+      effWkSub==="routines"&&showRoutines&&React.createElement(RoutinesView,{session,ttl:wkTitles.rt})
     ),
     effTab==="progress"&&acc("progress")&&React.createElement(ProgressTab,{session,isAdmin,showToast,milestoneConfig,bookings,saveMilestoneConfig,memberData,dowNames}),
     effTab==="admin"&&React.createElement(AdminView,{bookings,setBookings,showToast,isAdmin,isMaster,mFlags,saveMFlag,getMaxSpots,saveClassLimit,deleteClass,cancelClass,restoreClass,classLimits,wellnessEnabled,saveWellnessSetting,classesEnabled,strengthEnabled,saveClassesSetting,saveStrengthSetting,calendarEnabled,saveCalendarSetting,dowNames,saveDowName,slotNames,saveSlotName,wellSlots,saveWellSlots,milestoneConfig,saveMilestoneConfig,admSeg,setAdmSeg}),
