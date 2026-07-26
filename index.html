@@ -4445,7 +4445,13 @@ function RoutinesAdmin({member}){
       React.createElement("input",{value:rtTitle,placeholder:rtTitleGlobal||"ROUTINES",onChange:e=>setRtTitle(e.target.value),onBlur:e=>saveRtTitle(e.target.value),style:{...inS,width:"100%"}})
     ),
     !rtCol&&React.createElement("div",{style:{fontSize:10,color:"#555",letterSpacing:"0.04em",lineHeight:1.6,marginBottom:10}},"Build timed routines for this member. Turn the Routines add-on on above to show them the tab. Members log their own time each attempt — the history and best time build up for them."),
-    !rtCol&&React.createElement("button",{onClick:()=>setShowTimes(v=>!v),style:{width:"100%",background:showTimes?"#0a1a2a":"none",border:"1px dashed "+(showTimes?"#1d3a5a":"#2a2a2a"),borderRadius:0,color:"#1d9bf0",fontSize:10,letterSpacing:"0.12em",padding:"9px",cursor:"pointer",marginBottom:10}},showTimes?"✕ HIDE MEMBER'S LOGGED TIMES":"⏱ SHOW MEMBER'S LOGGED TIMES"),
+    !rtCol&&React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",background:"#0e0e0e",border:"1px solid "+(showTimes?"#1d5a34":"#222"),borderRadius:0,padding:"10px 12px",marginBottom:10}},
+      React.createElement("div",null,
+        React.createElement("div",{style:{fontSize:11,fontWeight:600,letterSpacing:"0.08em",color:"#fff"}},"MEMBER VIEW"),
+        React.createElement("div",{style:{fontSize:9,color:"#555",marginTop:2,letterSpacing:"0.04em"}},"See their routines and logged times as they see them")
+      ),
+      React.createElement("button",{onClick:()=>setShowTimes(v=>!v),style:{background:showTimes?"#4aaa66":"#222",color:showTimes?"#000":"#555",border:"1px solid "+(showTimes?"#4aaa66":"#333"),borderRadius:0,padding:"6px 18px",fontSize:10,letterSpacing:"0.12em",fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}},showTimes?"ON":"OFF")
+    ),
     !rtCol&&showTimes&&React.createElement("div",{style:{marginBottom:12}},
       routines.length===0
       ?React.createElement("div",{style:{fontSize:11,color:"#555",padding:"4px 0"}},"No routines yet.")
@@ -4468,7 +4474,7 @@ function RoutinesAdmin({member}){
         );
       })
     ),
-    rtCol?null:loading?React.createElement("div",{style:{fontSize:10,color:"#444",letterSpacing:"0.1em",padding:"8px 0"}},"LOADING...")
+    (rtCol||showTimes)?null:loading?React.createElement("div",{style:{fontSize:10,color:"#444",letterSpacing:"0.1em",padding:"8px 0"}},"LOADING...")
     :React.createElement(React.Fragment,null,
       ...routines.map(r=>{const isOpen=open.has(r.id);return React.createElement("div",{key:r.id,style:{border:"1px solid #222",borderRadius:0,marginBottom:10}},
         React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8,background:"#fff",padding:"8px 12px"}},
