@@ -4440,18 +4440,18 @@ function RoutinesAdmin({member}){
         React.createElement("span",{style:{marginLeft:"auto",fontSize:11,transform:rtCol?"rotate(-90deg)":"none",transition:"transform .15s"}},"▾")
       )
     ),
-    !rtCol&&React.createElement("div",{style:{marginBottom:12}},
-      React.createElement("label",{style:{display:"block",fontSize:9,letterSpacing:"0.12em",color:"#666",marginBottom:4}},"THIS MEMBER'S TITLE — OVERRIDES GLOBAL"),
-      React.createElement("input",{value:rtTitle,placeholder:rtTitleGlobal||"ROUTINES",onChange:e=>setRtTitle(e.target.value),onBlur:e=>saveRtTitle(e.target.value),style:{...inS,width:"100%"}})
-    ),
-    !rtCol&&React.createElement("div",{style:{fontSize:10,color:"#555",letterSpacing:"0.04em",lineHeight:1.6,marginBottom:10}},"Build timed routines for this member. Turn the Routines add-on on above to show them the tab. Members log their own time each attempt — the history and best time build up for them."),
-    !rtCol&&React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",background:"#0e0e0e",border:"1px solid "+(showTimes?"#1d5a34":"#222"),borderRadius:0,padding:"10px 12px",marginBottom:10}},
+    !rtCol&&React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",background:"#0e0e0e",border:"1px solid "+(showTimes?"#1d5a34":"#222"),borderRadius:0,padding:"10px 12px",marginTop:10,marginBottom:6}},
       React.createElement("div",null,
         React.createElement("div",{style:{fontSize:11,fontWeight:600,letterSpacing:"0.08em",color:"#fff"}},"MEMBER VIEW"),
         React.createElement("div",{style:{fontSize:9,color:"#555",marginTop:2,letterSpacing:"0.04em"}},"See their routines and logged times as they see them")
       ),
       React.createElement("button",{onClick:()=>setShowTimes(v=>!v),style:{background:showTimes?"#4aaa66":"#222",color:showTimes?"#000":"#555",border:"1px solid "+(showTimes?"#4aaa66":"#333"),borderRadius:0,padding:"6px 18px",fontSize:10,letterSpacing:"0.12em",fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}},showTimes?"ON":"OFF")
     ),
+    !rtCol&&!showTimes&&React.createElement("div",{style:{marginBottom:12}},
+      React.createElement("label",{style:{display:"block",fontSize:9,letterSpacing:"0.12em",color:"#666",marginBottom:4}},"THIS MEMBER'S TITLE — OVERRIDES GLOBAL"),
+      React.createElement("input",{value:rtTitle,placeholder:rtTitleGlobal||"ROUTINES",onChange:e=>setRtTitle(e.target.value),onBlur:e=>saveRtTitle(e.target.value),style:{...inS,width:"100%"}})
+    ),
+    !rtCol&&!showTimes&&React.createElement("div",{style:{fontSize:10,color:"#555",letterSpacing:"0.04em",lineHeight:1.6,marginBottom:10}},"Build timed routines for this member. Turn the Routines add-on on above to show them the tab. Members log their own time each attempt — the history and best time build up for them."),
     !rtCol&&showTimes&&React.createElement("div",{style:{marginBottom:12}},
       routines.length===0
       ?React.createElement("div",{style:{fontSize:11,color:"#555",padding:"4px 0"}},"No routines yet.")
