@@ -54,52 +54,26 @@ html,body{background:#080808;min-height:100vh;font-family:'DM Sans',sans-serif;c
 <script>
 const SB_URL = "https://tqidngxpbzkzdekhizyp.supabase.co";
 const SB_KEY = "sb_publishable_UTl_mZYy0xvuOUhNNOM6Mg_s6XOZlto";
-const SB_HDR = {"apikey":SB_KEY,"Authorization":`Bearer ${SB_KEY}`,"Content-Type":"application/json"};
 const APP_URL = "https://lamontfitnessapplications.github.io/fitnessapp/";
 
-const hashPw = s => {
-  let h = 5381;
-  for (let i = 0; i < s.length; i++) h = ((h << 5) + h) ^ s.charCodeAt(i);
-  return (h >>> 0).toString(36);
-};
-
-async function sbGet(table, query = "") {
+// The reset token is a per-user secret. Password_resets and members are locked down
+// by RLS (as they should be), so the browser cannot read the token or change the
+// password directly. Instead we hand the token + new password to the "doReset" action
+// of the dynamic-api Edge Function, which validates and applies it server-side.
+async function apiDoReset(token, password) {
   try {
-    const r = await fetch(`${SB_URL}/rest/v1/${table}?${query}`, { headers: SB_HDR });
-    return r.ok ? await r.json() : [];
-  } catch { return []; }
-}
-
-async function sbPatch(table, query, data) {
-  try {
-    const r = await fetch(`${SB_URL}/rest/v1/${table}?${query}`, {
-      method: "PATCH",
-      headers: { ...SB_HDR, "Prefer": "return=minimal" },
-      body: JSON.stringify(data)
+    const r = await fetch(`${SB_URL}/functions/v1/dynamic-api`, {
+      method: "POST",
+      headers: { "apikey": SB_KEY, "Authorization": `Bearer ${SB_KEY}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "doReset", token, password })
     });
-    return r.ok;
-  } catch { return false; }
-}
-
-async function sbDelete(table, query) {
-  try {
-    const r = await fetch(`${SB_URL}/rest/v1/${table}?${query}`, {
-      method: "DELETE",
-      headers: SB_HDR
-    });
-    return r.ok;
-  } catch { return false; }
+    return await r.json().catch(() => ({}));
+  } catch (e) {
+    return { error: "network" };
+  }
 }
 
 const app = document.getElementById("app");
-
-function renderLoading() {
-  app.innerHTML = `
-    <div class="state">
-      <div class="loading-ring"></div>
-      <div class="loading-txt">VALIDATING RESET LINK</div>
-    </div>`;
-}
 
 function renderInvalid(msg) {
   app.innerHTML = `
@@ -113,11 +87,11 @@ function renderInvalid(msg) {
     </div>`;
 }
 
-function renderForm(email) {
+function renderForm(token) {
   app.innerHTML = `
     <div class="card">
       <div class="card-title">SET NEW PASSWORD</div>
-      <div class="card-sub">Choose a new password for <strong style="color:#8cc63e">${email}</strong></div>
+      <div class="card-sub">Choose a new password for your Soul Fitness account.</div>
       <div class="field">
         <label>NEW PASSWORD</label>
         <input type="password" id="pw1" placeholder="Enter new password" autocomplete="new-password"/>
@@ -128,11 +102,13 @@ function renderForm(email) {
         <input type="password" id="pw2" placeholder="Confirm new password" autocomplete="new-password"/>
         <div id="pw-err" class="err-msg" style="display:none"></div>
       </div>
-      <button class="btn" id="submit-btn" onclick="doReset('${email}')">UPDATE PASSWORD</button>
-      <button class="btn btn-outline" onclick="window.location.href='${APP_URL}'">CANCEL</button>
+      <button class="btn" id="submit-btn">UPDATE PASSWORD</button>
+      <button class="btn btn-outline" id="cancel-btn">CANCEL</button>
     </div>`;
   document.getElementById("pw1").addEventListener("input", clearErr);
   document.getElementById("pw2").addEventListener("input", clearErr);
+  document.getElementById("submit-btn").addEventListener("click", () => doReset(token));
+  document.getElementById("cancel-btn").addEventListener("click", () => { window.location.href = APP_URL; });
 }
 
 function renderSuccess() {
@@ -147,18 +123,6 @@ function renderSuccess() {
     </div>`;
 }
 
-function renderError(msg) {
-  app.innerHTML = `
-    <div class="card">
-      <div class="state">
-        <div class="state-icon">❌</div>
-        <div class="state-title">SOMETHING WENT WRONG</div>
-        <div class="state-sub">${msg}</div>
-        <button class="btn" onclick="window.location.href='${APP_URL}'">BACK TO APP</button>
-      </div>
-    </div>`;
-}
-
 function clearErr() {
   const e = document.getElementById("pw-err");
   if (e) { e.style.display = "none"; e.textContent = ""; }
@@ -169,7 +133,7 @@ function showErr(msg) {
   if (e) { e.textContent = msg; e.style.display = "block"; }
 }
 
-async function doReset(email) {
+async function doReset(token) {
   const pw1 = document.getElementById("pw1").value.trim();
   const pw2 = document.getElementById("pw2").value.trim();
 
@@ -180,53 +144,33 @@ async function doReset(email) {
   btn.disabled = true;
   btn.textContent = "UPDATING...";
 
-  const hashed = hashPw(pw1);
-  const ok = await sbPatch("members", `email=eq.${encodeURIComponent(email)}`, { password: hashed });
+  const res = await apiDoReset(token, pw1);
 
-  if (!ok) {
-    btn.disabled = false;
-    btn.textContent = "UPDATE PASSWORD";
-    showErr("Failed to update password. Please try again.");
-    return;
+  if (res && res.ok) { renderSuccess(); return; }
+
+  // Re-enable and explain
+  btn.disabled = false;
+  btn.textContent = "UPDATE PASSWORD";
+  const err = res && res.error;
+  if (err === "expired") {
+    showErr("This reset link has expired (links are valid for 24 hours). Please request a new one from the app.");
+  } else if (err === "badtoken") {
+    showErr("This reset link is invalid or has already been used. Please request a new one from the app.");
+  } else if (err === "invalid") {
+    showErr("Password must be at least 6 characters.");
+  } else {
+    showErr("Something went wrong. Please try again in a moment.");
   }
-
-  // Delete the token (clean up)
-  const token = new URLSearchParams(window.location.search).get("token");
-  if (token) await sbDelete("password_resets", `token=eq.${encodeURIComponent(token)}`);
-
-  renderSuccess();
 }
 
-async function init() {
-  renderLoading();
-
+function init() {
   const params = new URLSearchParams(window.location.search);
-  const token = params.get("token");
-
+  const token = params.get("token") || params.get("reset");
   if (!token) {
-    renderInvalid("No reset token found. Please request a new password reset link.");
+    renderInvalid("No reset token found in the link. Please request a new password reset from the app.");
     return;
   }
-
-  // Look up the token
-  const rows = await sbGet("password_resets", `token=eq.${encodeURIComponent(token)}&select=email,expires_at`);
-
-  if (!rows || rows.length === 0) {
-    renderInvalid("This reset link is invalid or has already been used. Please request a new one.");
-    return;
-  }
-
-  const { email, expires_at } = rows[0];
-  const now = Date.now();
-
-  if (expires_at && now > expires_at) {
-    // Clean up expired token
-    await sbDelete("password_resets", `token=eq.${encodeURIComponent(token)}`);
-    renderInvalid("This reset link has expired (links are valid for 24 hours). Please request a new one.");
-    return;
-  }
-
-  renderForm(email);
+  renderForm(token);
 }
 
 init();
