@@ -6,15 +6,15 @@
 <meta name="theme-color" content="#080808"/>
 <title>Soul Fitness · Reset Password</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Syncopate:wght@700&display=swap" rel="stylesheet"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{background:#080808;min-height:100vh;font-family:'DM Sans',sans-serif;color:#fff}
 .wrap{max-width:420px;margin:0 auto;padding:48px 24px 32px;display:flex;flex-direction:column;align-items:center;min-height:100vh}
 .logo-area{text-align:center;margin-bottom:40px}
 .logo-sub{font-size:9px;letter-spacing:0.22em;color:#555;font-weight:500}
-.logo{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:0.18em;line-height:1;color:#8cc63e}
-.logo-tag{font-size:7px;letter-spacing:0.2em;color:#3a4a2a;margin-top:2px}
+.logo{font-family:'Syncopate',sans-serif;font-weight:700;font-size:24px;letter-spacing:0.14em;line-height:1;color:#fff;margin-top:4px}
+.logo-tag{font-size:7px;letter-spacing:0.2em;color:#3f6b1e;margin-top:6px;font-weight:700}
 .card{width:100%;background:#0e0e0e;border:1px solid #222;border-radius:12px;padding:28px 24px}
 .card-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.14em;color:#fff;margin-bottom:6px}
 .card-sub{font-size:12px;color:#666;letter-spacing:0.04em;margin-bottom:24px}
@@ -25,11 +25,11 @@ html,body{background:#080808;min-height:100vh;font-family:'DM Sans',sans-serif;c
 .field input::placeholder{color:#3a3a3a}
 .err-msg{font-size:11px;color:#e05555;margin-top:5px;letter-spacing:0.04em}
 .pw-hint{font-size:10px;color:#444;margin-top:5px;letter-spacing:0.03em}
-.btn{width:100%;padding:13px;background:#8cc63e;color:#000;border:none;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;letter-spacing:0.14em;cursor:pointer;transition:opacity .15s;margin-top:4px}
+.btn{width:100%;padding:13px;background:#8cc63e;color:#062018;border:none;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;letter-spacing:0.14em;cursor:pointer;transition:opacity .15s;margin-top:4px}
 .btn:hover:not(:disabled){opacity:0.88}
 .btn:disabled{opacity:0.35;cursor:not-allowed}
-.btn-outline{background:transparent;color:#666;border:1px solid #2a2a2a;margin-top:10px;font-size:11px;letter-spacing:0.12em}
-.btn-outline:hover:not(:disabled){border-color:#8cc63e;color:#8cc63e}
+.btn-outline{background:transparent;color:#555;border:1px solid #2a2a2a;margin-top:10px;font-size:11px;letter-spacing:0.12em}
+.btn-outline:hover:not(:disabled){border-color:#8cc63e;color:#aaa}
 
 /* states */
 .state{width:100%;text-align:center}
@@ -46,7 +46,7 @@ html,body{background:#080808;min-height:100vh;font-family:'DM Sans',sans-serif;c
   <div class="logo-area">
     <div class="logo-sub">LAMONT</div>
     <div class="logo">SOUL FITNESS</div>
-    <div class="logo-tag">MOVE WITH SOUL.</div>
+    <div class="logo-tag">WHERE COMMUNITY MEETS FITNESS</div>
   </div>
   <div id="app" style="width:100%"></div>
 </div>
@@ -55,7 +55,41 @@ html,body{background:#080808;min-height:100vh;font-family:'DM Sans',sans-serif;c
 const SB_URL = "https://tqidngxpbzkzdekhizyp.supabase.co";
 const SB_KEY = "sb_publishable_UTl_mZYy0xvuOUhNNOM6Mg_s6XOZlto";
 const SB_HDR = {"apikey":SB_KEY,"Authorization":`Bearer ${SB_KEY}`,"Content-Type":"application/json"};
-const APP_URL = "./";
+const APP_URL = "https://lamontfitnessapplications.github.io/fitnessapp/";
+
+const hashPw = s => {
+  let h = 5381;
+  for (let i = 0; i < s.length; i++) h = ((h << 5) + h) ^ s.charCodeAt(i);
+  return (h >>> 0).toString(36);
+};
+
+async function sbGet(table, query = "") {
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/${table}?${query}`, { headers: SB_HDR });
+    return r.ok ? await r.json() : [];
+  } catch { return []; }
+}
+
+async function sbPatch(table, query, data) {
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/${table}?${query}`, {
+      method: "PATCH",
+      headers: { ...SB_HDR, "Prefer": "return=minimal" },
+      body: JSON.stringify(data)
+    });
+    return r.ok;
+  } catch { return false; }
+}
+
+async function sbDelete(table, query) {
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/${table}?${query}`, {
+      method: "DELETE",
+      headers: SB_HDR
+    });
+    return r.ok;
+  } catch { return false; }
+}
 
 const app = document.getElementById("app");
 
@@ -79,11 +113,11 @@ function renderInvalid(msg) {
     </div>`;
 }
 
-function renderForm() {
+function renderForm(email) {
   app.innerHTML = `
     <div class="card">
       <div class="card-title">SET NEW PASSWORD</div>
-      <div class="card-sub">Choose a new password for your account.</div>
+      <div class="card-sub">Choose a new password for <strong style="color:#8cc63e">${email}</strong></div>
       <div class="field">
         <label>NEW PASSWORD</label>
         <input type="password" id="pw1" placeholder="Enter new password" autocomplete="new-password"/>
@@ -94,7 +128,7 @@ function renderForm() {
         <input type="password" id="pw2" placeholder="Confirm new password" autocomplete="new-password"/>
         <div id="pw-err" class="err-msg" style="display:none"></div>
       </div>
-      <button class="btn" id="submit-btn" onclick="doReset()">UPDATE PASSWORD</button>
+      <button class="btn" id="submit-btn" onclick="doReset('${email}')">UPDATE PASSWORD</button>
       <button class="btn btn-outline" onclick="window.location.href='${APP_URL}'">CANCEL</button>
     </div>`;
   document.getElementById("pw1").addEventListener("input", clearErr);
@@ -113,6 +147,18 @@ function renderSuccess() {
     </div>`;
 }
 
+function renderError(msg) {
+  app.innerHTML = `
+    <div class="card">
+      <div class="state">
+        <div class="state-icon">❌</div>
+        <div class="state-title">SOMETHING WENT WRONG</div>
+        <div class="state-sub">${msg}</div>
+        <button class="btn" onclick="window.location.href='${APP_URL}'">BACK TO APP</button>
+      </div>
+    </div>`;
+}
+
 function clearErr() {
   const e = document.getElementById("pw-err");
   if (e) { e.style.display = "none"; e.textContent = ""; }
@@ -123,7 +169,7 @@ function showErr(msg) {
   if (e) { e.textContent = msg; e.style.display = "block"; }
 }
 
-async function doReset() {
+async function doReset(email) {
   const pw1 = document.getElementById("pw1").value.trim();
   const pw2 = document.getElementById("pw2").value.trim();
 
@@ -134,35 +180,53 @@ async function doReset() {
   btn.disabled = true;
   btn.textContent = "UPDATING...";
 
-  const token = new URLSearchParams(window.location.search).get("token");
-  let ok = false, errMsg = "Failed to update password. Please try again.";
-  try {
-    const rr = await fetch(`${SB_URL}/functions/v1/dynamic-api`, { method:"POST", headers:{"apikey":SB_KEY,"Authorization":`Bearer ${SB_KEY}`,"Content-Type":"application/json"}, body: JSON.stringify({ action:"doReset", token, password: pw1 }) });
-    const jj = await rr.json().catch(() => ({}));
-    ok = !!(jj && jj.ok);
-    if (!ok && jj && jj.error === "expired") errMsg = "This reset link has expired. Please request a new one.";
-    else if (!ok && jj && jj.error === "badtoken") errMsg = "This reset link is invalid or already used. Please request a new one.";
-  } catch (e) {}
+  const hashed = hashPw(pw1);
+  const ok = await sbPatch("members", `email=eq.${encodeURIComponent(email)}`, { password: hashed });
 
   if (!ok) {
     btn.disabled = false;
     btn.textContent = "UPDATE PASSWORD";
-    showErr(errMsg);
+    showErr("Failed to update password. Please try again.");
     return;
   }
+
+  // Delete the token (clean up)
+  const token = new URLSearchParams(window.location.search).get("token");
+  if (token) await sbDelete("password_resets", `token=eq.${encodeURIComponent(token)}`);
 
   renderSuccess();
 }
 
 async function init() {
   renderLoading();
-  const token = new URLSearchParams(window.location.search).get("token");
+
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get("token");
+
   if (!token) {
     renderInvalid("No reset token found. Please request a new password reset link.");
     return;
   }
-  // Token is validated server-side when the new password is submitted.
-  renderForm();
+
+  // Look up the token
+  const rows = await sbGet("password_resets", `token=eq.${encodeURIComponent(token)}&select=email,expires_at`);
+
+  if (!rows || rows.length === 0) {
+    renderInvalid("This reset link is invalid or has already been used. Please request a new one.");
+    return;
+  }
+
+  const { email, expires_at } = rows[0];
+  const now = Date.now();
+
+  if (expires_at && now > expires_at) {
+    // Clean up expired token
+    await sbDelete("password_resets", `token=eq.${encodeURIComponent(token)}`);
+    renderInvalid("This reset link has expired (links are valid for 24 hours). Please request a new one.");
+    return;
+  }
+
+  renderForm(email);
 }
 
 init();
