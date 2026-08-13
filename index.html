@@ -4540,6 +4540,25 @@ function RoutinesAdmin({member}){
     else{await sbPost("coaching_notes",{class_name:k,content:json,updated_at:Date.now()});}
   }
   async function save(){setSaving(true);await upsertRT(key,clean(routines));setSaving(false);setMsg("Saved ✓");setTimeout(()=>setMsg(""),2500);}
+  async function saveGlobal(){
+    // Push the ticked routines to EVERY member who already has a routine of the same name (overwrites their copy).
+    const cleaned=clean(routines.filter(r=>!excl.has(r.id)));
+    if(!cleaned.length){setMsg("Tick at least one routine, then UPDATE ALL.");setTimeout(()=>setMsg(""),3000);return;}
+    if(!window.confirm("Update these routines for EVERY member who has a routine with the same name? This overwrites their copy."))return;
+    setSaving(true);
+    await upsertRT(key,clean(routines));
+    const byTitle={};cleaned.forEach(r=>{byTitle[(r.title||"").toLowerCase()]=r;});
+    const rows=await sbGet("coaching_notes","class_name=like.__RT__*&select=class_name,content");
+    let n=0;
+    for(const row of (rows||[])){
+      if(!row||!row.class_name||row.class_name.indexOf("__RT__")!==0||row.class_name===key)continue;
+      let arr=[];try{const o=JSON.parse(row.content);arr=Array.isArray(o)?o:(o.routines||[]);}catch{}
+      let changed=false;
+      const upd=(arr||[]).map(r=>{const m=byTitle[(r.title||"").toLowerCase()];if(m){changed=true;return {id:r.id||mwGenId(),title:m.title,exercises:m.exercises.map(e=>({...e,id:mwGenId()}))};}return r;});
+      if(changed){await upsertRT(row.class_name,upd);n++;}
+    }
+    setSaving(false);setMsg("Updated "+n+" other member(s) ✓");setTimeout(()=>setMsg(""),3500);
+  }
   async function openAssign(){
     const inc=routines.filter(r=>!excl.has(r.id));
     if(!inc.length){setMsg("Tick at least one routine to assign.");setTimeout(()=>setMsg(""),3000);return;}
@@ -4640,9 +4659,10 @@ function RoutinesAdmin({member}){
         )
       );}),
       React.createElement("button",{onClick:addRoutine,style:{width:"100%",background:"none",border:"1px dashed #3f6b1e",borderRadius:0,color:"#8cc63e",fontSize:10,letterSpacing:"0.12em",padding:"9px",cursor:"pointer",marginBottom:10}},"+ ADD ROUTINE"),
-      React.createElement("div",{style:{display:"flex",gap:8}},
-        React.createElement("button",{onClick:save,disabled:saving,style:{flex:2,background:"#fff",color:"#000",border:"none",fontFamily:"'Bebas Neue',sans-serif",fontSize:14,letterSpacing:"0.14em",padding:"12px",borderRadius:0,cursor:"pointer"}},saving?"SAVING...":"SAVE ROUTINES"),
-        React.createElement("button",{onClick:openAssign,disabled:saving,style:{flex:1,background:"none",color:"#8cc63e",border:"1px solid #3f6b1e",fontFamily:"'DM Sans',sans-serif",fontSize:10,letterSpacing:"0.08em",fontWeight:600,padding:"12px 6px",borderRadius:0,cursor:"pointer"}},"ASSIGN…")
+      React.createElement("div",{style:{display:"flex",gap:8,flexWrap:"wrap"}},
+        React.createElement("button",{onClick:save,disabled:saving,style:{flex:"2 1 100%",background:"#fff",color:"#000",border:"none",fontFamily:"'Bebas Neue',sans-serif",fontSize:14,letterSpacing:"0.14em",padding:"12px",borderRadius:0,cursor:"pointer"}},saving?"SAVING...":"SAVE ROUTINES"),
+        React.createElement("button",{onClick:openAssign,disabled:saving,style:{flex:1,minWidth:84,background:"none",color:"#8cc63e",border:"1px solid #3f6b1e",fontFamily:"'DM Sans',sans-serif",fontSize:10,letterSpacing:"0.08em",fontWeight:600,padding:"12px 6px",borderRadius:0,cursor:"pointer"}},"ASSIGN…"),
+        React.createElement("button",{onClick:saveGlobal,disabled:saving,title:"Save these edits to every member who already has a routine with the same name",style:{flex:1,minWidth:84,background:"none",color:"#c9a227",border:"1px solid #4a3f15",fontFamily:"'DM Sans',sans-serif",fontSize:10,letterSpacing:"0.08em",fontWeight:600,padding:"12px 6px",borderRadius:0,cursor:"pointer"}},"UPDATE ALL")
       ),
       showAssign&&React.createElement("div",{style:{border:"1px solid #3f6b1e",background:"#0a1520",padding:"12px",marginTop:10}},
         React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8}},
