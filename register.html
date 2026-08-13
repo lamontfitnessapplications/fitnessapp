@@ -250,8 +250,10 @@ async function handleSubmit(){
   let isExisting = false;
   try{
     // FITNESS members get full access (no __ACCESS__ row). TRIAL members start with Notice Board only.
+    // CONCESSION members get full access too, but are flagged so the app caps class booking at 10.
     const body={action:"memberUpsert",email,data:regData,defaults:{workouts_enabled:true}};
-    if(PLAN!=="fitness")body.accessTabs=["community"];
+    if(PLAN==="concession"){regData.membership_type="CONCESSION";}
+    else if(PLAN!=="fitness"){body.accessTabs=["community"];}
     const ur = await fetch(`${SB_URL}/functions/v1/dynamic-api`,{method:"POST",headers:{"apikey":SB_KEY,"Authorization":`Bearer ${SB_KEY}`,"Content-Type":"application/json"},body:JSON.stringify(body)});
     const uj = await ur.json().catch(()=>({}));
     ok = !!(uj&&uj.ok); isExisting = !!(uj&&uj.existing); tempPw = (uj&&uj.tempPw)||"";
