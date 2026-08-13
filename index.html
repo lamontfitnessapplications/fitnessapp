@@ -4562,8 +4562,17 @@ function RoutinesAdmin({member}){
   async function openAssign(){
     const inc=routines.filter(r=>!excl.has(r.id));
     if(!inc.length){setMsg("Tick at least one routine to assign.");setTimeout(()=>setMsg(""),3000);return;}
-    const m=await sbGet("members_public","select=email,name&order=name.asc");
-    setMembers(m||[]);setSelM(new Set());setMSearch("");setShowAssign(true);
+    const [m,rows]=await Promise.all([
+      sbGet("members_public","select=email,name&order=name.asc"),
+      sbGet("coaching_notes","class_name=like.__RT__*&select=class_name,content")
+    ]);
+    // Pre-tick members who already have EVERY included routine (matched by name).
+    const byEmail={};
+    (rows||[]).forEach(row=>{if(!row||!row.class_name||row.class_name.indexOf("__RT__")!==0)return;const em=row.class_name.slice(6);let arr=[];try{const o=JSON.parse(row.content);arr=Array.isArray(o)?o:(o.routines||[]);}catch{}byEmail[em]=arr;});
+    const incTitles=inc.map(r=>(r.title||"").trim().toLowerCase()).filter(Boolean);
+    const pre=new Set();
+    (m||[]).forEach(mm=>{const arr=byEmail[mm.email]||[];if(incTitles.length&&incTitles.every(t=>arr.some(x=>(x.title||"").trim().toLowerCase()===t)))pre.add(mm.email);});
+    setMembers(m||[]);setSelM(pre);setMSearch("");setShowAssign(true);
   }
   function toggleM(email){setSelM(p=>{const n=new Set(p);n.has(email)?n.delete(email):n.add(email);return n;});}
   async function assignTo(emails){
