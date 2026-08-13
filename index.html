@@ -590,7 +590,7 @@ function ImageCropper({imageSrc,onSave,onCancel}){
   );
 }
 // ── Member Profile Overlay (Admin) ────────────────────────────────────────────
-function MemberProfileOverlay({member,bookings,onClose,currentUserIsAdmin,mfWk,isMaster,mfPasteAI,canManageWk}){
+function MemberProfileOverlay({member,bookings,onClose,currentUserIsAdmin,mfWk,isMaster,mfPasteAI,canManageWk,wkMemHidden}){
   const upcomingBks=bookings.filter(b=>b.email===member.email&&b.date_key>=toDS(new Date())).length;
   const attendedBks=bookings.filter(b=>b.email===member.email&&b.date_key<toDS(new Date())).length;
   const joinDate=fmtJoinDate(member.joined_at);
@@ -1069,14 +1069,14 @@ function MemberProfileOverlay({member,bookings,onClose,currentUserIsAdmin,mfWk,i
               (on?"✓ ":"")+t.label);
           })
         ),
-        canManageWk&&React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",background:"#0e0e0e",border:"1px solid "+(wkEnabled?"#3f6b1e":"#222"),borderRadius:0,padding:"11px 14px",marginBottom:6}},
+        canManageWk&&React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",background:"#0e0e0e",border:"1px solid "+((wkEnabled&&!wkMemHidden)?"#3f6b1e":"#222"),borderRadius:0,padding:"11px 14px",marginBottom:6}},
           React.createElement("div",null,
             React.createElement("div",{style:{fontSize:11,fontWeight:600,letterSpacing:"0.08em",color:"#fff"}},"WORKOUTS"),
-            React.createElement("div",{style:{fontSize:9,color:"#555",marginTop:2,letterSpacing:"0.04em"}},"Add-on · personal training programs")
+            React.createElement("div",{style:{fontSize:9,color:wkMemHidden?"#c98a1e":"#555",marginTop:2,letterSpacing:"0.04em"}},wkMemHidden?"Hidden globally — turn off the global hide to change":"Add-on · personal training programs")
           ),
-          React.createElement("button",{onClick:()=>setWorkoutsFlag(!wkEnabled),disabled:savingAcc,
-            style:{background:wkEnabled?"#fff":"#222",color:wkEnabled?"#000":"#555",border:"1px solid "+(wkEnabled?"#fff":"#333"),borderRadius:0,padding:"6px 18px",fontSize:10,letterSpacing:"0.12em",fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}},
-            wkEnabled?"ON":"OFF")
+          React.createElement("button",{onClick:()=>{if(!wkMemHidden)setWorkoutsFlag(!wkEnabled);},disabled:savingAcc||wkMemHidden,
+            style:{background:(wkEnabled&&!wkMemHidden)?"#fff":"#222",color:(wkEnabled&&!wkMemHidden)?"#000":"#555",border:"1px solid "+((wkEnabled&&!wkMemHidden)?"#fff":"#333"),borderRadius:0,padding:"6px 18px",fontSize:10,letterSpacing:"0.12em",fontWeight:700,cursor:wkMemHidden?"default":"pointer",fontFamily:"'DM Sans',sans-serif"}},
+            wkMemHidden?"HIDDEN":(wkEnabled?"ON":"OFF"))
         ),
         React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",background:"#0e0e0e",border:"1px solid "+(rtEnabled?"#3f6b1e":"#222"),borderRadius:0,padding:"11px 14px",marginBottom:6}},
           React.createElement("div",null,
@@ -1667,7 +1667,7 @@ function AdminView({bookings,setBookings,showToast,isAdmin,isMaster,selfEmail,mF
   }
   const admDateLabel=`${["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][admDOW]} ${admDate.getDate()} ${MONTHS[admDate.getMonth()]} ${admDate.getFullYear()}`;
   return React.createElement("div",{className:"adm-wrap"},
-    selectedMember&&React.createElement(MemberProfileOverlay,{member:selectedMember,bookings,onClose:()=>setSelectedMember(null),currentUserIsAdmin:isAdmin,mfWk:mFlags.wk,isMaster,mfPasteAI:mFlags.pasteAI,canManageWk:(isMaster||(mFlags.wk!==false&&!(mFlags.wkAdminHide||[]).includes(selfEmail)))}),
+    selectedMember&&React.createElement(MemberProfileOverlay,{member:selectedMember,bookings,onClose:()=>setSelectedMember(null),currentUserIsAdmin:isAdmin,mfWk:mFlags.wk,isMaster,mfPasteAI:mFlags.pasteAI,canManageWk:(isMaster||(mFlags.wk!==false&&!(mFlags.wkAdminHide||[]).includes(selfEmail))),wkMemHidden:mFlags.wkMemHide===true}),
     React.createElement("div",{className:"adm-title"},"ADMIN"),
     React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"center",gap:8,padding:"0 0 6px"}},
       React.createElement("span",{onClick:e=>{const n=e.currentTarget.parentElement.nextElementSibling;if(n&&n.scrollBy)n.scrollBy({left:-160,behavior:"smooth"});},style:{color:"#8cc63e",fontSize:12,lineHeight:1,cursor:"pointer",padding:"3px 8px"}},"‹"),
