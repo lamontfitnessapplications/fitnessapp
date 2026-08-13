@@ -1545,6 +1545,7 @@ function AdminView({bookings,setBookings,showToast,isAdmin,isMaster,selfEmail,mF
   const [expanded,setExpanded]=useState({});
   const [members,setMembers]=useState([]);
   const [membersLoaded,setMembersLoaded]=useState(false);
+  const [showWkAdmins,setShowWkAdmins]=useState(false);
   const [masterHidden,setMasterHidden]=useState(false);
   const [mhSaving,setMhSaving]=useState(false);
   const [wellAdmBks,setWellAdmBks]=useState([]);
@@ -1702,20 +1703,25 @@ function AdminView({bookings,setBookings,showToast,isAdmin,isMaster,selfEmail,mF
           React.createElement("div",{style:{fontSize:11,fontWeight:600,letterSpacing:"0.08em",color:"#fff"}},"HIDE WORKOUTS FROM MEMBERS"),
           React.createElement("div",{style:{fontSize:9,color:"#555",marginTop:2,letterSpacing:"0.04em"}},"Hides the Workouts tab from every member. Admins keep access.")
         ),
-        React.createElement("button",{onClick:()=>saveMFlag("wkMemHide",!mFlags.wkMemHide),style:{background:mFlags.wkMemHide?"#fff":"#222",color:mFlags.wkMemHide?"#000":"#555",border:"1px solid "+(mFlags.wkMemHide?"#fff":"#333"),padding:"6px 18px",fontSize:10,letterSpacing:"0.12em",fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}},mFlags.wkMemHide?"HIDDEN":"VISIBLE")
+        React.createElement("button",{onClick:()=>saveMFlag("wkMemHide",!mFlags.wkMemHide),style:{background:mFlags.wkMemHide?"#fff":"#222",color:mFlags.wkMemHide?"#000":"#555",border:"1px solid "+(mFlags.wkMemHide?"#fff":"#333"),padding:"6px 18px",fontSize:10,letterSpacing:"0.12em",fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}},mFlags.wkMemHide?"HIDE":"VISIBLE")
       ),
       isMaster&&React.createElement("div",{style:{background:"#0e0e0e",border:"1px solid #222",padding:"11px 14px",marginBottom:10}},
-        React.createElement("div",{style:{fontSize:11,fontWeight:600,letterSpacing:"0.08em",color:"#fff"}},"WHO CAN CREATE WORKOUTS"),
-        React.createElement("div",{style:{fontSize:9,color:"#555",marginTop:2,marginBottom:8,letterSpacing:"0.04em"}},"Untick an admin to stop them building workout programs. You (master) always have access."),
-        (members.filter(m=>m.is_admin&&m.email!==ADMIN_EMAIL).length===0)
-          ?React.createElement("div",{style:{fontSize:10,color:"#555"}},"No other admins yet.")
-          :members.filter(m=>m.is_admin&&m.email!==ADMIN_EMAIL).map(a=>{
-              const wkHidden=(mFlags.wkAdminHide||[]).includes(a.email);
-              return React.createElement("div",{key:a.email,style:{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"8px 0",borderTop:"1px solid #181818"}},
-                React.createElement("div",{style:{fontSize:12,color:"#ccc"}},a.name||a.email),
-                React.createElement("button",{onClick:()=>{const list=(mFlags.wkAdminHide||[]).slice();const i=list.indexOf(a.email);if(i>=0)list.splice(i,1);else list.push(a.email);saveMFlag("wkAdminHide",list);},style:{width:26,height:26,borderRadius:0,border:"1px solid "+(wkHidden?"#333":"#3f6b1e"),background:wkHidden?"transparent":"#16280d",color:"#8cc63e",fontSize:13,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}},wkHidden?"":"✓")
-              );
-            })
+        React.createElement("div",{onClick:()=>setShowWkAdmins(v=>!v),style:{display:"flex",alignItems:"center",justifyContent:"space-between",cursor:"pointer",userSelect:"none"}},
+          React.createElement("div",{style:{fontSize:11,fontWeight:600,letterSpacing:"0.08em",color:"#fff"}},"WHO CAN CREATE WORKOUTS"),
+          React.createElement("span",{style:{fontSize:11,color:"#8cc63e",transform:showWkAdmins?"none":"rotate(-90deg)",transition:"transform .15s"}},"▾")
+        ),
+        showWkAdmins&&React.createElement(React.Fragment,null,
+          React.createElement("div",{style:{fontSize:9,color:"#555",marginTop:6,marginBottom:8,letterSpacing:"0.04em"}},"Untick an admin to stop them building workout programs. You (master) always have access."),
+          (members.filter(m=>m.is_admin&&m.email!==ADMIN_EMAIL).length===0)
+            ?React.createElement("div",{style:{fontSize:10,color:"#555"}},"No other admins yet.")
+            :members.filter(m=>m.is_admin&&m.email!==ADMIN_EMAIL).map(a=>{
+                const wkHidden=(mFlags.wkAdminHide||[]).includes(a.email);
+                return React.createElement("div",{key:a.email,style:{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"8px 0",borderTop:"1px solid #181818"}},
+                  React.createElement("div",{style:{fontSize:12,color:"#ccc"}},a.name||a.email),
+                  React.createElement("button",{onClick:()=>{const list=(mFlags.wkAdminHide||[]).slice();const i=list.indexOf(a.email);if(i>=0)list.splice(i,1);else list.push(a.email);saveMFlag("wkAdminHide",list);},style:{width:26,height:26,borderRadius:0,border:"1px solid "+(wkHidden?"#333":"#3f6b1e"),background:wkHidden?"transparent":"#16280d",color:"#8cc63e",fontSize:13,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}},wkHidden?"":"✓")
+                );
+              })
+        )
       ),
       isMaster&&React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",background:"#0e0e0e",border:"1px solid "+(!mFlags.pasteAI?"#8cc63e":"#222"),padding:"11px 14px",marginBottom:10}},
         React.createElement("div",null,
