@@ -612,6 +612,42 @@ function MemberProfileOverlay({member,bookings,onClose,currentUserIsAdmin,mfWk,i
   const [concActive,setConcActive]=useState(isConcessionMT(member.membership_type));
   const [concBusy,setConcBusy]=useState(false);
   const [concMsg,setConcMsg]=useState("");
+  const [showNotes,setShowNotes]=useState(false);
+  const [memberNotes,setMemberNotes]=useState([]);
+  const [notesLoaded,setNotesLoaded]=useState(false);
+  const [newNote,setNewNote]=useState("");
+  const [savingNote,setSavingNote]=useState(false);
+  const notesKey="__MEMBERNOTES__"+member.email;
+  async function loadNotes(){
+    const r=await sbGet("coaching_notes",`class_name=eq.${encodeURIComponent(notesKey)}&select=content`);
+    let list=[];
+    if(r&&r.length&&r[0].content){try{list=JSON.parse(r[0].content)||[];}catch{list=[];}}
+    setMemberNotes(list);setNotesLoaded(true);
+  }
+  async function writeNotes(list){
+    const q=`class_name=eq.${encodeURIComponent(notesKey)}`;
+    const ex=await sbGet("coaching_notes",q+"&select=class_name");
+    const body={content:JSON.stringify(list),updated_at:Date.now()};
+    if(ex&&ex.length)await sbPatch("coaching_notes",q,body);else await sbPost("coaching_notes",{class_name:notesKey,...body});
+  }
+  async function addNote(){
+    const text=newNote.trim();
+    if(!text)return;
+    setSavingNote(true);
+    const entry={id:Date.now()+"-"+Math.random().toString(36).slice(2,7),text,ts:Date.now()};
+    const next=[entry,...memberNotes];
+    await writeNotes(next);
+    setMemberNotes(next);setNewNote("");setSavingNote(false);
+  }
+  async function deleteNote(id){
+    const next=memberNotes.filter(n=>n.id!==id);
+    setMemberNotes(next);
+    await writeNotes(next);
+  }
+  function fmtNoteTs(ts){
+    const d=new Date(ts);
+    return `${["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][d.getDay()]} ${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()} · ${String(d.getHours()%12||12).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}${d.getHours()<12?"am":"pm"}`;
+  }
   useEffect(()=>{
     if(!currentUserIsAdmin)return;
     (async()=>{
@@ -623,6 +659,10 @@ function MemberProfileOverlay({member,bookings,onClose,currentUserIsAdmin,mfWk,i
       setConcInfo({checkins:(ci||[]).length,baseline:b});
     })();
   },[]);
+  useEffect(()=>{
+    if(!currentUserIsAdmin||!showNotes||notesLoaded)return;
+    loadNotes();
+  },[showNotes]);
   async function writeConcBaseline(b){
     const k="__CONCESSION__"+member.email;const q=`class_name=eq.${encodeURIComponent(k)}`;
     const ex=await sbGet("coaching_notes",q+"&select=class_name");
@@ -1108,6 +1148,28 @@ function MemberProfileOverlay({member,bookings,onClose,currentUserIsAdmin,mfWk,i
         accMsg&&React.createElement("div",{style:{fontSize:10,color:"#4aaa88",letterSpacing:"0.04em",marginBottom:4}},accMsg)
       )
       ),
+      currentUserIsAdmin&&React.createElement(React.Fragment,null,
+        React.createElement("div",{onClick:()=>setShowNotes(v=>!v),style:{width:"100%",display:"flex",alignItems:"center",justifyContent:"space-between",background:"#fff",color:"#000",borderRadius:0,padding:"9px 14px",fontFamily:"'Bebas Neue',sans-serif",fontSize:14,letterSpacing:"0.14em",cursor:"pointer",userSelect:"none",marginTop:16,marginBottom:showNotes?10:0}},
+          React.createElement("span",null,"NOTES"),
+          React.createElement("div",{style:{display:"flex",alignItems:"center",gap:10}},
+            memberNotes.length>0&&React.createElement("span",{style:{fontFamily:"'DM Sans',sans-serif",fontSize:9,letterSpacing:"0.06em",color:"#176a9a",fontWeight:700}},String(memberNotes.length)),
+            React.createElement("span",{style:{fontSize:11,transform:showNotes?"none":"rotate(-90deg)",transition:"transform .15s"}},"▾")
+          )
+        ),
+        showNotes&&React.createElement(React.Fragment,null,
+          React.createElement("textarea",{value:newNote,placeholder:"Add a note...",onChange:e=>setNewNote(e.target.value),rows:3,style:{width:"100%",background:"#141414",border:"1px solid #333",borderRadius:0,color:"#fff",fontSize:13,padding:"10px 12px",fontFamily:"'DM Sans',sans-serif",outline:"none",resize:"vertical",lineHeight:1.6,marginBottom:8}}),
+          React.createElement("button",{onClick:addNote,disabled:savingNote||!newNote.trim(),style:{width:"100%",background:"#8cc63e",color:"#0a0a0a",border:"none",borderRadius:0,fontFamily:"'Bebas Neue',sans-serif",fontSize:14,letterSpacing:"0.1em",padding:"10px 18px",cursor:"pointer",marginBottom:12}},savingNote?"...":"ADD NOTE"),
+          !notesLoaded?React.createElement("div",{style:{fontSize:10,color:"#555"}},"LOADING...")
+          :memberNotes.length===0?React.createElement("div",{style:{fontSize:10,color:"#555"}},"No notes yet.")
+          :memberNotes.map(n=>React.createElement("div",{key:n.id,style:{background:"#0e0e0e",border:"1px solid #222",borderRadius:0,padding:"10px 12px",marginBottom:6}},
+              React.createElement("div",{style:{display:"flex",alignItems:"flex-start",justifyContent:"space-between",gap:10}},
+                React.createElement("div",{style:{fontSize:12,color:"#ccc",lineHeight:1.5,whiteSpace:"pre-wrap",wordBreak:"break-word"}},n.text),
+                React.createElement("button",{onClick:()=>deleteNote(n.id),style:{background:"none",border:"1px solid #333",color:"#888",fontSize:9,letterSpacing:"0.06em",padding:"3px 8px",borderRadius:0,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",fontWeight:600,flexShrink:0}},"DELETE")
+              ),
+              React.createElement("div",{style:{fontSize:9,color:"#555",marginTop:6,letterSpacing:"0.04em"}},fmtNoteTs(n.ts))
+            ))
+        )
+      ),
       currentUserIsAdmin&&canManageWk&&React.createElement(MemberWorkoutAdmin,{member,memberView:wkMemberView,setMemberView:setWkMemberView,isMaster,mfPasteAI}),
       currentUserIsAdmin&&React.createElement(RoutinesAdmin,{member}),
       currentUserIsAdmin&&React.createElement(MemberPBAdmin,{member}),
@@ -1548,6 +1610,7 @@ function AdminView({bookings,setBookings,showToast,isAdmin,isMaster,selfEmail,mF
   const [showWkAdmins,setShowWkAdmins]=useState(false);
   const [masterHidden,setMasterHidden]=useState(false);
   const [mhSaving,setMhSaving]=useState(false);
+  const [mhLoaded,setMhLoaded]=useState(false);
   const [wellAdmBks,setWellAdmBks]=useState([]);
   const [wellAdmLoaded,setWellAdmLoaded]=useState(false);
   const [selectedMember,setSelectedMember]=useState(null);
@@ -1634,7 +1697,9 @@ function AdminView({bookings,setBookings,showToast,isAdmin,isMaster,selfEmail,mF
   useEffect(()=>{
     if(admSeg==="members"&&!membersLoaded){
       sbGet("members","select=*&order=name.asc").then(data=>{setMembers(data||[]);setMembersLoaded(true);});
-      sbGet("coaching_notes","class_name=eq."+encodeURIComponent("__MASTER_HIDDEN__")+"&select=content").then(r=>{setMasterHidden(!!(r&&r.length&&r[0].content==="1"));});
+    }
+    if((admSeg==="members"||admSeg==="functions")&&!mhLoaded){
+      sbGet("coaching_notes","class_name=eq."+encodeURIComponent("__MASTER_HIDDEN__")+"&select=content").then(r=>{setMasterHidden(!!(r&&r.length&&r[0].content==="1"));setMhLoaded(true);});
     }
     if(admSeg==="wellness"&&!wellAdmLoaded){
       const keys=[];const now=new Date();now.setHours(0,0,0,0);
@@ -1680,32 +1745,32 @@ function AdminView({bookings,setBookings,showToast,isAdmin,isMaster,selfEmail,mF
       React.createElement("button",{"data-adm":"classes",className:`adm-seg-btn${admSeg==="classes"?" aas":""}`,onClick:()=>setAdmSeg("classes")},"CLASSES"),
       (isMaster||mFlags.welladm)&&React.createElement("button",{"data-adm":"wellness",className:`adm-seg-btn${admSeg==="wellness"?" aas":""}`,onClick:()=>setAdmSeg("wellness")},"WELLNESS"),
       React.createElement("button",{"data-adm":"sections",className:`adm-seg-btn${admSeg==="sections"?" aas":""}`,onClick:()=>setAdmSeg("sections")},"SECTIONS"),
-      React.createElement("button",{"data-adm":"onboarding",className:`adm-seg-btn${admSeg==="onboarding"?" aas":""}`,onClick:()=>setAdmSeg("onboarding")},"ONBOARDING")
+      React.createElement("button",{"data-adm":"onboarding",className:`adm-seg-btn${admSeg==="onboarding"?" aas":""}`,onClick:()=>setAdmSeg("onboarding")},"ONBOARDING"),
+      isMaster&&React.createElement("button",{"data-adm":"functions",className:`adm-seg-btn${admSeg==="functions"?" aas":""}`,onClick:()=>setAdmSeg("functions")},"FUNCTIONS")
     ),
-    admSeg==="members"&&(!membersLoaded?React.createElement("div",{className:"no-bk"},"LOADING...")
-    :React.createElement(React.Fragment,null,
-      isMaster&&React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",background:"#0e0e0e",border:"1px solid "+(masterHidden?"#8cc63e":"#222"),padding:"11px 14px",marginBottom:10}},
+    admSeg==="functions"&&isMaster&&React.createElement(React.Fragment,null,
+      React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",background:"#0e0e0e",border:"1px solid "+(masterHidden?"#8cc63e":"#222"),padding:"11px 14px",marginBottom:10}},
         React.createElement("div",null,
           React.createElement("div",{style:{fontSize:11,fontWeight:600,letterSpacing:"0.08em",color:"#fff"}},"HIDE ME FROM MEMBERS"),
           React.createElement("div",{style:{fontSize:9,color:"#555",marginTop:2,letterSpacing:"0.04em"}},"Hides your account from all members & admins")
         ),
         React.createElement("button",{onClick:toggleMasterHidden,disabled:mhSaving,style:{background:masterHidden?"#fff":"#222",color:masterHidden?"#000":"#555",border:"1px solid "+(masterHidden?"#fff":"#333"),padding:"6px 18px",fontSize:10,letterSpacing:"0.12em",fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}},masterHidden?"HIDE":"VISIBLE")
       ),
-      isMaster&&React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",background:"#0e0e0e",border:"1px solid "+(!mFlags.wk?"#8cc63e":"#222"),padding:"11px 14px",marginBottom:10}},
+      React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",background:"#0e0e0e",border:"1px solid "+(!mFlags.wk?"#8cc63e":"#222"),padding:"11px 14px",marginBottom:10}},
         React.createElement("div",null,
           React.createElement("div",{style:{fontSize:11,fontWeight:600,letterSpacing:"0.08em",color:"#fff"}},"WORKOUT PROGRAM"),
           React.createElement("div",{style:{fontSize:9,color:"#555",marginTop:2,letterSpacing:"0.04em"}},"HIDE = ON hides it from admins (master keeps access)")
         ),
         React.createElement("button",{onClick:()=>saveMFlag("wk",!mFlags.wk),style:{background:!mFlags.wk?"#fff":"#222",color:!mFlags.wk?"#000":"#555",border:"1px solid "+(!mFlags.wk?"#fff":"#333"),padding:"6px 18px",fontSize:10,letterSpacing:"0.12em",fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}},!mFlags.wk?"HIDE":"VISIBLE")
       ),
-      isMaster&&React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",background:"#0e0e0e",border:"1px solid "+(mFlags.wkMemHide?"#8cc63e":"#222"),padding:"11px 14px",marginBottom:10}},
+      React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",background:"#0e0e0e",border:"1px solid "+(mFlags.wkMemHide?"#8cc63e":"#222"),padding:"11px 14px",marginBottom:10}},
         React.createElement("div",null,
           React.createElement("div",{style:{fontSize:11,fontWeight:600,letterSpacing:"0.08em",color:"#fff"}},"HIDE WORKOUTS FROM MEMBERS"),
           React.createElement("div",{style:{fontSize:9,color:"#555",marginTop:2,letterSpacing:"0.04em"}},"Hides the Workouts tab from every member. Admins keep access.")
         ),
         React.createElement("button",{onClick:()=>saveMFlag("wkMemHide",!mFlags.wkMemHide),style:{background:mFlags.wkMemHide?"#fff":"#222",color:mFlags.wkMemHide?"#000":"#555",border:"1px solid "+(mFlags.wkMemHide?"#fff":"#333"),padding:"6px 18px",fontSize:10,letterSpacing:"0.12em",fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}},mFlags.wkMemHide?"HIDE":"VISIBLE")
       ),
-      isMaster&&React.createElement("div",{style:{background:"#0e0e0e",border:"1px solid #222",padding:"11px 14px",marginBottom:10}},
+      React.createElement("div",{style:{background:"#0e0e0e",border:"1px solid #222",padding:"11px 14px",marginBottom:10}},
         React.createElement("div",{onClick:()=>setShowWkAdmins(v=>!v),style:{display:"flex",alignItems:"center",justifyContent:"space-between",cursor:"pointer",userSelect:"none"}},
           React.createElement("div",{style:{fontSize:11,fontWeight:600,letterSpacing:"0.08em",color:"#fff"}},"WHO CAN CREATE WORKOUTS"),
           React.createElement("span",{style:{fontSize:11,color:"#8cc63e",transform:showWkAdmins?"none":"rotate(-90deg)",transition:"transform .15s"}},"▾")
@@ -1723,27 +1788,30 @@ function AdminView({bookings,setBookings,showToast,isAdmin,isMaster,selfEmail,mF
               })
         )
       ),
-      isMaster&&React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",background:"#0e0e0e",border:"1px solid "+(!mFlags.pasteAI?"#8cc63e":"#222"),padding:"11px 14px",marginBottom:10}},
+      React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",background:"#0e0e0e",border:"1px solid "+(!mFlags.pasteAI?"#8cc63e":"#222"),padding:"11px 14px",marginBottom:10}},
         React.createElement("div",null,
           React.createElement("div",{style:{fontSize:11,fontWeight:600,letterSpacing:"0.08em",color:"#fff"}},"PASTE FROM AI"),
           React.createElement("div",{style:{fontSize:9,color:"#555",marginTop:2,letterSpacing:"0.04em"}},"HIDE = ON hides it from admins (master always has it)")
         ),
         React.createElement("button",{onClick:()=>saveMFlag("pasteAI",!mFlags.pasteAI),style:{background:!mFlags.pasteAI?"#fff":"#222",color:!mFlags.pasteAI?"#000":"#555",border:"1px solid "+(!mFlags.pasteAI?"#fff":"#333"),padding:"6px 18px",fontSize:10,letterSpacing:"0.12em",fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}},!mFlags.pasteAI?"HIDE":"VISIBLE")
       ),
-      isMaster&&React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",background:"#0e0e0e",border:"1px solid "+(!mFlags.welladm?"#8cc63e":"#222"),padding:"11px 14px",marginBottom:10}},
+      React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",background:"#0e0e0e",border:"1px solid "+(!mFlags.welladm?"#8cc63e":"#222"),padding:"11px 14px",marginBottom:10}},
         React.createElement("div",null,
           React.createElement("div",{style:{fontSize:11,fontWeight:600,letterSpacing:"0.08em",color:"#fff"}},"WELLNESS"),
           React.createElement("div",{style:{fontSize:9,color:"#555",marginTop:2,letterSpacing:"0.04em"}},"HIDE = ON hides it from admins")
         ),
         React.createElement("button",{onClick:()=>saveMFlag("welladm",!mFlags.welladm),style:{background:!mFlags.welladm?"#fff":"#222",color:!mFlags.welladm?"#000":"#555",border:"1px solid "+(!mFlags.welladm?"#fff":"#333"),padding:"6px 18px",fontSize:10,letterSpacing:"0.12em",fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}},!mFlags.welladm?"HIDE":"VISIBLE")
       ),
-      isMaster&&React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",background:"#0e0e0e",border:"1px solid "+(mFlags.maint?"#c98a1e":"#222"),padding:"11px 14px",marginBottom:10}},
+      React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",background:"#0e0e0e",border:"1px solid "+(mFlags.maint?"#c98a1e":"#222"),padding:"11px 14px",marginBottom:10}},
         React.createElement("div",null,
           React.createElement("div",{style:{fontSize:11,fontWeight:600,letterSpacing:"0.08em",color:"#fff"}},"MAINTENANCE MODE"),
           React.createElement("div",{style:{fontSize:9,color:"#555",marginTop:2,letterSpacing:"0.04em"}},"ON = members & admins see only the Notice Board")
         ),
         React.createElement("button",{onClick:()=>saveMFlag("maint",!mFlags.maint),style:{background:mFlags.maint?"#c98a1e":"#222",color:mFlags.maint?"#000":"#555",border:"1px solid "+(mFlags.maint?"#c98a1e":"#333"),padding:"6px 18px",fontSize:10,letterSpacing:"0.12em",fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}},mFlags.maint?"ON":"OFF")
-      ),
+      )
+    ),
+    admSeg==="members"&&(!membersLoaded?React.createElement("div",{className:"no-bk"},"LOADING...")
+    :React.createElement(React.Fragment,null,
       React.createElement("div",{className:"adm-stats-row"},
         React.createElement("div",{className:"adm-stat"},React.createElement("div",{className:"adm-stat-num"},visMembers.length),React.createElement("div",{className:"adm-stat-lbl"},"MEMBERS")),
         React.createElement("div",{className:"adm-stat"},React.createElement("div",{className:"adm-stat-num"},bookings.filter(b=>b.date_key>=toDS(new Date())).length),React.createElement("div",{className:"adm-stat-lbl"},"UPCOMING BKS"))
