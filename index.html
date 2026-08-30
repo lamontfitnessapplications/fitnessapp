@@ -517,6 +517,12 @@ function classAddRule(classDow,dk,time){
 function classHideRule(classDow,dk,time){
   return classRulesOn(classDow,dk,"hide").find(r=>r.time===time)||null;
 }
+// A delete is stored as a hide rule carrying del:true. It differs from a hide
+// in one way: the slot disappears from the admin list too, instead of sitting
+// there as a HIDDEN card waiting to be unhidden.
+function classDeleteRule(classDow,dk,time){
+  return classRulesOn(classDow,dk,"hide").find(r=>r.time===time&&r.del===true)||null;
+}
 function classRuleName(classDow,dk,time){
   const r=classAddRule(classDow,dk,time);
   return (r&&r.name)?r.name:"";
@@ -537,7 +543,9 @@ function classAllTimesFor(dk,baseTimes,classLimits,classDow){
     .filter(k=>k.slice(0,dk.length+1)===dk+":")
     .map(k=>k.slice(dk.length+1));
   const rAdd=classRulesOn(classDow,dk,"add").map(r=>r.time);
-  return [...new Set([...(baseTimes||[]),...rAdd,...dateTimes])].sort();
+  return [...new Set([...(baseTimes||[]),...rAdd,...dateTimes])]
+    .filter(t=>!classDeleteRule(classDow,dk,t))
+    .sort();
 }
 const DAYS_FULL=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
 function ruleSpanLabel(r,dow){
@@ -1779,6 +1787,14 @@ function AdminView({bookings,setBookings,showToast,isAdmin,isMaster,selfEmail,mF
     const nm=(newClassName||"").trim();
     if(wdIsSingle(addWeeks,addOngoing)){
       if(!saveClassLimit)return false;
+      // A previous DELETE would otherwise swallow the row we are about to write.
+      if(classDeleteRule(classDow,admDK,time)){
+        const cur=JSON.parse(JSON.stringify(classDow||{}));
+        const k=String(admDOW);const o=cur[k]||{add:[],hide:[]};
+        o.hide=(o.hide||[]).filter(r=>!(r.time===time&&r.del===true));
+        cur[k]=o;
+        if(saveClassDow)await saveClassDow(cur);
+      }
       await saveClassLimit(time,admDK,String(n));
       if(nm&&saveSlotName)await saveSlotName(time,admDK,nm);
       return true;
@@ -1808,6 +1824,30 @@ function AdminView({bookings,setBookings,showToast,isAdmin,isMaster,selfEmail,mF
     const ok=saveClassDow?await saveClassDow(cur):false;
     if(ok)await wdClearBlockingRows(time,"hide");
     return ok;
+  }
+  // DELETE means gone: drop every rule for this weekday+time, clear the per-date
+  // rows going forward, and — for a class that lives in the built-in timetable,
+  // which no database row can remove — write an ongoing delete rule over it.
+  async function wdDeleteClass(time){
+    const inBase=(DEFAULT_SCHEDULE[admDOW]||[]).some(x=>x.t===time);
+    const cur=JSON.parse(JSON.stringify(classDow||{}));
+    const k=String(admDOW);
+    const o=cur[k]||{add:[],hide:[]};
+    const hadRule=((o.add||[]).some(r=>r.time===time)||(o.hide||[]).some(r=>r.time===time));
+    o.add=(o.add||[]).filter(r=>r.time!==time);
+    o.hide=(o.hide||[]).filter(r=>r.time!==time);
+    if(inBase)o.hide.push({time,from:admDK,until:null,del:true});
+    cur[k]=o;
+    let okRule=true;
+    if(inBase||hadRule)okRule=saveClassDow?await saveClassDow(cur):false;
+    let rows=0;
+    for(const dk of wdDates(1,true)){
+      if((classLimits||{})[dk+":"+time]!==undefined){
+        if(deleteClass)await deleteClass(time,dk);
+        rows++;
+      }
+    }
+    return {ok:okRule,rows,inBase,hadRule};
   }
   // Unhiding has to lift the rule too, or the per-date restore lasts one week.
   async function wdUnhide(time){
@@ -2078,8 +2118,9 @@ function AdminView({bookings,setBookings,showToast,isAdmin,isMaster,selfEmail,mF
               React.createElement("button",{
                 onClick:async e=>{
                   e.stopPropagation();
-                  if(!window.confirm("Delete this hidden class permanently?"))return;
-                  await deleteClass(time,admDK);showToast("Class deleted");
+                  if(!window.confirm("Delete "+fmt12(time)+" on "+(DAYS_FULL[admDOW]||"")+"s permanently? It will stop appearing from "+admDK+" onwards. Existing bookings are not cancelled."))return;
+                  const r=await wdDeleteClass(time);
+                  showToast(r.ok?"Class deleted ✓":"Could not delete — try again");
                 },
                 style:{background:"none",border:"1px solid #2a2a2a",borderRadius:0,color:"#555",
                        fontFamily:"'Bebas Neue',sans-serif",fontSize:12,letterSpacing:"0.1em",
