@@ -482,7 +482,11 @@ const MAX_SPOTS=25;
 const WD_TIMES=["05:15","06:15","07:15","09:15","12:00","17:15","18:15","19:15"];
 const SAT_TIMES=["06:30","07:30","08:30","09:30"];
 const DEFAULT_SCHEDULE={1:[{t:"05:00",n:"Mixed Performance"},{t:"06:00",n:"Mixed Performance"},{t:"07:00",n:"Mixed Performance"},{t:"16:00",n:"Mixed Performance"},{t:"17:00",n:"S&C Lower Body"},{t:"18:00",n:"S&C Lower Body"}],2:[{t:"16:00",n:"Teens S&C Upper"},{t:"17:00",n:"Team-Up"},{t:"18:00",n:"Teens/Girls S&C Upper"}],3:[{t:"05:00",n:"S&C Upper"},{t:"06:00",n:"S&C Upper"},{t:"07:00",n:"S&C Upper"},{t:"16:00",n:"S&C Upper"},{t:"17:00",n:"Boxing"},{t:"18:00",n:"S&C Upper"}],4:[{t:"16:00",n:"Teens S&C Lower"},{t:"17:00",n:"Teens/Girls S&C Upper"}],5:[{t:"05:00",n:"Levels"},{t:"06:00",n:"Levels"},{t:"07:00",n:"Levels"},{t:"16:00",n:"Levels"},{t:"17:00",n:"Teens Sports"}],6:[{t:"06:00",n:"Hero WOD"},{t:"07:30",n:"Boxing"},{t:"08:30",n:"Body Pump - Upper"}],0:[]};
-function defaultSlotName(dk,time){const d=new Date(dk+"T00:00:00").getDay();const f=(DEFAULT_SCHEDULE[d]||[]).find(x=>x.t===time);return f?f.n:"";}
+function defaultSlotName(dk,time,classDow){
+  const rn=classDow?classRuleName(classDow,dk,time):"";
+  if(rn)return rn;
+  const d=new Date(dk+"T00:00:00").getDay();const f=(DEFAULT_SCHEDULE[d]||[]).find(x=>x.t===time);return f?f.n:"";
+}
 const WELL_TIMES=["06:00","08:00","10:00","12:00","14:00","16:00","18:00"];
 // Per-date wellness slot overrides live in coaching_notes row __WELL_SLOTS__
 // content = { "<date_key>": { hide:["06:00",...], add:["19:30",...] } }
@@ -490,6 +494,58 @@ function wellTimesFor(dk,wellSlots){
   const o=(wellSlots&&wellSlots[dk])||{};
   const hide=o.hide||[];const add=o.add||[];
   return [...new Set([...WELL_TIMES,...add])].filter(t=>!hide.includes(t)).sort();
+}
+// ── Recurring class rules ─────────────────────────────────────────────────────
+// coaching_notes row __CLASS_DOW__ holds weekday rules:
+//   { "<0-6>": { add:[{time,spots,name?,from,until}], hide:[{time,from,until}] } }
+// until:null means ongoing. A class_limits row is a per-DATE override and always
+// beats a rule, so the order is:
+//   DEFAULT_SCHEDULE -> rule add -> rule hide -> class_limits row (wins).
+function classRuleActive(r,dk){
+  if(!r||!r.time)return false;
+  if(r.from&&dk<r.from)return false;
+  if(r.until&&dk>r.until)return false;
+  return true;
+}
+function classRulesOn(classDow,dk,kind){
+  const dow=new Date(dk+"T00:00:00").getDay();
+  return ((((classDow||{})[dow])||{})[kind]||[]).filter(r=>classRuleActive(r,dk));
+}
+function classAddRule(classDow,dk,time){
+  return classRulesOn(classDow,dk,"add").find(r=>r.time===time)||null;
+}
+function classHideRule(classDow,dk,time){
+  return classRulesOn(classDow,dk,"hide").find(r=>r.time===time)||null;
+}
+function classRuleName(classDow,dk,time){
+  const r=classAddRule(classDow,dk,time);
+  return (r&&r.name)?r.name:"";
+}
+// Capacity for one date+time. 0 means hidden, which is what every caller
+// already treats as "not on today".
+function classSpotsFor(dk,time,classLimits,classDow){
+  const k=dk+":"+time;
+  if(classLimits&&(k in classLimits))return classLimits[k];
+  if(classHideRule(classDow,dk,time))return 0;
+  const a=classAddRule(classDow,dk,time);
+  return (a&&a.spots)?a.spots:MAX_SPOTS;
+}
+// Every time that exists on this date, hidden ones included — admin needs those
+// so it can show a HIDDEN card. Filter by classSpotsFor>0 for the member list.
+function classAllTimesFor(dk,baseTimes,classLimits,classDow){
+  const dateTimes=Object.keys(classLimits||{})
+    .filter(k=>k.slice(0,dk.length+1)===dk+":")
+    .map(k=>k.slice(dk.length+1));
+  const rAdd=classRulesOn(classDow,dk,"add").map(r=>r.time);
+  return [...new Set([...(baseTimes||[]),...rAdd,...dateTimes])].sort();
+}
+const DAYS_FULL=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+function ruleSpanLabel(r,dow){
+  if(!r)return "";
+  const every="Every "+(DAYS_FULL[dow]||"");
+  if(!r.until)return every+" · ongoing";
+  const u=new Date(r.until+"T00:00:00");
+  return every+" · until "+u.getDate()+" "+MONTHS[u.getMonth()];
 }
 // True when a slot (date_key + time) starts less than 24h from now.
 function within24h(dateKey,time){
@@ -1601,7 +1657,7 @@ function MilestoneAdminPanel({milestoneConfig,saveMilestoneConfig,showToast}){
     )
   );
 }
-function AdminView({bookings,setBookings,showToast,isAdmin,isMaster,selfEmail,mFlags,saveMFlag,getMaxSpots,saveClassLimit,deleteClass,cancelClass,restoreClass,classLimits,wellnessEnabled,saveWellnessSetting,classesEnabled,strengthEnabled,saveClassesSetting,saveStrengthSetting,calendarEnabled,saveCalendarSetting,dowNames,saveDowName,slotNames,saveSlotName,wellSlots,saveWellSlots,milestoneConfig,saveMilestoneConfig,admSeg,setAdmSeg}){
+function AdminView({bookings,setBookings,showToast,isAdmin,isMaster,selfEmail,mFlags,saveMFlag,getMaxSpots,saveClassLimit,deleteClass,cancelClass,restoreClass,classLimits,wellnessEnabled,saveWellnessSetting,classesEnabled,strengthEnabled,saveClassesSetting,saveStrengthSetting,calendarEnabled,saveCalendarSetting,dowNames,saveDowName,slotNames,saveSlotName,wellSlots,saveWellSlots,classDow,saveClassDow,milestoneConfig,saveMilestoneConfig,admSeg,setAdmSeg}){
   const [expandedTier,setExpandedTier]=useState(null);
   const [admDate,setAdmDate]=useState(new Date());
   const [expanded,setExpanded]=useState({});
@@ -1621,6 +1677,11 @@ function AdminView({bookings,setBookings,showToast,isAdmin,isMaster,selfEmail,mF
   const [addingClass,setAddingClass]=useState(false);
   const [newClassTime,setNewClassTime]=useState("");
   const [newClassSpots,setNewClassSpots]=useState("16");
+  const [newClassName,setNewClassName]=useState("");
+  const [addWeeks,setAddWeeks]=useState(1);const [addOngoing,setAddOngoing]=useState(false);
+  const [hidingClass,setHidingClass]=useState(null);
+  const [hideWeeks,setHideWeeks]=useState(1);const [hideOngoing,setHideOngoing]=useState(false);
+  const [ruleBusy,setRuleBusy]=useState(false);
   const [editingTime,setEditingTime]=useState(null);
   const [newTimeVal,setNewTimeVal]=useState("");
   const [undoData,setUndoData]=useState(null);
@@ -1656,6 +1717,110 @@ function AdminView({bookings,setBookings,showToast,isAdmin,isMaster,selfEmail,mF
       cur[dk]={...o,add:(o.add||[]).filter(t=>t!==time),hide:(o.hide||[]).filter(t=>t!==time)};
     });
     if(saveWellSlots)saveWellSlots(cur);
+  }
+  // ── Recurring class scope ─────────────────────────────────────────────────
+  function wdIsSingle(weeks,ongoing){return !ongoing&&(!weeks||weeks<=1);}
+  function wdUntilFor(weeks,ongoing){
+    if(ongoing)return null;
+    const n=Math.max(1,parseInt(weeks)||1);
+    return toDS(addDays(admDate,(n-1)*7));
+  }
+  // Same weekday, one week apart. Ongoing has no end, so cap the sweep at a year
+  // — far past any date a member can book.
+  function wdDates(weeks,ongoing){
+    const n=ongoing?52:Math.max(1,parseInt(weeks)||1);
+    const a=[];for(let i=0;i<n;i++)a.push(toDS(addDays(admDate,i*7)));
+    return a;
+  }
+  // A class_limits row beats a rule, so a leftover row would defeat the rule we
+  // just wrote. Clear the ones that would fight it.
+  async function wdClearBlockingRows(time,ruleKind){
+    const dks=wdDates(ruleKind==="add"?addWeeks:hideWeeks,ruleKind==="add"?addOngoing:hideOngoing);
+    for(const dk of dks){
+      const k=dk+":"+time;
+      if(!(k in (classLimits||{})))continue;
+      const v=classLimits[k];
+      if(ruleKind==="add"&&v===0&&deleteClass)await deleteClass(time,dk);
+      if(ruleKind==="hide"&&v>0&&deleteClass)await deleteClass(time,dk);
+    }
+  }
+  function wdBookingsInRange(time,weeks,ongoing){
+    const dks=wdDates(weeks,ongoing);
+    return (bookings||[]).filter(b=>b.time===time&&dks.indexOf(b.date_key)>=0);
+  }
+  function wdCtl(weeks,setWeeks,ongoing,setOngoing){
+    const opts=[{v:1,l:"THIS DATE"},{v:4,l:"4 WEEKS"},{v:8,l:"8 WEEKS"},{v:12,l:"12 WEEKS"}];
+    return React.createElement("div",{style:{display:"flex",gap:5,flexWrap:"wrap",marginBottom:10}},
+      opts.map(o=>{
+        const on=!ongoing&&(weeks||1)===o.v;
+        return React.createElement("button",{key:o.v,onClick:()=>{setOngoing(false);setWeeks(o.v);},
+          style:{background:on?"#16280d":"transparent",color:on?"#8cc63e":"#666",
+                 border:"1px solid "+(on?"#3f6b1e":"#2a2a2a"),borderRadius:0,fontSize:9,
+                 letterSpacing:"0.08em",fontWeight:600,padding:"6px 9px",cursor:"pointer",
+                 fontFamily:"'DM Sans',sans-serif"}},o.l);
+      }),
+      React.createElement("button",{onClick:()=>setOngoing(true),
+        style:{background:ongoing?"#16280d":"transparent",color:ongoing?"#8cc63e":"#666",
+               border:"1px solid "+(ongoing?"#3f6b1e":"#2a2a2a"),borderRadius:0,fontSize:9,
+               letterSpacing:"0.08em",fontWeight:600,padding:"6px 9px",cursor:"pointer",
+               fontFamily:"'DM Sans',sans-serif"}},"ONGOING")
+    );
+  }
+  function wdSpanText(weeks,ongoing){
+    const d=DAYS_FULL[admDOW]||"";
+    if(ongoing)return "Every "+d+" from "+admDateLabel+", ongoing.";
+    const n=Math.max(1,parseInt(weeks)||1);
+    if(n<=1)return "This date only.";
+    return "Every "+d+" for "+n+" weeks, ending "+wdUntilFor(weeks,ongoing)+".";
+  }
+  async function wdAddClass(){
+    const time=newClassTime;if(!time)return false;
+    const n=Math.max(1,parseInt(newClassSpots)||MAX_SPOTS);
+    const nm=(newClassName||"").trim();
+    if(wdIsSingle(addWeeks,addOngoing)){
+      if(!saveClassLimit)return false;
+      await saveClassLimit(time,admDK,String(n));
+      if(nm&&saveSlotName)await saveSlotName(time,admDK,nm);
+      return true;
+    }
+    const cur=JSON.parse(JSON.stringify(classDow||{}));
+    const k=String(admDOW);
+    const o=cur[k]||{add:[],hide:[]};
+    o.add=(o.add||[]).filter(r=>r.time!==time);
+    const rule={time,spots:n,from:admDK,until:wdUntilFor(addWeeks,addOngoing)};
+    if(nm)rule.name=nm;
+    o.add.push(rule);
+    o.hide=(o.hide||[]).filter(r=>r.time!==time);
+    cur[k]=o;
+    const ok=saveClassDow?await saveClassDow(cur):false;
+    if(ok)await wdClearBlockingRows(time,"add");
+    return ok;
+  }
+  async function wdHideClass(time){
+    if(wdIsSingle(hideWeeks,hideOngoing)){await hideClass(time);return true;}
+    const cur=JSON.parse(JSON.stringify(classDow||{}));
+    const k=String(admDOW);
+    const o=cur[k]||{add:[],hide:[]};
+    o.hide=(o.hide||[]).filter(r=>r.time!==time);
+    // The add rule stays: a bounded hide should let the class come back after.
+    o.hide.push({time,from:admDK,until:wdUntilFor(hideWeeks,hideOngoing)});
+    cur[k]=o;
+    const ok=saveClassDow?await saveClassDow(cur):false;
+    if(ok)await wdClearBlockingRows(time,"hide");
+    return ok;
+  }
+  // Unhiding has to lift the rule too, or the per-date restore lasts one week.
+  async function wdUnhide(time){
+    const r=classHideRule(classDow,admDK,time);
+    if(r){
+      const cur=JSON.parse(JSON.stringify(classDow||{}));
+      const k=String(admDOW);const o=cur[k]||{add:[],hide:[]};
+      o.hide=(o.hide||[]).filter(x=>!(x.time===time&&x.from===r.from&&(x.until||null)===(r.until||null)));
+      cur[k]=o;
+      if(saveClassDow)await saveClassDow(cur);
+    }
+    if((classLimits||{})[admDK+":"+time]===0)await unhideClass(time);
+    else showToast("Class restored ✓");
   }
   function scheduleUndoClear(){
     if(undoTimerRef.current)clearTimeout(undoTimerRef.current);
@@ -1721,8 +1886,9 @@ function AdminView({bookings,setBookings,showToast,isAdmin,isMaster,selfEmail,mF
   const visMembers=masterHidden?members.filter(m=>m.email!==ADMIN_EMAIL):members;
   const admDK=toDS(admDate);const admDOW=admDate.getDay();const admIsSat=admDOW===6;
   const standardTimes=(DEFAULT_SCHEDULE[admDOW]||[]).map(x=>x.t);
-  const extraTimes=Object.keys(classLimits||{}).filter(k=>k.startsWith(admDK+':')).map(k=>k.slice(admDK.length+1)).filter(t=>!standardTimes.includes(t));
-  const admTimes=[...standardTimes,...extraTimes].sort();const admVisibleTimes=admTimes.filter(t=>(classLimits[admDK+':'+t]??MAX_SPOTS)>0);
+  const admTimes=classAllTimesFor(admDK,standardTimes,classLimits,classDow);
+  const extraTimes=admTimes.filter(t=>!standardTimes.includes(t));
+  const admVisibleTimes=admTimes.filter(t=>(getMaxSpots?getMaxSpots(t,admDK):MAX_SPOTS)>0);
   const dayBks=bookings.filter(b=>b.date_key===admDK);
   const totalBooked=dayBks.length;const totalSpots=admVisibleTimes.reduce((s,t)=>s+(getMaxSpots?getMaxSpots(t,admDK):MAX_SPOTS),0);
   function changeDay(n){let d=new Date(admDate);d.setDate(d.getDate()+n);if(d.getDay()===0)d.setDate(d.getDate()+n);setAdmDate(d);setExpanded({});}
@@ -1899,12 +2065,12 @@ function AdminView({bookings,setBookings,showToast,isAdmin,isMaster,selfEmail,mF
           return React.createElement("div",{key:time,style:{background:"#141414",border:"1px solid #2a2a2a",borderRadius:0,marginBottom:8,padding:"12px 14px",display:"flex",alignItems:"center",justifyContent:"space-between"}},
             React.createElement("div",null,
               React.createElement("div",{style:{fontFamily:"'Bebas Neue',sans-serif",fontSize:16,color:"#555",letterSpacing:"0.08em"}},fmt12(time)),
-              (slotNames?.[admDK+":"+time]||defaultSlotName(admDK,time)||dowNames?.[admDOW])&&React.createElement("div",{style:{fontSize:7,letterSpacing:"0.1em",color:"#444",fontWeight:600,marginTop:2,fontFamily:"'DM Sans',sans-serif"}},slotNames?.[admDK+":"+time]||defaultSlotName(admDK,time)||dowNames?.[admDOW]),
+              (slotNames?.[admDK+":"+time]||defaultSlotName(admDK,time,classDow)||dowNames?.[admDOW])&&React.createElement("div",{style:{fontSize:7,letterSpacing:"0.1em",color:"#444",fontWeight:600,marginTop:2,fontFamily:"'DM Sans',sans-serif"}},slotNames?.[admDK+":"+time]||defaultSlotName(admDK,time,classDow)||dowNames?.[admDOW]),
               React.createElement("div",{style:{fontSize:8,letterSpacing:"0.15em",color:"#444",fontWeight:600,marginTop:3}},"HIDDEN FROM MEMBERS")
             ),
             React.createElement("div",{style:{display:"flex",gap:8,alignItems:"center"}},
               React.createElement("button",{
-                onClick:async e=>{e.stopPropagation();await unhideClass(time);},
+                onClick:async e=>{e.stopPropagation();await wdUnhide(time);},
                 style:{background:"#0a140c",border:"1px solid #2a4a2e",borderRadius:0,color:"#5a7a60",
                        fontFamily:"'Bebas Neue',sans-serif",fontSize:12,letterSpacing:"0.1em",
                        padding:"7px 14px",cursor:"pointer"}
@@ -1926,7 +2092,8 @@ function AdminView({bookings,setBookings,showToast,isAdmin,isMaster,selfEmail,mF
           React.createElement("div",{className:"adm-class-hdr",onClick:()=>!isEditingThis&&!isEditingTimeThis&&!isEditingNameThis&&setExpanded(p=>({...p,[time]:!p[time]}))},
             React.createElement("div",{style:{display:"flex",flexDirection:"column",minWidth:68}},
                 React.createElement("div",{className:"adm-class-time",style:{minWidth:"unset"}},fmt12(time)),
-                (slotNames?.[admDK+':'+time]||defaultSlotName(admDK,time)||dowNames?.[admDOW])&&React.createElement("div",{style:{fontSize:7,letterSpacing:"0.1em",color:"#555",fontWeight:600,marginTop:2,fontFamily:"'DM Sans',sans-serif"}},slotNames?.[admDK+':'+time]||defaultSlotName(admDK,time)||dowNames?.[admDOW])
+                (slotNames?.[admDK+':'+time]||defaultSlotName(admDK,time,classDow)||dowNames?.[admDOW])&&React.createElement("div",{style:{fontSize:7,letterSpacing:"0.1em",color:"#555",fontWeight:600,marginTop:2,fontFamily:"'DM Sans',sans-serif"}},slotNames?.[admDK+':'+time]||defaultSlotName(admDK,time,classDow)||dowNames?.[admDOW]),
+                (()=>{const r=classAddRule(classDow,admDK,time);return r?React.createElement("div",{style:{fontSize:7,letterSpacing:"0.09em",color:"#3f6b1e",fontWeight:700,marginTop:2,fontFamily:"'DM Sans',sans-serif"}},ruleSpanLabel(r,admDOW).toUpperCase()):null;})()
               ),
             React.createElement("div",{className:"adm-class-mid"},
               React.createElement("div",{className:`adm-class-count${taken>=slotMax?" full":taken>0?" has-bk":""}`},`${taken} / ${slotMax}${taken>=slotMax?" · FULL":""}`),
@@ -1950,12 +2117,13 @@ function AdminView({bookings,setBookings,showToast,isAdmin,isMaster,selfEmail,mF
               },isEditingTimeThis?"✕":"Edit Time"),
               !isEditingThis&&!isEditingTimeThis&&React.createElement("button",{
                 style:{fontSize:9,flexShrink:0,background:"none",border:"none",color:"#8a2515",cursor:"pointer",padding:"4px 2px",letterSpacing:"0.08em",fontFamily:"'DM Sans',sans-serif",fontWeight:600},
-                onClick:async e=>{
+                onClick:e=>{
                   e.stopPropagation();
-                  if(slotBks.length>0){showToast(`${slotBks.length} member${slotBks.length>1?"s":""} booked — remove them first`);return;}
-                  await hideClass(time);
+                  if(hidingClass===time){setHidingClass(null);return;}
+                  setHidingClass(time);setHideWeeks(1);setHideOngoing(false);
+                  setEditingLimit(null);setEditingTime(null);setEditingName(null);
                 }
-              },"Hide"),
+              },hidingClass===time?"✕":"Hide"),
               !isEditingThis&&!isEditingTimeThis&&!isEditingNameThis&&React.createElement("button",{
                 style:{fontSize:9,flexShrink:0,background:"none",border:"none",color:"#4a1008",cursor:"pointer",padding:"4px 2px",letterSpacing:"0.08em",fontFamily:"'DM Sans',sans-serif",fontWeight:600},
                 onClick:async e=>{
@@ -1971,7 +2139,7 @@ function AdminView({bookings,setBookings,showToast,isAdmin,isMaster,selfEmail,mF
           isEditingNameThis&&React.createElement("div",{style:{padding:"12px 14px",borderTop:"1px solid #141414",display:"flex",alignItems:"center",gap:8}},
             React.createElement("div",{style:{fontSize:9,color:"#555",letterSpacing:"0.12em",fontWeight:600,flexShrink:0}},"CLASS NAME"),
             React.createElement("input",{type:"text",value:nameInput,onChange:e=>setNameInput(e.target.value),
-              placeholder:slotNames?.[admDK+":"+time]||defaultSlotName(admDK,time)||dowNames?.[admDOW]||"e.g. POWER HOUR",
+              placeholder:slotNames?.[admDK+":"+time]||defaultSlotName(admDK,time,classDow)||dowNames?.[admDOW]||"e.g. POWER HOUR",
               style:{flex:1,background:"#0e0e0e",border:"1px solid #333",borderRadius:0,padding:"7px 8px",color:"#fff",fontFamily:"'DM Sans',sans-serif",fontSize:14,outline:"none"}
             }),
             React.createElement("button",{
@@ -2020,7 +2188,36 @@ function AdminView({bookings,setBookings,showToast,isAdmin,isMaster,selfEmail,mF
               style:{background:"none",border:"1px solid #333",color:"#666",borderRadius:0,fontFamily:"'Bebas Neue',sans-serif",fontSize:11,letterSpacing:"0.1em",padding:"8px 10px",cursor:"pointer",flexShrink:0}
             },"CANCEL")
           ),
-          isOpen&&!isEditingThis&&!isEditingTimeThis&&React.createElement("div",{className:"adm-members-list"},
+          hidingClass===time&&React.createElement("div",{style:{padding:"12px 14px",borderTop:"1px solid #141414"}},
+            React.createElement("div",{style:{fontSize:9,letterSpacing:"0.12em",color:"#555",fontWeight:600,marginBottom:8}},"HIDE THIS CLASS"),
+            wdCtl(hideWeeks,setHideWeeks,hideOngoing,setHideOngoing),
+            React.createElement("div",{style:{fontSize:10,color:"#777",letterSpacing:"0.03em",lineHeight:1.5,marginBottom:8}},wdSpanText(hideWeeks,hideOngoing)),
+            (()=>{
+              const clash=wdBookingsInRange(time,hideWeeks,hideOngoing);
+              if(!clash.length)return null;
+              const days=[...new Set(clash.map(b=>b.date_key))].sort();
+              return React.createElement("div",{style:{background:"#2a1508",border:"1px solid #6b3f1e",padding:"9px 11px",marginBottom:9}},
+                React.createElement("div",{style:{fontSize:10,color:"#e0a060",fontWeight:700,letterSpacing:"0.06em",marginBottom:3}},
+                  clash.length+" booking"+(clash.length>1?"s":"")+" on "+days.length+" date"+(days.length>1?"s":"")+" in that range"),
+                React.createElement("div",{style:{fontSize:9,color:"#a07850",letterSpacing:"0.03em",lineHeight:1.5}},
+                  days.slice(0,6).join(", ")+(days.length>6?" +"+(days.length-6)+" more":"")+" — hiding will not cancel them, but members lose the class from their list.")
+              );
+            })(),
+            React.createElement("div",{style:{display:"flex",gap:8}},
+              React.createElement("button",{onClick:()=>setHidingClass(null),
+                style:{flex:1,background:"none",border:"1px solid #333",borderRadius:0,padding:"9px",color:"#666",fontSize:10,letterSpacing:"0.1em",cursor:"pointer"}},"CANCEL"),
+              React.createElement("button",{disabled:ruleBusy,
+                onClick:async()=>{
+                  setRuleBusy(true);
+                  const ok=await wdHideClass(time);
+                  setRuleBusy(false);setHidingClass(null);
+                  showToast(ok?"Class hidden ✓":"Could not save");
+                },
+                style:{flex:2,background:"#8a2515",color:"#fff",border:"none",borderRadius:0,padding:"9px",fontFamily:"'Bebas Neue',sans-serif",fontSize:13,letterSpacing:"0.12em",cursor:"pointer"}},
+                ruleBusy?"...":"HIDE CLASS")
+            )
+          ),
+          isOpen&&!isEditingThis&&!isEditingTimeThis&&hidingClass!==time&&React.createElement("div",{className:"adm-members-list"},
             slotBks.length===0?React.createElement("div",{className:"adm-empty"},"NO BOOKINGS")
             :slotBks.map((bk,i)=>React.createElement("div",{key:i,className:"adm-member-row"},
               React.createElement("div",null,React.createElement("div",{className:"adm-member-name"},bk.name),React.createElement("div",{className:"adm-member-email"},bk.email)),
@@ -2031,7 +2228,7 @@ function AdminView({bookings,setBookings,showToast,isAdmin,isMaster,selfEmail,mF
       }),
       admDOW!==0&&React.createElement("div",{style:{marginTop:12}},
         !addingClass
-          ?React.createElement("button",{onClick:()=>{setAddingClass(true);setNewClassTime("");setNewClassSpots("16");},style:{width:"100%",background:"none",border:"1px dashed #2a2a2a",borderRadius:0,padding:"11px",color:"#555",fontSize:10,letterSpacing:"0.14em",cursor:"pointer"}},"+ ADD CLASS")
+          ?React.createElement("button",{onClick:()=>{setAddingClass(true);setNewClassTime("");setNewClassSpots("16");setNewClassName("");setAddWeeks(1);setAddOngoing(false);},style:{width:"100%",background:"none",border:"1px dashed #2a2a2a",borderRadius:0,padding:"11px",color:"#555",fontSize:10,letterSpacing:"0.14em",cursor:"pointer"}},"+ ADD CLASS")
           :React.createElement("div",{style:{background:"#0e0e0e",border:"1px solid #2a2a2a",borderRadius:0,padding:"14px"}},
               React.createElement("div",{style:{fontSize:9,letterSpacing:"0.14em",color:"#555",fontWeight:600,marginBottom:10}},"NEW CLASS · "+admDateLabel.toUpperCase()),
               React.createElement("div",{style:{display:"flex",gap:8,alignItems:"center",marginBottom:10}},
@@ -2046,18 +2243,29 @@ function AdminView({bookings,setBookings,showToast,isAdmin,isMaster,selfEmail,mF
                     style:{width:"100%",background:"#141414",border:"1px solid #2a2a2a",borderRadius:0,color:"#ccc",fontSize:14,padding:"8px",fontFamily:"'DM Sans',sans-serif",textAlign:"center",outline:"none",boxSizing:"border-box"}})
                 )
               ),
+              React.createElement("div",{style:{marginBottom:10}},
+                React.createElement("div",{style:{fontSize:9,color:"#555",letterSpacing:"0.1em",fontWeight:600,marginBottom:4}},"CLASS NAME"),
+                React.createElement("input",{type:"text",value:newClassName,onChange:e=>setNewClassName(e.target.value),
+                  placeholder:defaultSlotName(admDK,newClassTime,classDow)||dowNames?.[admDOW]||"e.g. BOXING",
+                  style:{width:"100%",background:"#141414",border:"1px solid #2a2a2a",borderRadius:0,color:"#ccc",fontSize:14,padding:"8px 10px",fontFamily:"'DM Sans',sans-serif",outline:"none",boxSizing:"border-box"}})
+              ),
+              React.createElement("div",{style:{fontSize:9,color:"#555",letterSpacing:"0.1em",fontWeight:600,marginBottom:6}},"HOW OFTEN"),
+              wdCtl(addWeeks,setAddWeeks,addOngoing,setAddOngoing),
+              React.createElement("div",{style:{fontSize:10,color:"#777",letterSpacing:"0.03em",lineHeight:1.5,marginBottom:10}},wdSpanText(addWeeks,addOngoing)),
               React.createElement("div",{style:{display:"flex",gap:8}},
                 React.createElement("button",{onClick:()=>setAddingClass(false),style:{flex:1,background:"none",border:"1px solid #333",borderRadius:0,padding:"9px",color:"#666",fontSize:10,letterSpacing:"0.1em",cursor:"pointer"}},"CANCEL"),
                 React.createElement("button",{
-                  disabled:!newClassTime,
+                  disabled:!newClassTime||ruleBusy,
                   onClick:async()=>{
                     if(!newClassTime)return;
-                    await saveClassLimit(newClassTime,admDK,newClassSpots||"16");
-                    setAddingClass(false);
-                    showToast("Class added ✓");
+                    setRuleBusy(true);
+                    const ok=await wdAddClass();
+                    setRuleBusy(false);
+                    if(ok)setAddingClass(false);
+                    showToast(ok?"Class added ✓":"Could not save");
                   },
                   style:{flex:2,background:newClassTime?"#fff":"#1a1a1a",color:newClassTime?"#000":"#444",border:"none",borderRadius:0,padding:"9px",fontFamily:"'Bebas Neue',sans-serif",fontSize:13,letterSpacing:"0.12em",cursor:newClassTime?"pointer":"default"}
-                },"SAVE CLASS")
+                },ruleBusy?"...":"SAVE CLASS")
               )
           )
       )
@@ -4999,6 +5207,7 @@ function App(){
   const [calendarEnabled,setCalendarEnabled]=useState(true);
   const [dowNames,setDowNames]=useState({});
   const [wellSlots,setWellSlots]=useState({});
+  const [classDow,setClassDow]=useState({});
   const [repeatWeeks,setRepeatWeeks]=useState(1);
   const [milestoneConfig,setMilestoneConfig]=useState({interval:25,label:"classes completed — keep it up!"});
   const photoRef=useRef(null);
@@ -5088,6 +5297,8 @@ function App(){
       if(dnData&&dnData.length){try{const dn=JSON.parse(dnData[0].content);setDowNames(p=>({...p,...dn}));}catch{}}
       const wsData=await sbGet("coaching_notes","class_name=eq.__WELL_SLOTS__&select=content");
       if(wsData&&wsData.length){try{const ws=JSON.parse(wsData[0].content);if(ws&&typeof ws==="object")setWellSlots(ws);}catch{}}
+      const cdData=await sbGet("coaching_notes","class_name=eq.__CLASS_DOW__&select=content");
+      if(cdData&&cdData.length){try{const cd=JSON.parse(cdData[0].content);if(cd&&typeof cd==="object")setClassDow(cd);}catch{}}
       const mcData=await sbGet("coaching_notes","class_name=eq.__MILESTONE_CONFIG__&select=content");
       if(mcData&&mcData.length){try{const mc=JSON.parse(mcData[0].content);setMilestoneConfig(p=>({...p,...mc}));}catch{}}
       const mfData=await sbGet("coaching_notes","class_name=eq.__MFLAGS__&select=content");
@@ -5203,8 +5414,7 @@ function App(){
   const selDate=addDays(weekStart,selDay);
   const selDK=toDS(selDate);
   const baseTimes=(DEFAULT_SCHEDULE[selDate.getDay()]||[]).map(x=>x.t);
-  const extraTimesBook=Object.keys(classLimits||{}).filter(k=>k.startsWith(selDK+':')).map(k=>k.slice(selDK.length+1)).filter(t=>!baseTimes.includes(t));
-  const times=[...baseTimes,...extraTimesBook].sort().filter(t=>(classLimits[selDK+':'+t]??MAX_SPOTS)>0);
+  const times=classAllTimesFor(selDK,baseTimes,classLimits,classDow).filter(t=>getMaxSpots(t,selDK)>0);
   const weekDates=Array.from({length:6},(_,i)=>addDays(weekStart,i));
   const isThisWeek=toDS(weekStart)===toDS(mondayOf(new Date()));
   const getBksFor=(dk,t)=>bookings.filter(b=>b.date_key===dk&&b.time===t);
@@ -5294,7 +5504,7 @@ function App(){
     setBookings(prev=>[...prev,newBk]);
     const ok=await sbPost("bookings",newBk);
     if(!ok){setBookings(prev=>prev.filter(b=>!(b.email===session.email&&b.date_key===selDK&&b.time===time)));showToast("Booking failed — try again");}
-    else{showToast("Spot reserved ✓");if(calendarEnabled)openAddToCalendar({title:"Soul Fitness "+(slotNames[selDK+":"+time]||defaultSlotName(selDK,time)||getDayClassName(selDK)||sessionType),dateKey:selDK,time,durationMin:60,details:"Booked via the Soul Fitness app."});}
+    else{showToast("Spot reserved ✓");if(calendarEnabled)openAddToCalendar({title:"Soul Fitness "+(slotNames[selDK+":"+time]||defaultSlotName(selDK,time,classDow)||getDayClassName(selDK)||sessionType),dateKey:selDK,time,durationMin:60,details:"Booked via the Soul Fitness app."});}
     setBkBusy(p=>({...p,[lk]:false}));
   }
   // Book the same weekday+time for N consecutive weeks. Skips full/unavailable/limit weeks, reports a summary.
@@ -5329,7 +5539,7 @@ function App(){
     if(n===0)showToast("Those weeks are full — nothing booked");
     else if(skipped.length===0)showToast(`Booked ${n} week${n>1?"s":""} ✓`);
     else showToast(`Booked ${n} of ${weeks} — ${skipped.map(d=>d.getDate()+" "+MONTHS[d.getMonth()]).join(", ")} full`);
-    if(added.length&&calendarEnabled)openAddToCalendar({title:"Soul Fitness "+(slotNames[added[0].date_key+":"+time]||defaultSlotName(added[0].date_key,time)||getDayClassName(added[0].date_key)||sessionType),dateKey:added[0].date_key,time,durationMin:60,recurWeeks:added.length,details:"Booked via the Soul Fitness app."});
+    if(added.length&&calendarEnabled)openAddToCalendar({title:"Soul Fitness "+(slotNames[added[0].date_key+":"+time]||defaultSlotName(added[0].date_key,time,classDow)||getDayClassName(added[0].date_key)||sessionType),dateKey:added[0].date_key,time,durationMin:60,recurWeeks:added.length,details:"Booked via the Soul Fitness app."});
     setBkBusy(p=>({...p,[lk]:false}));
   }
   async function handleCancel(time,dk){
@@ -5344,7 +5554,7 @@ function App(){
     await sbDelete("wellness_bookings",`email=eq.${encodeURIComponent(session.email)}&date_key=eq.${dk}&time=eq.${encodeURIComponent(time)}`);
     showToast("Wellness session cancelled");
   }
-  function getMaxSpots(time,dateKey){const k=`${dateKey}:${time}`;return k in classLimits?classLimits[k]:MAX_SPOTS;}
+  function getMaxSpots(time,dateKey){return classSpotsFor(dateKey,time,classLimits,classDow);}
   async function saveClassLimit(time,dateKey,spots){
     const n=parseInt(spots);if(isNaN(n)||n<1)return;
     const existing=await sbGet("class_limits",`time_slot=eq.${encodeURIComponent(time)}&date_key=eq.${encodeURIComponent(dateKey)}&select=id`);
@@ -5425,6 +5635,24 @@ function App(){
     const existing=await sbGet("coaching_notes","class_name=eq.__WELL_SLOTS__&select=class_name");
     if(existing&&existing.length){await sbPatch("coaching_notes","class_name=eq.__WELL_SLOTS__",{content:JSON.stringify(clean),updated_at:Date.now()});}
     else{await sbPost("coaching_notes",{class_name:"__WELL_SLOTS__",content:JSON.stringify(clean),updated_at:Date.now()});}
+  }
+  async function saveClassDow(next){
+    // next: full rules object keyed by weekday. Prune weekdays with nothing left.
+    const clean={};
+    Object.keys(next||{}).forEach(k=>{
+      const o=next[k]||{};
+      const add=(o.add||[]).filter(r=>r&&r.time);
+      const hide=(o.hide||[]).filter(r=>r&&r.time);
+      if(add.length||hide.length)clean[k]={add,hide};
+    });
+    setClassDow(clean);
+    try{
+      const existing=await sbGet("coaching_notes","class_name=eq.__CLASS_DOW__&select=class_name");
+      const body={content:JSON.stringify(clean),updated_at:Date.now()};
+      if(existing&&existing.length)await sbPatch("coaching_notes","class_name=eq.__CLASS_DOW__",body);
+      else await sbPost("coaching_notes",{class_name:"__CLASS_DOW__",...body});
+      return true;
+    }catch(e){return false;}
   }
   async function saveMilestoneConfig(cfg){
     setMilestoneConfig(cfg);
@@ -5643,7 +5871,7 @@ React.createElement("div",{style:{display:"flex",flexDirection:"column",alignIte
             React.createElement("div",{className:`c-row${userBkd?" cb":""}${past?" cp":""}`,style:{cursor:"pointer"},onClick:()=>setExpandedClass(isExpanded?null:time)},
               React.createElement("div",{style:{display:"flex",flexDirection:"column",flex:"0 0 92px",maxWidth:92,overflow:"hidden"}},
                 React.createElement("div",{className:"c-time",style:{minWidth:"unset"}},fmt12(time)),
-                (slotNames[`${selDK}:${time}`]||defaultSlotName(selDK,time)||getDayClassName(selDK))&&React.createElement("div",{style:{fontSize:7,letterSpacing:"0.12em",color:"#555",fontWeight:600,marginTop:1,fontFamily:"'DM Sans',sans-serif",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis",maxWidth:92}},slotNames[`${selDK}:${time}`]||defaultSlotName(selDK,time)||getDayClassName(selDK))
+                (slotNames[`${selDK}:${time}`]||defaultSlotName(selDK,time,classDow)||getDayClassName(selDK))&&React.createElement("div",{style:{fontSize:7,letterSpacing:"0.12em",color:"#555",fontWeight:600,marginTop:1,fontFamily:"'DM Sans',sans-serif",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis",maxWidth:92}},slotNames[`${selDK}:${time}`]||defaultSlotName(selDK,time,classDow)||getDayClassName(selDK))
               ),
               React.createElement("div",{className:"c-mid"},
                 React.createElement("div",{className:`c-bars${userBkd?" cb-mine":""}`},Array.from({length:maxSp}).map((_,i)=>React.createElement("div",{key:i,className:`c-bar${i<taken?" ct":""}`}))),
@@ -5779,7 +6007,7 @@ React.createElement("div",{style:{display:"flex",flexDirection:"column",alignIte
       effWkSub==="routines"&&showRoutines&&React.createElement(RoutinesView,{session,ttl:wkTitles.rt})
     ),
     effTab==="progress"&&acc("progress")&&React.createElement(ProgressTab,{session,isAdmin,showToast,milestoneConfig,bookings,saveMilestoneConfig,memberData,dowNames}),
-    effTab==="admin"&&React.createElement(AdminView,{bookings,setBookings,showToast,isAdmin,isMaster,selfEmail:session?.email,mFlags,saveMFlag,getMaxSpots,saveClassLimit,deleteClass,cancelClass,restoreClass,classLimits,wellnessEnabled,saveWellnessSetting,classesEnabled,strengthEnabled,saveClassesSetting,saveStrengthSetting,calendarEnabled,saveCalendarSetting,dowNames,saveDowName,slotNames,saveSlotName,wellSlots,saveWellSlots,milestoneConfig,saveMilestoneConfig,admSeg,setAdmSeg}),
+    effTab==="admin"&&React.createElement(AdminView,{bookings,setBookings,showToast,isAdmin,isMaster,selfEmail:session?.email,mFlags,saveMFlag,getMaxSpots,saveClassLimit,deleteClass,cancelClass,restoreClass,classLimits,wellnessEnabled,saveWellnessSetting,classesEnabled,strengthEnabled,saveClassesSetting,saveStrengthSetting,calendarEnabled,saveCalendarSetting,dowNames,saveDowName,slotNames,saveSlotName,wellSlots,saveWellSlots,classDow,saveClassDow,milestoneConfig,saveMilestoneConfig,admSeg,setAdmSeg}),
     ),
     React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"center",gap:8,padding:"5px 0 4px",background:"#080808",marginTop:0}},
       React.createElement("span",{onClick:e=>{const n=e.currentTarget.parentElement.nextElementSibling;if(n&&n.scrollBy)n.scrollBy({left:-160,behavior:"smooth"});},style:{color:"#8cc63e",fontSize:12,lineHeight:1,cursor:"pointer",padding:"3px 8px"}},"‹"),

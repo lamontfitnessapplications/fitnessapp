@@ -163,6 +163,28 @@ const MAX_SPOTS=25;
 const DEFAULT_SCHEDULE={1:[{t:"05:00",n:"Mixed Performance"},{t:"06:00",n:"Mixed Performance"},{t:"07:00",n:"Mixed Performance"},{t:"16:00",n:"Mixed Performance"},{t:"17:00",n:"S&C Lower Body"},{t:"18:00",n:"S&C Lower Body"}],2:[{t:"16:00",n:"Teens S&C Upper"},{t:"17:00",n:"Team-Up"},{t:"18:00",n:"Teens/Girls S&C Upper"}],3:[{t:"05:00",n:"S&C Upper"},{t:"06:00",n:"S&C Upper"},{t:"07:00",n:"S&C Upper"},{t:"16:00",n:"S&C Upper"},{t:"17:00",n:"Boxing"},{t:"18:00",n:"S&C Upper"}],4:[{t:"16:00",n:"Teens S&C Lower"},{t:"17:00",n:"Teens/Girls S&C Upper"}],5:[{t:"05:00",n:"Levels"},{t:"06:00",n:"Levels"},{t:"07:00",n:"Levels"},{t:"16:00",n:"Levels"},{t:"17:00",n:"Teens Sports"}],6:[{t:"06:00",n:"Hero WOD"},{t:"07:30",n:"Boxing"},{t:"08:30",n:"Body Pump - Upper"}],0:[]};
 const DEFAULT_DOW_NAMES={1:"RISE UP",2:"STRENGTH LOWER",3:"ASCEND",4:"STRENGTH UPPER",5:"ELEVATE",6:"SUMMIT",0:""};
 function toDS(d){return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;}
+// ── Recurring class rules (mirrors index.html __CLASS_DOW__) ──────────────────
+// { "<0-6 weekday>": { add:[{time,spots,name?,from,until}], hide:[{time,from,until}] } }
+// A class_limits row for the date always beats a rule.
+function cdActive(r,dk){
+  if(!r||!r.time)return false;
+  if(r.from&&dk<r.from)return false;
+  if(r.until&&dk>r.until)return false;
+  return true;
+}
+function cdRulesOn(classDow,dk,kind){
+  const dow=new Date(dk+"T00:00:00").getDay();
+  return ((((classDow||{})[dow])||{})[kind]||[]).filter(r=>cdActive(r,dk));
+}
+function cdAdd(classDow,dk,time){return cdRulesOn(classDow,dk,"add").find(r=>r.time===time)||null;}
+function cdHide(classDow,dk,time){return cdRulesOn(classDow,dk,"hide").find(r=>r.time===time)||null;}
+// limits here are keyed by time — the kiosk only ever loads one date.
+function cdSpots(dk,time,limits,classDow){
+  if(limits&&(time in limits))return limits[time];
+  if(cdHide(classDow,dk,time))return 0;
+  const a=cdAdd(classDow,dk,time);
+  return (a&&a.spots)?a.spots:MAX_SPOTS;
+}
 function fmt12(t){if(!t)return"";const[h,m]=t.split(":").map(Number);const ampm=h<12?"AM":"PM";const h12=h===0?12:h>12?h-12:h;return`${h12}:${String(m).padStart(2,"0")} ${ampm}`;}
 function addDays(d,n){const r=new Date(d);r.setDate(r.getDate()+n);return r;}
 function isToday(d){const n=new Date();return d.getFullYear()===n.getFullYear()&&d.getMonth()===n.getMonth()&&d.getDate()===n.getDate();}
@@ -174,6 +196,7 @@ function App(){
   const [classLimits,setClassLimits]=useState({});
   const [slotNames,setSlotNames]=useState({});
   const [dowNames,setDowNames]=useState(DEFAULT_DOW_NAMES);
+  const [classDow,setClassDow]=useState({});
   const [loading,setLoading]=useState(true);
   const [expandedSlot,setExpandedSlot]=useState(null);
   const [busy,setBusy]=useState({});
@@ -182,6 +205,9 @@ function App(){
   useEffect(()=>{
     sbGet("coaching_notes","class_name=eq.__DOW_NAMES__&select=content&limit=1").then(rows=>{
       if(rows&&rows[0]){try{const dn=JSON.parse(rows[0].content);setDowNames(p=>({...p,...dn}));}catch{}}
+    });
+    sbGet("coaching_notes","class_name=eq.__CLASS_DOW__&select=content&limit=1").then(rows=>{
+      if(rows&&rows[0]){try{const cd=JSON.parse(rows[0].content);if(cd&&typeof cd==="object")setClassDow(cd);}catch{}}
     });
   },[]);
   const selDK=toDS(selDate);
@@ -209,10 +235,15 @@ function App(){
   useEffect(()=>{const id=setInterval(()=>loadData(),180000);return()=>clearInterval(id);},[loadData]);
   const baseTimes=(DEFAULT_SCHEDULE[dayOfWeek]||[]).map(x=>x.t);
   const bookingTimes=bookings.map(b=>b.time);
-  const allTimes=[...new Set([...baseTimes,...Object.keys(classLimits),...bookingTimes])].sort().filter(t=>(classLimits[t]??MAX_SPOTS)>0);
+  const ruleAdds=cdRulesOn(classDow,selDK,"add").map(r=>r.time);
+  // A hidden class that still has someone booked stays on the list — the desk
+  // has to be able to check those people in.
+  const allTimes=[...new Set([...baseTimes,...ruleAdds,...Object.keys(classLimits),...bookingTimes])]
+    .sort().filter(t=>cdSpots(selDK,t,classLimits,classDow)>0||bookingTimes.indexOf(t)>=0);
   function defaultSlotName(time,dow){const f=(DEFAULT_SCHEDULE[dow]||[]).find(x=>x.t===time);return f?f.n:"";}
   function getClassName(time){
-    return slotNames[time]||defaultSlotName(time,dayOfWeek)||dowNames[dayOfWeek]||"";
+    const r=cdAdd(classDow,selDK,time);
+    return slotNames[time]||(r&&r.name)||defaultSlotName(time,dayOfWeek)||dowNames[dayOfWeek]||"";
   }
   async function toggleCheckIn(bk){
     if(busy[bk.id])return;
@@ -265,7 +296,7 @@ function App(){
             :allTimes.map(time=>{
                 const list=bookings.filter(b=>b.time===time);
                 const taken=list.length;
-                const maxSp=classLimits[time]||MAX_SPOTS;
+                const maxSp=cdSpots(selDK,time,classLimits,classDow)||MAX_SPOTS;
                 const checkedCount=list.filter(b=>b.checked_in).length;
                 const isExpanded=expandedSlot===time;
                 const className=getClassName(time);
