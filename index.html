@@ -1237,6 +1237,7 @@ function MemberProfileOverlay({member,bookings,onClose,currentUserIsAdmin,mfWk,i
       currentUserIsAdmin&&canManageWk&&React.createElement(MemberWorkoutAdmin,{member,memberView:wkMemberView,setMemberView:setWkMemberView,isMaster,mfPasteAI}),
       currentUserIsAdmin&&React.createElement(RoutinesAdmin,{member}),
       currentUserIsAdmin&&React.createElement(MemberPBAdmin,{member}),
+      currentUserIsAdmin&&React.createElement(MemberChallengeAdmin,{member}),
       currentUserIsAdmin&&React.createElement(React.Fragment,null,
         React.createElement("div",{className:"mp-section"},"ADMIN CONTROLS"),
         React.createElement("div",{style:{background:"#0e0e0e",border:"1px solid #222",borderRadius:0,padding:"12px 14px",marginBottom:8}},
@@ -1665,7 +1666,7 @@ function MilestoneAdminPanel({milestoneConfig,saveMilestoneConfig,showToast}){
     )
   );
 }
-function AdminView({bookings,setBookings,showToast,isAdmin,isMaster,selfEmail,mFlags,saveMFlag,getMaxSpots,saveClassLimit,deleteClass,cancelClass,restoreClass,classLimits,wellnessEnabled,saveWellnessSetting,classesEnabled,strengthEnabled,saveClassesSetting,saveStrengthSetting,calendarEnabled,saveCalendarSetting,dowNames,saveDowName,slotNames,saveSlotName,wellSlots,saveWellSlots,classDow,saveClassDow,milestoneConfig,saveMilestoneConfig,admSeg,setAdmSeg}){
+function AdminView({bookings,setBookings,showToast,isAdmin,isMaster,selfEmail,mFlags,saveMFlag,getMaxSpots,saveClassLimit,deleteClass,cancelClass,restoreClass,classLimits,wellnessEnabled,saveWellnessSetting,classesEnabled,strengthEnabled,saveClassesSetting,saveStrengthSetting,calendarEnabled,saveCalendarSetting,dowNames,saveDowName,slotNames,saveSlotName,wellSlots,saveWellSlots,classDow,saveClassDow,milestoneConfig,saveMilestoneConfig,admSeg,setAdmSeg,challengeEnabled,saveChallengeSetting}){
   const [expandedTier,setExpandedTier]=useState(null);
   const [admDate,setAdmDate]=useState(new Date());
   const [expanded,setExpanded]=useState({});
@@ -1952,6 +1953,7 @@ function AdminView({bookings,setBookings,showToast,isAdmin,isMaster,selfEmail,mF
       (isMaster||mFlags.welladm)&&React.createElement("button",{"data-adm":"wellness",className:`adm-seg-btn${admSeg==="wellness"?" aas":""}`,onClick:()=>setAdmSeg("wellness")},"WELLNESS"),
       React.createElement("button",{"data-adm":"sections",className:`adm-seg-btn${admSeg==="sections"?" aas":""}`,onClick:()=>setAdmSeg("sections")},"SECTIONS"),
       React.createElement("button",{"data-adm":"onboarding",className:`adm-seg-btn${admSeg==="onboarding"?" aas":""}`,onClick:()=>setAdmSeg("onboarding")},"ONBOARDING"),
+      React.createElement("button",{"data-adm":"challenge",className:`adm-seg-btn${admSeg==="challenge"?" aas":""}`,onClick:()=>setAdmSeg("challenge")},"CHALLENGE"),
       isMaster&&React.createElement("button",{"data-adm":"functions",className:`adm-seg-btn${admSeg==="functions"?" aas":""}`,onClick:()=>setAdmSeg("functions")},"FUNCTIONS")
     ),
     admSeg==="functions"&&isMaster&&React.createElement(React.Fragment,null,
@@ -2377,12 +2379,14 @@ function AdminView({bookings,setBookings,showToast,isAdmin,isMaster,selfEmail,mF
         );
       })()
     ),
+    admSeg==="challenge"&&React.createElement(ChallengeAdminPanel,{showToast}),
     admSeg==="sections"&&React.createElement(React.Fragment,null,
       React.createElement("div",{style:{fontSize:10,letterSpacing:"0.18em",color:"#555",fontWeight:600,margin:"16px 0 10px"}},"SECTION VISIBILITY"),
       React.createElement("div",{style:{fontSize:11,color:"#666",letterSpacing:"0.04em",lineHeight:1.7,marginBottom:16}},"Turn a section on or off. When a section is off, its tab is hidden from members throughout the app. Admin management for each section stays available here."),
       [
         {key:"classes",title:"HIIT CLASSES",enabled:classesEnabled,save:saveClassesSetting},
         {key:"strength",title:"STRENGTH CLASSES",enabled:strengthEnabled,save:saveStrengthSetting},
+        {key:"challenge",title:"CHALLENGE",enabled:challengeEnabled,save:saveChallengeSetting},
         ...((isMaster||mFlags.welladm)?[{key:"wellness",title:"WELLNESS CLASSES",enabled:wellnessEnabled,save:saveWellnessSetting}]:[])
       ].map(s=>React.createElement("div",{key:s.key,style:{background:"#141414",border:"1px solid #222",borderRadius:0,padding:"12px 16px",marginBottom:8}},
         React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between"}},
@@ -5106,6 +5110,1510 @@ function RoutinesAdmin({member}){
   );
 }
 // ── Routines (member-facing, timed logging) ───────────────────────────────────
+// ── Challenge ──────────────────────────────────────────────────────────────
+// An accountability journey in its own member tab, plus CHALLENGE SETUP in Admin.
+// Storage (coaching_notes): __CHALLENGES__ = every challenge configured, oldest first;
+// __CHLOG__<email> = one record per member, bucketed by challenge start date.
+// On/off: feature_flags.challenge_enabled (defaults OFF).
+// Challenge content — words only, copied verbatim from Team 365's index.html (Sam, 24 Sep 2026: copy the text, not the code).
+// What counts as each movement, shown under CHALLENGE JOURNEY in the challenge details (Sam, 27 Sep 2026:
+// same as Team 365). A saved movement with no description takes its default here by id.
+const CH_MOVE_DESC={
+  cardio:"Running, walking, cycling, swimming, sport or any activity that gets your heart rate up.",
+  strength:"Weights, resistance work, functional training, Pilates, bodyweight or conditioning.",
+  recovery:"Sauna, cold plunge, stretching, mobility, breathwork or other intentional recovery."
+};
+const CH_DEFAULT_MOVEMENT=[
+  {id:"cardio",label:"CARDIO",note:"Minimum 30 minutes",desc:CH_MOVE_DESC.cardio},
+  {id:"strength",label:"STRENGTH",note:"Minimum 30 minutes",desc:CH_MOVE_DESC.strength},
+  {id:"recovery",label:"RECOVERY",note:"Minimum 30 minutes",desc:CH_MOVE_DESC.recovery}
+];
+// Up to six movements. The first three are the challenge's own; more are added by typing a name into the
+// empty row, and a row left without a name isn't kept.
+const CH_MOVE_SLOTS=6;
+function chNewMoveId(list){let n=4;while((list||[]).some(x=>x&&x.id==="move"+n))n++;return "move"+n;}
+// The rows to show in Admin: every movement, then one empty row to add the next, until there are six.
+function chMoveRows(list){const m=list||[];const last=m[m.length-1];const extra=m.length<CH_MOVE_SLOTS&&(!last||String(last.label||"").trim())?1:0;return m.length+extra;}
+// An extra movement only exists while it has a real name: one whose name is blank or just its id ("MOVE4") is dropped.
+function chMoveNamed(x){const l=String(x&&x.label||"").trim();return CH_MOVE_DESC[String(x.id)]!==undefined||(!!l&&l.toUpperCase()!==String(x.id).toUpperCase());}
+// Weekly themes and lines — Soul Fitness's own (Sam, 24 Sep 2026).
+const CH_DEFAULT_THEMES=[
+  "YOUR PURSUIT BEGINS",
+  "BUILD YOUR MOMENTUM",
+  "PUSH BEYOND YOUR COMFORT",
+  "BECOME WHO YOU'RE CAPABLE OF BECOMING"
+];
+const CH_DEFAULT_LINES=[
+  "START WHERE YOU ARE. COMMIT TO THE PROCESS.",
+  "SHOW UP. PUT IN THE WORK. KEEP MOVING.",
+  "CHALLENGE YOURSELF. DISCOVER WHAT YOU'RE CAPABLE OF.",
+  "KEEP GOING. KEEP GROWING. NEVER SETTLE."
+];
+// One question a day. Stored beside each answer (rq), so rewording one later never re-attaches a past answer.
+const CH_DEFAULT_REFLECTIONS=[
+  "What made you decide to start?",
+  "What are you hoping will be different by the end of these 30 days?",
+  "What did you do today that you could have easily put off?",
+  "What did showing up today mean to you?",
+  "What did you have to overcome today?",
+  "What are you learning about your habits?",
+  "What are you proud of after your first week?",
+  "What helps you keep going when motivation isn't there?",
+  "What did you choose today that your future self will thank you for?",
+  "When today wasn't easy, how did you respond?",
+  "What did you notice about yourself today?",
+  "What small choice made a difference today?",
+  "What does consistency look like for you?",
+  "What have you learned about keeping a commitment?",
+  "What do you do when things don't go to plan?",
+  "Where did you show determination today?",
+  "What excuse were you tempted to make today?",
+  "What happened when you chose action over hesitation?",
+  "What are you beginning to do differently?",
+  "What has become easier since Day 1?",
+  "What have the last three weeks shown you about yourself?",
+  "Who are you becoming through the things you repeatedly do?",
+  "What part of your life is changing beyond your training?",
+  "What have you learned from a difficult day?",
+  "What commitment are you starting to make without thinking twice?",
+  "What are you doing now that the person who started Day 1 might not have done?",
+  "What have you discovered you are capable of?",
+  "What do you want to take from these 30 days?",
+  "What do you not want to go back to?",
+  "What does tomorrow look like?"
+];
+// Placeholder text only — never part of an input's value, so never saved as the member's own words.
+const CH_DEFAULT_WIN_EG=[
+  "I actually started.",
+  "I got up when my alarm went off.",
+  "I did my training even though I didn't feel like it.",
+  "I followed through on what I committed to.",
+  "I pushed through a difficult session.",
+  "I made a better choice when it would have been easier not to.",
+  "I completed my first week.",
+  "I showed up even though I wasn't motivated.",
+  "I did what I said I would do.",
+  "I didn't let a busy day become an excuse.",
+  "I finished something I wanted to quit halfway through.",
+  "I made time for myself today.",
+  "I stayed consistent when nobody was checking.",
+  "I kept my commitment for another week.",
+  "I bounced back after a tough day.",
+  "I kept going when things got difficult.",
+  "I didn't make the excuse I was tempted to make.",
+  "I took action instead of putting it off.",
+  "I made a choice today that I'm proud of.",
+  "I noticed that showing up is starting to feel normal.",
+  "I completed three weeks without giving up.",
+  "I did something today that the old me would have avoided.",
+  "I kept my commitments despite a busy day.",
+  "I turned a difficult day around.",
+  "I followed through without having to think twice.",
+  "I chose what was right for me over what was easiest.",
+  "I did more than I thought I could.",
+  "I can see how much has changed since Day 1.",
+  "I stayed committed right to the end.",
+  "I finished what I started."
+];
+const CH_DEFAULT_REF_EG=[
+  "I'm sick of saying I'll start Monday.",
+  "I want to prove to myself I can stick to something.",
+  "The recovery session. I nearly skipped it.",
+  "That I'm someone who does what he says now.",
+  "Being knackered after work.",
+  "I do better when I go first thing.",
+  "Seven for seven. Haven't done that before.",
+  "Just starting. The first five minutes are the worst.",
+  "Went to bed instead of watching another episode.",
+  "Cut it shorter instead of cancelling it.",
+  "I talk myself out of things before I've even tried.",
+  "Packed my gear the night before.",
+  "Boring, honestly. Same time, same thing.",
+  "It gets easier once you stop debating it.",
+  "I used to give up. Today I just moved it.",
+  "Finished the last set when no one would have known.",
+  "That I'd earned a day off.",
+  "It took half as long as I'd been dreading.",
+  "I don't negotiate with myself in the morning.",
+  "Getting started. That was always the hard part.",
+  "I'm more stubborn than I thought.",
+  "Someone my kids see training.",
+  "I'm sleeping properly and I'm less short with people.",
+  "A bad day doesn't have to become a bad week.",
+  "Walking after dinner. It just happens now.",
+  "Trained on a day I felt rubbish.",
+  "More than I give myself credit for.",
+  "The early mornings. They set the whole day up.",
+  "Starting again every Monday.",
+  "Same as today."
+];
+const CH_FALLBACK_Q="What did today teach you?";
+const CH_Q={
+  consistency:"How well did I follow through on my commitments today?",
+  determination:"How determined was I to achieve today's goals?",
+  win:"What's my biggest win today?"
+};
+const CH_CONSISTENCY=[
+  {id:"short",label:"Made a start, but there's more to do"},
+  {id:"adapted",label:"It was challenging, but I stayed consistent"},
+  {id:"did",label:"I was consistent and followed through completely"}
+];
+const CH_DETERMINATION=[
+  {id:"push",label:"I made progress, even when it was difficult"},
+  {id:"on",label:"It was challenging, but I stayed determined"},
+  {id:"strong",label:"I was fully determined and achieved what I set out to do"}
+];
+// Nutrition and hydration: three options each, in pattern order (Sam, 24 Sep 2026). Observations, never scored.
+// The ids are shared, so the strips and totals read both the same way.
+const CH_INTAKE_N=[
+  {id:"low",label:"Made some good choices"},
+  {id:"on",label:"Stayed on track"},
+  {id:"strong",label:"Strong nutrition today"}
+];
+const CH_INTAKE_H=[
+  {id:"low",label:"Got some good hydration in"},
+  {id:"on",label:"Kept my fluids up"},
+  {id:"strong",label:"Hydrated and feeling strong"}
+];
+const CH_INTAKE=CH_INTAKE_N;
+// {N} is replaced with the challenge's length when shown.
+const CH_CLOSING="{N} DAYS COMPLETE";
+const CH_CLOSING_SUB="THIS IS JUST THE BEGINNING.";
+// The target each intake is measured against, in small type beside its heading (Sam, 27 Sep 2026: same as Team 365).
+const CH_INTAKE_N_NOTE="Your daily nutrition target";
+const CH_INTAKE_H_NOTE="3L of water daily";
+// The INTAKE words are config, editable in Admin: each one's heading, the note beside it and its three options.
+// The ids (low/on/strong) never change, so rewording never changes what a saved day means.
+const CH_DEFAULT_INTAKE={
+  n:{label:"NUTRITION",note:CH_INTAKE_N_NOTE,opts:CH_INTAKE_N.map(o=>o.label)},
+  h:{label:"HYDRATION",note:CH_INTAKE_H_NOTE,opts:CH_INTAKE_H.map(o=>o.label)}
+};
+const CH_INTAKE_IDS=["low","on","strong"];
+// What members see: a blank word falls back to the original, field by field.
+function chIntakeOf(cfg,k){
+  const d=CH_DEFAULT_INTAKE[k];
+  const x=cfg&&cfg.intake&&typeof cfg.intake==="object"&&cfg.intake[k]&&typeof cfg.intake[k]==="object"?cfg.intake[k]:{};
+  const opts=Array.isArray(x.opts)?x.opts:[];
+  return {label:String(x.label||"").trim()||d.label,note:x.note!=null?String(x.note):d.note,
+    opts:CH_INTAKE_IDS.map((id,i)=>({id,label:String(opts[i]||"").trim()||d.opts[i]}))};
+}
+// The Admin boxes hold exactly what has been typed, spaces included; a box never set shows the original.
+function chIntakeRaw(cfg,k){
+  const d=CH_DEFAULT_INTAKE[k];
+  const x=cfg&&cfg.intake&&typeof cfg.intake==="object"&&cfg.intake[k]&&typeof cfg.intake[k]==="object"?cfg.intake[k]:null;
+  const o=x&&Array.isArray(x.opts)?x.opts:null;
+  return {label:x&&x.label!=null?String(x.label):d.label,note:x&&x.note!=null?String(x.note):d.note,opts:d.opts.map((y,i)=>o&&o[i]!=null?String(o[i]):y)};
+}
+
+// ── The challenge details: a button above the day box that starts closed (Sam, 27 Sep 2026: Soul's own words).
+// "{N}" is the challenge length. Clearing the button name hides it.
+const CH_ABOUT_TITLE="THE {N} DAY CHALLENGE DETAILS";
+const CH_DEFAULT_ABOUT={
+  title:["SOUL FOR {N}","THE {N}-DAY CHALLENGE","{N} DAYS. ONE COMMITMENT. MAKE THEM COUNT."],
+  details:"For the next {N} days, the focus is on you. Your choices. Your commitment. Your consistency. Your determination.",
+  sections:[
+    {h:"NOURISHMENT JOURNEY",t:"Record how your nutrition and hydration went each day. No scores, just an honest look at your day."},
+    {h:"CHALLENGE JOURNEY",t:"Complete any 2 of 3: cardio, strength and recovery. At least 30 minutes each.",move:true},
+    {h:"CONSISTENCY & DETERMINATION",t:"Choose the answer that best reflects how your day really went."},
+    {h:"BIGGEST WIN & REFLECTION",t:"Write down your biggest win and answer the day's reflection question. One line is enough."},
+    {h:"EACH WEEK",t:"A new theme and a line to carry with you through the week."},
+    {h:"MISSED A DAY?",t:"Tap the day on your grid and fill it in. You can go back to any day up to today, plus one week after the challenge ends."},
+    {h:"THIS IS JUST THE BEGINNING",t:"Look back at what you chose to do with your {N} days. Your commitment. Your consistency. Your determination. Your wins. Your words."}
+  ],
+  closing:["SOUL FOR {N}","SHOW UP. PUT IN THE WORK. KEEP MOVING.","WITH SOUL FITNESS."]
+};
+function chAboutTitleOf(cfg){return cfg&&typeof cfg.aboutTitle==="string"?cfg.aboutTitle:CH_ABOUT_TITLE;}
+// The details in parts, whatever shape they were saved in. A plain string (an older build) is split back into
+// parts: capitals-only blocks are the title and the closing, a block with no heading is the details, the rest
+// heading + text. The CHALLENGE JOURNEY section lists the movements under it.
+function chAboutOf(cfg){
+  const a=cfg&&cfg.about;
+  const clean=o=>({title:(Array.isArray(o.title)?o.title:[]).map(x=>String(x==null?"":x)).concat(["","",""]).slice(0,3),
+    details:String(o.details==null?"":o.details),
+    sections:(Array.isArray(o.sections)?o.sections:[]).filter(x=>x&&typeof x==="object").map(x=>({h:String(x.h==null?"":x.h),t:String(x.t==null?"":x.t),move:x.move===true})),
+    closing:(Array.isArray(o.closing)?o.closing:[]).map(x=>String(x==null?"":x))});
+  const flag=o=>{if(!o.sections.some(x=>x.move)){const i=o.sections.findIndex(x=>/^(CHALLENGE|COMMITMENT) JOURNEY$/.test(x.h.trim().toUpperCase()));if(i>=0)o.sections[i].move=true;}return o;};
+  if(a&&typeof a==="object"&&!Array.isArray(a))return flag(clean(a));
+  if(typeof a!=="string")return flag(clean(CH_DEFAULT_ABOUT));
+  const caps=t=>!!t&&t===t.toUpperCase();
+  const blocks=a.split(/\n\s*\n/).map(b=>b.split("\n").map(l=>l.trim()).filter(Boolean)).filter(b=>b.length);
+  const o={title:[],details:"",sections:[],closing:[]};
+  blocks.forEach((b,i)=>{
+    if(b.every(caps)){if(i===0&&!o.title.length)o.title=b.slice(0,3);else o.closing=b;return;}
+    let k=0;while(k<b.length&&caps(b[k]))k++;
+    if(k===0&&!o.details)o.details=b.join(" ");
+    else o.sections.push({h:b.slice(0,k).join(" "),t:b.slice(k).join(" ")});
+  });
+  return flag(clean(o));
+}
+function chAboutEmpty(o){return !o.title.some(x=>x.trim())&&!o.details.trim()&&!o.sections.some(x=>x.h.trim()||x.t.trim())&&!o.closing.some(x=>x.trim());}
+
+// ── The weekly challenge: one a week, alongside the days. Config on the challenge (`weekly`), the member's
+// ticks on their record (`weekly`, keyed by week number). Soul members type what they did by default
+// (Sam, 27 Sep 2026: typing is the only option — there is no workout picker). The value is a time.
+const CH_WEEKLY_TITLE="WEEKLY CHALLENGE";
+const CH_WEEKLY_TEXT="Complete one weekly challenge of your choice and record your time.";
+const CH_WEEKLY_HOW="Each week, write what you did, add your time and tick the box.";
+function chWeeklyOf(cfg){
+  const w=cfg&&cfg.weekly&&typeof cfg.weekly==="object"&&!Array.isArray(cfg.weekly)?cfg.weekly:{};
+  return {on:w.on!==false,
+    // Members always type what they did; a `pick` saved by an earlier build is ignored.
+    pick:false,
+    title:String(w.title||"").trim()||CH_WEEKLY_TITLE,
+    // WHAT TO DO. Left blank, it stays blank; only a challenge that has never had one gets the default.
+    text:w.text!=null?String(w.text):CH_WEEKLY_TEXT,
+    // The line under the name in the challenge details. Blank leaves the weekly part out of them.
+    how:w.how!=null?String(w.how):CH_WEEKLY_HOW};
+}
+// The Admin editor's copy: the name exactly as typed (a trimmed read-back used to eat the space in
+// "TIMED CHALLENGE"). Every writer carries every field, so editing one part never resets another.
+function chWeeklyRaw(cfg){const x=chWeeklyOf(cfg);const w=cfg&&cfg.weekly&&typeof cfg.weekly==="object"&&!Array.isArray(cfg.weekly)?cfg.weekly:{};return {...x,title:w.title!=null?String(w.title):x.title};}
+// The weeks follow the themes: four weeks for 30 days, the last one running to the end (days 22–30).
+function chWeekCount(cfg){const n=Math.max(1,(cfg.themes||[]).length);return Math.max(1,Math.min(n,Math.ceil((cfg.days||1)/7)));}
+function chWeekOfDay(cfg,day){return Math.min(chWeekCount(cfg),Math.max(1,Math.ceil(day/7)));}
+function chWeekRange(cfg,w){const n=chWeekCount(cfg);const a=(w-1)*7+1;return [a,w===n?cfg.days:Math.min(cfg.days,w*7)];}
+// Times are minutes and seconds, "MM:SS". Digits are typed and the ":" goes in by itself: 842 -> 8:42, then 08:42 once saved.
+function chMinsTyping(v){const d=String(v||"").replace(/\D/g,"").slice(0,4);return d.length>2?d.slice(0,-2)+":"+d.slice(-2):d;}
+function chMinsFmt(v){
+  const t=String(v||"").trim();if(!t)return "";
+  let m,s2;
+  if(t.indexOf(":")>=0){const p=t.split(":");m=p[0].replace(/\D/g,"");s2=(p[1]||"").replace(/\D/g,"");}
+  else{const d=t.replace(/\D/g,"");if(!d)return "";if(d.length<=2){m=d;s2="0";}else{m=d.slice(0,-2);s2=d.slice(-2);}}
+  const pad=x=>{x=String(parseInt(x||"0",10)||0);return x.length<2?"0"+x:x;};
+  return pad(m)+":"+pad(s2).slice(-2);
+}
+function chWeeklyLog(b){return b&&b.weekly&&typeof b.weekly==="object"&&!Array.isArray(b.weekly)?b.weekly:{};}
+function chWeeklyDone(b){const o=chWeeklyLog(b);return Object.keys(o).filter(k=>o[k]&&o[k].done).length;}
+
+const CH_E=React.createElement;
+const CH_GRACE=7;
+const CH_C={card:"#141414",deep:"#0e0e0e",panel:"#0d0d0d",line:"#222",line2:"#2a2a2a",rule:"#1c1c1c",text:"#fff",mid:"#aaa",dim:"#777",faint:"#555",ghost:"#333",acc:"#8cc63e",accB:"#3f6b1e",accF:"#16280d",accL:"#b5dc80",err:"#e06040"};
+// Three clearly different greens, one per intake option — dark, mid and light, each well apart from
+// the others and from an empty day (Sam asked for more distinction, 24 Sep 2026). A pattern, never a grade.
+const CH_TONES=["#364a1b","#62892d","#b0e26e"];
+const CH_DOW=["SUN","MON","TUE","WED","THU","FRI","SAT"];
+const CH_MON=["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
+const CH_DOW_FULL=["SUNDAY","MONDAY","TUESDAY","WEDNESDAY","THURSDAY","FRIDAY","SATURDAY"];
+const CH_MON_FULL=["JANUARY","FEBRUARY","MARCH","APRIL","MAY","JUNE","JULY","AUGUST","SEPTEMBER","OCTOBER","NOVEMBER","DECEMBER"];
+const CH_DEFAULT_CFG={name:"30 DAY CHALLENGE",start:"",days:30,movement:CH_DEFAULT_MOVEMENT,movementRequired:2,themes:CH_DEFAULT_THEMES,lines:CH_DEFAULT_LINES,reflections:CH_DEFAULT_REFLECTIONS,winExamples:CH_DEFAULT_WIN_EG,refExamples:CH_DEFAULT_REF_EG,qConsistency:CH_Q.consistency,qDetermination:CH_Q.determination,qWin:CH_Q.win,closing:CH_CLOSING,closingSub:CH_CLOSING_SUB,members:[]};
+
+// ── dates: every date is a YYYY-MM-DD string anchored at midday, so a DST shift cannot move a day boundary
+function chParse(ds){return new Date(ds+"T12:00:00");}
+function chAddDays(ds,n){const d=chParse(ds);d.setDate(d.getDate()+n);return toDS(d);}
+function chToday(){return toDS(new Date());}
+function chDayNum(start,today){return Math.round((chParse(today)-chParse(start))/86400000)+1;}
+function chFmtDay(ds){const d=chParse(ds);return CH_DOW[d.getDay()]+" "+d.getDate()+" "+CH_MON[d.getMonth()];}
+function chFmtLong(ds){const d=chParse(ds);return CH_DOW_FULL[d.getDay()]+" "+d.getDate()+" "+CH_MON_FULL[d.getMonth()];}
+function chFmtRange(a,b){const x=chParse(a),y=chParse(b);return x.getDate()+" "+CH_MON[x.getMonth()]+(x.getFullYear()!==y.getFullYear()?" "+x.getFullYear():"")+" – "+y.getDate()+" "+CH_MON[y.getMonth()]+" "+y.getFullYear();}
+function chEndDS(cfg){return chAddDays(cfg.start,Math.max(1,parseInt(cfg.days,10)||1)-1);}
+function chNextDS(list){let last=null;(list||[]).forEach(c=>{if(c&&c.start){const e=chEndDS(c);if(!last||e>last)last=e;}});return last?chAddDays(last,1):null;}
+
+// ── config: a saved challenge uses its own content; the code defaults only ever fill a hole
+function chCfgFrom(raw){
+  let o=raw;if(typeof o==="string"){try{o=JSON.parse(o);}catch{o=null;}}
+  if(!o||typeof o!=="object"||Array.isArray(o))o={};
+  const list=(v,d)=>Array.isArray(v)&&v.length?v.map(x=>String(x==null?"":x)):d.slice();
+  const str=(v,d)=>typeof v==="string"&&v.trim()?v:d;
+  const mv=Array.isArray(o.movement)?o.movement.filter(m=>m&&m.id&&chMoveNamed(m)).slice(0,CH_MOVE_SLOTS).map(m=>({id:String(m.id),label:String(String(m.label||"").trim()?m.label:m.id).toUpperCase(),note:m.note?String(m.note):"",desc:m.desc!=null?String(m.desc):(CH_MOVE_DESC[String(m.id)]||"")})):[];
+  const movement=mv.length?mv:CH_DEFAULT_MOVEMENT.map(m=>({...m}));
+  let req=parseInt(o.movementRequired,10);if(!(req>=1))req=Math.min(2,movement.length);if(req>movement.length)req=movement.length;
+  let days=parseInt(o.days,10);if(!(days>=1))days=30;if(days>366)days=366;
+  return {id:o.id?String(o.id):"",name:str(o.name,CH_DEFAULT_CFG.name),start:typeof o.start==="string"&&/^\d{4}-\d{2}-\d{2}$/.test(o.start)?o.start:"",days,movement,movementRequired:req,
+    themes:list(o.themes,CH_DEFAULT_THEMES),lines:list(o.lines,CH_DEFAULT_LINES),reflections:list(o.reflections,CH_DEFAULT_REFLECTIONS),winExamples:list(o.winExamples,CH_DEFAULT_WIN_EG),refExamples:list(o.refExamples,CH_DEFAULT_REF_EG),
+    qConsistency:str(o.qConsistency,CH_Q.consistency),qDetermination:str(o.qDetermination,CH_Q.determination),qWin:str(o.qWin,CH_Q.win),closing:str(o.closing,CH_CLOSING),closingSub:str(o.closingSub,CH_CLOSING_SUB),
+    tagline:typeof o.tagline==="string"?o.tagline:"",
+    // Kept exactly as stored; the helpers (chAboutOf, chIntakeOf, chWeeklyOf) fill in anything missing.
+    subtitle:typeof o.subtitle==="string"?o.subtitle:"",
+    aboutTitle:typeof o.aboutTitle==="string"?o.aboutTitle:undefined,
+    about:o.about!=null&&(typeof o.about==="string"||(typeof o.about==="object"&&!Array.isArray(o.about)))?o.about:undefined,
+    intake:o.intake&&typeof o.intake==="object"&&!Array.isArray(o.intake)?o.intake:undefined,
+    weekly:o.weekly&&typeof o.weekly==="object"&&!Array.isArray(o.weekly)?o.weekly:undefined,
+    members:Array.isArray(o.members)?o.members.map(e=>String(e).toLowerCase()):null};
+}
+function chCfgStore(c){return {id:c.id,name:c.name,start:c.start,days:c.days,movement:c.movement,movementRequired:c.movementRequired,themes:c.themes,lines:c.lines,reflections:c.reflections,winExamples:c.winExamples,refExamples:c.refExamples,qConsistency:c.qConsistency,qDetermination:c.qDetermination,qWin:c.qWin,closing:c.closing,closingSub:c.closingSub,tagline:c.tagline||"",members:c.members,
+  ...(c.subtitle?{subtitle:c.subtitle}:{}),...(c.aboutTitle!==undefined?{aboutTitle:c.aboutTitle}:{}),...(c.about!==undefined?{about:c.about}:{}),
+  ...(c.intake!==undefined?{intake:c.intake}:{}),...(c.weekly!==undefined?{weekly:c.weekly}:{})};}
+// A list that exists is the answer, even when it is empty. Returns null when the stored value is not a list at all.
+function chListFrom(content){
+  let a=[];
+  if(typeof content==="string"){try{const p=JSON.parse(content);if(!Array.isArray(p))return null;a=p;}catch{return null;}}
+  return a.map(chCfgFrom).filter(c=>c.start).map(c=>({...c,id:c.id||("ch_"+c.start)})).sort((x,y)=>x.start<y.start?-1:x.start>y.start?1:0);
+}
+function chEnrolled(cfg,email){if(!cfg)return false;if(cfg.members===null)return true;return cfg.members.includes(String(email||"").toLowerCase());}
+// The challenge running today; else the next one due; else the most recent finished one.
+function chActive(list,today){
+  const L=(list||[]).filter(c=>c&&c.start);
+  const run=L.filter(c=>c.start<=today&&today<=chEndDS(c));if(run.length)return run[run.length-1];
+  const up=L.filter(c=>c.start>today).sort((a,b)=>a.start<b.start?-1:1);if(up.length)return up[0];
+  const done=L.filter(c=>chEndDS(c)<today).sort((a,b)=>chEndDS(a)<chEndDS(b)?1:-1);return done[0]||null;
+}
+function chThemeIdx(day,n){if(!n)return 0;return Math.max(0,Math.min(n-1,Math.floor((day-1)/7)));}
+function chThemeOf(cfg,day){return cfg.themes[chThemeIdx(day,cfg.themes.length)]||"";}
+function chLineOf(cfg,day){const l=cfg.lines&&cfg.lines.length?cfg.lines:CH_DEFAULT_LINES;return l[chThemeIdx(day,l.length)]||"";}
+function chQuestionOf(cfg,day){return cfg.reflections[day-1]||CH_FALLBACK_Q;}
+
+// ── member record: one per member, bucketed by challenge start date
+function chEntriesOf(b){return b&&b.entries&&typeof b.entries==="object"?b.entries:{};}
+function chHasEntries(b){return Object.keys(chEntriesOf(b)).length>0;}
+function chMergeBucket(b,cfg){return {...(b&&typeof b==="object"?b:{}),name:cfg.name,days:cfg.days,movement:cfg.movement,movementRequired:cfg.movementRequired,entries:{...chEntriesOf(b)}};}
+// Which setup to show a member's record with. Members only ever see challenges still on the studio's list,
+// so the challenge's CURRENT setup always wins (name, length, movement) — a record's stamped copy is only a
+// fallback. (Sam, 25 Sep 2026: after a remove + re-create on the same date, members saw the old name.)
+function chCfgOfBucket(cfg,b){
+  if(cfg)return cfg;
+  const o=chCfgFrom({name:b&&b.name,days:b&&b.days,movement:b&&b.movement,movementRequired:b&&b.movementRequired,start:"2000-01-01"});
+  return o;
+}
+function chState(cfg,b,today){
+  const ms=b&&typeof b.start==="string"&&b.start>cfg.start?b.start:cfg.start;
+  const N=cfg.days;const day=chDayNum(ms,today);
+  const end=chAddDays(ms,N-1);const graceEnd=chAddDays(end,CH_GRACE);
+  const phase=day<1?"upcoming":day<=N?"running":day<=N+CH_GRACE?"grace":"finished";
+  return {memberStart:ms,day,N,end,graceEnd,phase,lastOpen:Math.min(day,N),canEdit:phase==="running"||phase==="grace"};
+}
+function chMoveCount(e,cfg){const c=(e&&e.c)||{};return cfg.movement.filter(m=>c[m.id]===true).length;}
+function chMet(e,cfg){return !!e&&chMoveCount(e,cfg)>=cfg.movementRequired;}
+// Consecutive days with something saved, ending today; while today is still open it counts back from yesterday.
+function chStreak(entries,st){if(st.phase!=="running")return 0;let d=st.day;if(!entries[d])d--;let n=0;while(d>=1&&entries[d]){n++;d--;}return n;}
+function chCountBy(entries,N,key,opts){const out={};opts.forEach(o=>{out[o.id]=0;});for(let d=1;d<=N;d++){const e=entries[d];if(e&&e[key]&&out[e[key]]!=null)out[e[key]]++;}return out;}
+function chMoveTotals(entries,cfg,upto){const out={};cfg.movement.forEach(m=>{out[m.id]=0;});for(let d=1;d<=upto;d++){const c=(entries[d]&&entries[d].c)||{};cfg.movement.forEach(m=>{if(c[m.id]===true)out[m.id]++;});}return out;}
+function chMetDays(entries,cfg,N){let n=0;for(let d=1;d<=N;d++)if(chMet(entries[d],cfg))n++;return n;}
+
+// Which challenges a member sees: those they are in that have not passed their catch-up window (the live one first),
+// then any other challenge still on the studio's list that they have a record in, newest first.
+// Removed-but-kept challenges (the archive) stay in a member's history if they logged anything in them
+// (Sam, 25 Sep 2026: "after a year they might have 3 completed and 1 live").
+function chMemberStarts(list,log,email,today,archive){
+  const em=String(email||"").toLowerCase();
+  const open=c=>chEnrolled(c,em)&&chAddDays(chEndDS(c),CH_GRACE)>=today;
+  const live=chActive(list.filter(open),today);
+  const out=live?[live.start]:[];
+  const onList={};list.forEach(c=>{onList[c.start]=true;});
+  const past=list.filter(c=>(!live||c.start!==live.start)&&(open(c)||chHasEntries(log&&log[c.start])));
+  (archive||[]).forEach(c=>{if(!onList[c.start]&&chHasEntries(log&&log[c.start])&&!past.some(x=>x.start===c.start))past.push(c);});
+  past.sort((a,b)=>a.start<b.start?1:-1).forEach(c=>out.push(c.start));
+  return out;
+}
+
+// ── storage: reads that can tell "no row" from "could not read", and writes that report whether they landed
+async function chRead(key){
+  try{
+    const r=await fetch(`${SB_URL}/rest/v1/coaching_notes?class_name=eq.${encodeURIComponent(key)}&select=content`,{headers:SB_HDR});
+    if(!r.ok)return {ok:false,exists:false,content:null};
+    const j=await r.json();
+    return {ok:true,exists:!!(j&&j.length),content:j&&j.length?j[0].content:null};
+  }catch{return {ok:false,exists:false,content:null};}
+}
+async function chWrite(key,content,exists){
+  try{
+    if(exists){
+      const r=await fetch(`${SB_URL}/rest/v1/coaching_notes?class_name=eq.${encodeURIComponent(key)}`,{method:"PATCH",headers:{...SB_HDR,"Prefer":"return=representation"},body:JSON.stringify({content,updated_at:Date.now()})});
+      if(!r.ok)return false;const j=await r.json().catch(()=>null);return Array.isArray(j)&&j.length>0;
+    }
+    // The new row comes back with the write too, so a write that was quietly refused can't look like a save.
+    const r=await fetch(`${SB_URL}/rest/v1/coaching_notes`,{method:"POST",headers:{...SB_HDR,"Prefer":"return=representation"},body:JSON.stringify({class_name:key,content,updated_at:Date.now()})});
+    if(!r.ok)return false;const j=await r.json().catch(()=>null);return Array.isArray(j)&&j.length>0;
+  }catch{return false;}
+}
+async function chDeleteRow(key){
+  try{
+    const r=await fetch(`${SB_URL}/rest/v1/coaching_notes?class_name=eq.${encodeURIComponent(key)}`,{method:"DELETE",headers:{...SB_HDR,"Prefer":"return=representation"}});
+    if(!r.ok)return false;const j=await r.json().catch(()=>null);return Array.isArray(j)&&j.length>0;
+  }catch{return false;}
+}
+async function chLoadList(){
+  const r=await chRead("__CHALLENGES__");
+  if(!r.ok)return {ok:false,list:[],exists:false};
+  const list=chListFrom(r.content);
+  if(list===null)return {ok:false,list:[],exists:true,corrupt:true};
+  return {ok:true,list,exists:r.exists};
+}
+// Challenges removed from the studio's list but kept for members' history.
+async function chLoadArchive(){
+  const r=await chRead("__CHALLENGES_ARCHIVE__");
+  if(!r.ok)return {ok:false,list:[],exists:false};
+  const list=chListFrom(r.content);
+  if(list===null)return {ok:false,list:[],exists:true,corrupt:true};
+  return {ok:true,list,exists:r.exists};
+}
+function chParseLog(content){if(!content)return {};try{const o=JSON.parse(content);return o&&typeof o==="object"&&!Array.isArray(o)?o:{};}catch{return {};}}
+// Re-read, merge one day in, write back. The entry is keyed by day, so saving twice replaces rather than appends,
+// and the first save's timestamp survives an edit.
+async function chSaveDay(email,cfg,day,data){
+  const key="__CHLOG__"+email;
+  const r=await chRead(key);if(!r.ok)return {ok:false};
+  const log=chParseLog(r.content);
+  const b=chMergeBucket(log[cfg.start],cfg);
+  const prev=b.entries[day];
+  const e={};
+  const c={};cfg.movement.forEach(m=>{if(data.c&&data.c[m.id]===true)c[m.id]=true;});
+  if(Object.keys(c).length)e.c=c;
+  ["n","h","cs","d"].forEach(k=>{if(data[k])e[k]=data[k];});
+  if(data.win&&data.win.trim())e.win=data.win.trim();
+  if(data.ref&&data.ref.trim())e.ref=data.ref.trim();
+  e.rq=data.rq||(prev&&prev.rq)||chQuestionOf(cfg,day);
+  e.ts=prev&&prev.ts?prev.ts:Date.now();
+  if(prev)e.ets=Date.now();
+  b.entries[day]=e;log[cfg.start]=b;
+  const ok=await chWrite(key,JSON.stringify(log),r.exists);
+  return {ok,log};
+}
+// A member's own Day 1, for someone who joined late. Only `start` changes on that one bucket: their entries,
+// the rest of the bucket and every other challenge on the record are left exactly as they were.
+// One week of the weekly challenge: re-read, change that week, write back. Days and other weeks are untouched.
+async function chSaveWeek(email,cfg,w,patch){
+  const key="__CHLOG__"+email;
+  const r=await chRead(key);if(!r.ok)return {ok:false};
+  const log=chParseLog(r.content);
+  const b=chMergeBucket(log[cfg.start],cfg);
+  const cur={...chWeeklyLog(b)};const was=cur[String(w)]||{};
+  cur[String(w)]={...was,...patch,ts:was.ts||Date.now()};
+  b.weekly=cur;log[cfg.start]=b;
+  const ok=await chWrite(key,JSON.stringify(log),r.exists);
+  return {ok,log};
+}
+async function chSaveMemberStart(email,cfg,start){
+  const key="__CHLOG__"+email;
+  const r=await chRead(key);if(!r.ok)return {ok:false};
+  const log=chParseLog(r.content);
+  const prev=log[cfg.start]&&typeof log[cfg.start]==="object"&&!Array.isArray(log[cfg.start])?log[cfg.start]:{};
+  const b={...prev,entries:chEntriesOf(prev)};
+  if(start&&start>cfg.start)b.start=start;else delete b.start;
+  log[cfg.start]=b;
+  const ok=await chWrite(key,JSON.stringify(log),r.exists);
+  return {ok,log};
+}
+// Delete every member's entries for the challenge that starts on `start`. Reads every member record first;
+// a record left empty is deleted outright. Reports how many members were changed and how many failed.
+// Each record is re-read just before it is changed, so a day a member saves meanwhile isn't lost.
+async function chDeleteEntries(start){
+  const rows=[];
+  try{
+    for(let off=0;;off+=500){
+      const r=await fetch(`${SB_URL}/rest/v1/coaching_notes?class_name=like.${encodeURIComponent("__CHLOG__*")}&select=class_name,content&order=class_name.asc&limit=500&offset=${off}`,{headers:SB_HDR});
+      if(!r.ok)return {ok:false,members:0,failed:0};
+      const j=await r.json();
+      if(!Array.isArray(j))return {ok:false,members:0,failed:0};
+      rows.push(...j);
+      if(j.length<500)break;
+    }
+  }catch{return {ok:false,members:0,failed:0};}
+  let members=0,failed=0;
+  for(const row of rows){
+    if(!row||typeof row.class_name!=="string"||row.class_name.indexOf("__CHLOG__")!==0)continue;
+    if(!Object.prototype.hasOwnProperty.call(chParseLog(row.content),start))continue;
+    const cur=await chRead(row.class_name);
+    if(!cur.ok){failed++;continue;}
+    const log=chParseLog(cur.content);
+    if(!Object.prototype.hasOwnProperty.call(log,start)){members++;continue;}
+    delete log[start];
+    const ok=Object.keys(log).length?await chWrite(row.class_name,JSON.stringify(log),true):await chDeleteRow(row.class_name);
+    if(ok)members++;else failed++;
+  }
+  return {ok:failed===0,members,failed};
+}
+async function chSaveFlag(enabled){
+  try{
+    const r=await fetch(`${SB_URL}/rest/v1/feature_flags?id=eq.1`,{method:"PATCH",headers:{...SB_HDR,"Prefer":"return=representation"},body:JSON.stringify({challenge_enabled:enabled===true})});
+    if(!r.ok)return false;const j=await r.json().catch(()=>null);
+    if(!(Array.isArray(j)&&j.length===1&&j[0].challenge_enabled===(enabled===true)))return false;
+  }catch{return false;}
+  // Then read it back: the switch only counts as moved if the saved value is what was asked for.
+  return chFlagIs(enabled);
+}
+async function chFlagIs(enabled){
+  try{
+    const r=await fetch(`${SB_URL}/rest/v1/feature_flags?id=eq.1&select=challenge_enabled`,{headers:SB_HDR});
+    if(!r.ok)return false;const j=await r.json();
+    return Array.isArray(j)&&j.length===1&&j[0].challenge_enabled===(enabled===true);
+  }catch{return false;}
+}
+// Does this member get the CHALLENGE tab (with the switch in SECTIONS on)? Only if the Challenge view would
+// show them something: a challenge they are in, or a past one to look back on — the exact rule the view uses
+// (chMemberStarts), so the tab never opens onto nothing. Admins follow the same rule. Read-only.
+// true / false, or null when something couldn't be read (then the tab shows, as it used to).
+async function chMemberHasTab(email){
+  const em=String(email||"").toLowerCase();
+  const [L,A,r]=await Promise.all([chLoadList(),chLoadArchive(),chRead("__CHLOG__"+email)]);
+  if(!L.ok||!A.ok||!r.ok)return null;
+  return chMemberStarts(L.list,chParseLog(r.content),em,chToday(),A.list).length>0;
+}
+
+// ── Member screens, laid out the way Team 365's Challenge reads (Sam, 24 Sep 2026), in Soul Fitness green.
+const chLbl={fontSize:9,letterSpacing:"0.18em",color:"#666",fontWeight:600};
+const chBtnWhite={width:"100%",background:"#fff",color:"#000",border:"none",borderRadius:0,fontFamily:"'Bebas Neue',sans-serif",fontSize:14,letterSpacing:"0.12em",padding:"11px",cursor:"pointer"};
+const chBtnGhost={background:"none",border:"1px solid #333",color:"#888",fontSize:9,letterSpacing:"0.12em",fontWeight:600,padding:"5px 10px",borderRadius:0,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"};
+// Member buttons: rounded and raised so they read as buttons (Sam, 24 Sep 2026); they press in when tapped.
+const CH_RAD=10;
+(function(){try{if(typeof document==="undefined"||document.getElementById("ch-btn-css"))return;const el=document.createElement("style");el.id="ch-btn-css";
+  el.textContent=".ch-btn{transition:transform .08s,box-shadow .08s,background .15s,border-color .15s;-webkit-tap-highlight-color:transparent}.ch-btn:active{transform:translateY(1px)}";
+  document.head.appendChild(el);}catch(e){}})();
+const chRaised={borderRadius:CH_RAD,boxShadow:"none"};
+const chBtnAcc={width:"100%",background:"#0f160a",color:CH_C.acc,border:"1px solid "+CH_C.accB,...chRaised,fontFamily:"'Bebas Neue',sans-serif",fontSize:14,letterSpacing:"0.16em",padding:"14px",cursor:"pointer"};
+// TODAY'S JOURNAL, the open day's heading and EDIT: one solid green button (dark text, as Soul's green bars have).
+const chBtnJournal={position:"relative",width:"100%",boxSizing:"border-box",display:"flex",alignItems:"center",justifyContent:"center",background:CH_C.acc,color:"#0a0a0a",border:"1px solid "+CH_C.acc,borderRadius:CH_RAD,boxShadow:"none",fontFamily:"'Bebas Neue',sans-serif",fontSize:14,letterSpacing:"0.16em",lineHeight:1.1,padding:"9px 34px",cursor:"pointer",userSelect:"none"};
+const chCard={background:"#141414",border:"1px solid #888",borderRadius:CH_RAD};
+// Headings and box borders stay grey while a challenge runs, and turn green only once it is finished
+// (Sam, 27 Sep 2026 — same as Team 365). Progress marks (the bar, streak, %, ticks) are green throughout.
+function chBox(acc){return {...chCard,border:"1px solid "+(acc?CH_C.acc:"#888")};}
+function chAccHdr(txt,tight,acc){return CH_E("div",{"data-chsection-hdr":txt,style:{fontSize:10,letterSpacing:"0.22em",color:acc?CH_C.acc:"#999",fontWeight:600,margin:tight?"14px 0 10px":"26px 0 12px"}},txt);}
+// The heading is the status: once a section is answered it turns green and takes a tick.
+function ChallengeHead({title,done,right,first,tight}){
+  return CH_E("div",{"data-chhead":title,style:{display:"flex",alignItems:"baseline",justifyContent:"space-between",fontSize:9,letterSpacing:"0.22em",color:done?CH_C.acc:"#777",fontWeight:600,margin:first?"14px 0 11px":tight?"13px 0 9px":"24px 0 11px",paddingTop:first?0:tight?11:18,borderTop:first?"none":"1px solid #141414"}},
+    CH_E("span",null,title+(done?" ✓":"")),
+    right?CH_E("span",{style:{fontSize:9,letterSpacing:"0.12em",color:done?CH_C.acc:"#555"}},right):null);
+}
+// Related questions boxed together, so the day reads as separate questions rather than one long form.
+function ChallengeGroup({title,children,first}){
+  return CH_E("div",{"data-chgroup":title,style:{background:"#0e0e0e",border:"1px solid #888",borderRadius:0,padding:"2px 14px 16px",marginTop:first?0:14}},children);
+}
+function ChallengeBar({pct}){
+  return CH_E("div",{style:{height:9,background:"#2a2a2a",overflow:"hidden"}},CH_E("div",{"data-chpct":pct,style:{height:"100%",width:Math.max(0,Math.min(100,pct))+"%",background:CH_C.acc,transition:"width .3s"}}));
+}
+// Width of the label column, so every movement's note starts in the same place.
+function chLabelW(movement){const n=Math.max(4,...(movement||[]).map(m=>String(m.label||"").length));return Math.min(160,n*8+16);}
+// When any name is too long for a column (over 12 characters), every tick puts its note under its name.
+function chLabelStack(movement){return (movement||[]).some(m=>String(m.label||"").length>12);}
+function ChallengeTick({id,on,label,note,onClick,disabled,labelW,stack}){
+  return CH_E("div",{"data-move":id,"data-on":on?"1":"0",className:disabled?undefined:"ch-btn",onClick:disabled?undefined:onClick,
+    style:{display:"flex",alignItems:"center",gap:12,padding:"12px 13px",background:on?"#131c0d":"#1a1a1a",border:"1px solid "+(on?CH_C.acc:"#444"),...chRaised,...(disabled?{boxShadow:"none"}:{}),marginBottom:8,cursor:disabled?"default":"pointer",opacity:disabled?0.6:1}},
+    CH_E("div",{style:{width:22,height:22,flexShrink:0,borderRadius:6,border:"1px solid "+(on?CH_C.acc:"#555"),background:on?CH_C.accF:"#0e0e0e",color:CH_C.acc,fontSize:12,display:"flex",alignItems:"center",justifyContent:"center"}},on?"✓":""),
+    CH_E("div",{"data-movestack":stack?"1":"0",style:{flex:1,minWidth:0,display:"flex",flexDirection:stack?"column":"row",alignItems:stack?"flex-start":"baseline",gap:stack?2:10}},
+      CH_E("span",{"data-movelabel":"1",style:stack
+        ?{fontFamily:"'Bebas Neue',sans-serif",fontSize:15,letterSpacing:"0.1em",color:on?"#fff":"#bbb",lineHeight:1.2,whiteSpace:"normal",overflowWrap:"break-word",maxWidth:"100%"}
+        :{fontFamily:"'Bebas Neue',sans-serif",fontSize:15,letterSpacing:"0.1em",color:on?"#fff":"#bbb",lineHeight:1.2,width:labelW||90,flexShrink:0,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}},label),
+      note&&CH_E("span",{"data-movenote":"1",style:{fontSize:9,letterSpacing:"0.1em",color:"#777"}},note)));
+}
+// The colour each intake option has in the NOURISHMENT JOURNEY squares, by id.
+const CH_TONE_OF={low:CH_TONES[0],on:CH_TONES[1],strong:CH_TONES[2]};
+// Equal-weight options: same size, same colour — the moment one looks better it becomes a rating.
+// With `tones`, a chosen option takes the colour it has in the NOURISHMENT JOURNEY strip, so what a member taps
+// is what they will see there (the brightest square takes dark text so it can still be read).
+function ChallengeChoice({options,value,onChange,compact,name,tones,disabled}){
+  return CH_E("div",{"data-chchoice":name||""},
+    options.map(o=>{const on=value===o.id;const tone=on&&tones&&tones[o.id];
+      return CH_E("button",{key:o.id,type:"button",className:"ch-btn","data-opt":o.id,disabled,onClick:()=>onChange(on?"":o.id),
+      style:{display:"block",width:"100%",textAlign:"left",background:tone||(on?CH_C.accF:"#1a1a1a"),color:tone?(tone===CH_TONES[2]?"#0a0a0a":"#fff"):on?"#fff":"#ccc",border:"1px solid "+(on?CH_C.acc:"#444"),...chRaised,fontFamily:"'DM Sans',sans-serif",fontSize:compact?11:12,letterSpacing:compact?"0.02em":"0.04em",fontWeight:500,lineHeight:1.35,padding:compact?"11px 10px":"13px 14px",marginBottom:compact?7:8,cursor:disabled?"default":"pointer"}},o.label);}));
+}
+// A run of days in three clearly different strengths of one colour: the shape of a habit, no grade on any of it.
+// The words come from the challenge's own INTAKE setup.
+function ChallengeIntakeStrip({title,k,entries,N,cfg}){
+  const OPTS=chIntakeOf(cfg,k).opts;
+  const tone=v=>{const i=OPTS.findIndex(o=>o.id===v);return i<0?null:CH_TONES[i];};
+  return CH_E("div",{"data-chstrip":k,style:{marginBottom:14}},
+    CH_E("div",{style:{fontSize:9,letterSpacing:"0.18em",color:"#777",fontWeight:600,marginBottom:6}},title),
+    CH_E("div",{style:{display:"flex",gap:2,flexWrap:"wrap"}},
+      Array.from({length:N},(_,i)=>{const e=entries[i+1];const v=e&&e[k];const t=tone(v);
+        return CH_E("div",{key:i,"data-tone":t?OPTS.findIndex(o=>o.id===v):"",title:"Day "+(i+1)+(t?" · "+chOptLabel(OPTS,v):""),style:{flex:"1 1 6px",minWidth:6,height:16,background:t||"#161616",border:"1px solid "+(t?"transparent":"#202020")}});})),
+    // Three equal columns, so the key under NUTRITION and the key under HYDRATION line up square for square.
+    CH_E("div",{"data-chlegend":"1",style:{display:"grid",gridTemplateColumns:"repeat(3,minmax(0,1fr))",gap:"4px 8px",marginTop:6}},
+      OPTS.map((o,i)=>CH_E("div",{key:o.id,"data-chlegend-item":o.id,style:{display:"flex",alignItems:"flex-start",gap:4,minWidth:0}},
+        CH_E("div",{style:{width:8,height:8,flexShrink:0,marginTop:1,background:CH_TONES[i]}}),
+        CH_E("span",{style:{fontSize:8,letterSpacing:"0.06em",color:"#666",lineHeight:1.3}},o.label)))));
+}
+// One movement: its name, a bar across the gap, and what it adds up to. The name column is fixed and wraps,
+// so every bar starts and finishes on the same two lines however long a movement is called.
+function ChallengeCommitRow({label,n,of,last}){
+  const pct=of>0?Math.round(Math.min(n,of)/of*100):0;
+  return CH_E("div",{style:{display:"flex",alignItems:"center",gap:10,padding:"10px 0",borderBottom:last?"none":"1px solid #1e1e1e"}},
+    CH_E("span",{"data-chmovebar-label":"1",style:{fontFamily:"'Bebas Neue',sans-serif",fontSize:14,letterSpacing:"0.1em",color:"#bbb",flexShrink:0,lineHeight:1.1,width:92,overflowWrap:"break-word"}},label),
+    CH_E("div",{style:{flex:1,minWidth:20,height:6,background:"#2a2a2a",overflow:"hidden"}},CH_E("div",{style:{height:"100%",width:pct+"%",background:CH_C.acc}})),
+    CH_E("span",{style:{fontSize:9,letterSpacing:"0.1em",color:CH_C.acc,fontWeight:600,flexShrink:0,whiteSpace:"nowrap",width:100,textAlign:"right"}},n+" OF "+of+" ACHIEVED"));
+}
+function ChallengeMoveRows({cfg,entries,upto,of}){
+  const tot=chMoveTotals(entries,cfg,upto);
+  return CH_E("div",{"data-chmoves":"1"},cfg.movement.map((m,i)=>CH_E(ChallengeCommitRow,{key:m.id,label:m.label,n:tot[m.id]||0,of:of==null?upto:of,last:i===cfg.movement.length-1})));
+}
+function chOptLabel(opts,id){const o=opts.find(x=>x.id===id);return o?o.label:"";}
+// One day of the record, compact: used on the completion screen, for past challenges and in the coach's view.
+function ChallengeDayCard({cfg,day,entry}){
+  if(!entry)return null;
+  const met=chMet(entry,cfg);const c=entry.c||{};
+  const iN=chIntakeOf(cfg,"n"),iH=chIntakeOf(cfg,"h");
+  return CH_E("div",{"data-chdaycard":day,style:{background:"#0e0e0e",border:"1px solid #1a1a1a",padding:"11px 13px",marginBottom:7}},
+    CH_E("div",{style:{display:"flex",alignItems:"baseline",justifyContent:"space-between",gap:8,marginBottom:7}},
+      CH_E("span",{style:{fontFamily:"'Bebas Neue',sans-serif",fontSize:16,letterSpacing:"0.1em",color:"#fff"}},"DAY "+day),
+      CH_E("span",{style:{fontSize:9,letterSpacing:"0.08em",color:CH_C.acc,fontWeight:600,textAlign:"right"}},[chOptLabel(CH_CONSISTENCY,entry.cs),chOptLabel(CH_DETERMINATION,entry.d)].filter(Boolean).join("  ·  "))),
+    CH_E("div",{style:{display:"flex",flexWrap:"wrap",gap:5,marginBottom:8,alignItems:"center"}},
+      cfg.movement.map(m=>CH_E("span",{key:m.id,style:{fontSize:8,letterSpacing:"0.08em",fontWeight:600,padding:"3px 6px",border:"1px solid "+(c[m.id]?CH_C.accB:"#222"),background:c[m.id]?CH_C.accF:"transparent",color:c[m.id]?CH_C.accL:"#444"}},(c[m.id]?"✓ ":"")+m.label)),
+      met&&CH_E("span",{style:{fontSize:8,letterSpacing:"0.12em",fontWeight:700,color:CH_C.acc}},"COMMITMENT MET")),
+    (entry.n||entry.h)&&CH_E("div",{"data-chdaycard-intake":"1",style:{fontSize:9,letterSpacing:"0.06em",color:"#777",marginBottom:8,lineHeight:1.6}},
+      [entry.n?iN.label+" — "+chOptLabel(iN.opts,entry.n):null,entry.h?iH.label+" — "+chOptLabel(iH.opts,entry.h):null].filter(Boolean).join("   ·   ")),
+    (entry.win||"").trim()&&CH_E("div",{style:{fontSize:13,color:"#eee",lineHeight:1.55,marginBottom:(entry.ref||"").trim()?9:0}},entry.win.trim()),
+    (entry.ref||"").trim()&&CH_E(React.Fragment,null,
+      CH_E("div",{style:{fontSize:9,letterSpacing:"0.08em",color:"#666",lineHeight:1.5}},entry.rq||chQuestionOf(cfg,day)),
+      CH_E("div",{style:{fontSize:13,color:"#bbb",lineHeight:1.55,marginTop:3}},entry.ref.trim())));
+}
+// A saved day, mirroring the form: same headings, same order, all ticked, answers in place of the controls.
+function ChallengeDayRead({cfg,day,entry}){
+  const e=entry||{};const c=e.c||{};const big=v=>({fontSize:14,color:v?"#fff":"#555",lineHeight:1.5});
+  return CH_E("div",{"data-chday":day},
+    CH_E(ChallengeGroup,{title:"COMMITMENT",first:true},
+      CH_E(ChallengeHead,{title:"COMMITMENT",done:chMet(e,cfg),right:"ANY "+cfg.movementRequired+" OF "+cfg.movement.length,first:true}),
+      cfg.movement.map(m=>CH_E(ChallengeTick,{key:m.id,id:m.id,on:c[m.id]===true,label:m.label,note:m.note,disabled:true,labelW:chLabelW(cfg.movement),stack:chLabelStack(cfg.movement)}))),
+    CH_E(ChallengeGroup,{title:"FOLLOW THROUGH"},
+      CH_E(ChallengeHead,{title:"FOLLOW THROUGH",done:!!e.cs,first:true}),
+      CH_E("div",{style:{fontSize:13,color:e.cs?"#eee":"#555",lineHeight:1.5}},chOptLabel(CH_CONSISTENCY,e.cs)||"—"),
+      CH_E(ChallengeHead,{title:"DRIVE",done:!!e.d,tight:true}),
+      CH_E("div",{style:{fontSize:13,color:e.d?"#eee":"#555",lineHeight:1.5}},chOptLabel(CH_DETERMINATION,e.d)||"—")),
+    CH_E(ChallengeGroup,{title:"BIGGEST WIN"},
+      CH_E(ChallengeHead,{title:"BIGGEST WIN",done:!!(e.win||"").trim(),first:true}),
+      CH_E("div",{style:big((e.win||"").trim())},(e.win||"").trim()||"—"),
+      CH_E(ChallengeHead,{title:"REFLECTION",done:!!(e.ref||"").trim(),tight:true}),
+      CH_E("div",{style:{fontSize:11,color:"#777",letterSpacing:"0.02em",lineHeight:1.5,marginBottom:5}},e.rq||chQuestionOf(cfg,day)),
+      CH_E("div",{style:big((e.ref||"").trim())},(e.ref||"").trim()||"—")));
+}
+function ChallengeDayForm({cfg,day,entry,saving,onSave,onCancel}){
+  const e=entry||{};
+  const [c,setC]=useState(()=>({...(e.c||{})}));
+  const [n,setN]=useState(e.n||"");const [h,setH]=useState(e.h||"");
+  const [cs,setCs]=useState(e.cs||"");const [d,setD]=useState(e.d||"");
+  const [win,setWin]=useState(e.win||"");const [ref,setRef]=useState(e.ref||"");
+  const rq=e.rq||chQuestionOf(cfg,day);
+  const cnt=cfg.movement.filter(m=>c[m.id]===true).length;
+  const any=cnt>0||n||h||cs||d||win.trim()||ref.trim();
+  const q={fontSize:12,color:"#bbb",letterSpacing:"0.04em",lineHeight:1.6,marginBottom:9};
+  const sub={fontSize:9,letterSpacing:"0.16em",color:"#777",fontWeight:600};
+  // Nutrition above hydration, each heading with its note beside it in smaller type.
+  const intake=(k,val,set,top)=>{const I=chIntakeOf(cfg,k);
+    return CH_E("div",{"data-chintake":k,style:{marginTop:top?0:10}},
+      CH_E("div",{style:{display:"flex",alignItems:"baseline",flexWrap:"wrap",gap:"2px 8px",marginBottom:8}},
+        CH_E("span",{style:sub},I.label),
+        I.note&&CH_E("span",{"data-chintake-note":k,style:{fontSize:8,letterSpacing:"0.06em",color:"#555"}},I.note)),
+      CH_E(ChallengeChoice,{name:k,options:I.opts,value:val,onChange:set,compact:true,tones:CH_TONE_OF}));};
+  return CH_E("div",{"data-chform":day},
+    CH_E(ChallengeGroup,{title:"INTAKE",first:true},
+      CH_E(ChallengeHead,{title:"INTAKE",done:!!(n&&h),first:true}),
+      intake("n",n,setN,true),
+      intake("h",h,setH,false)),
+    CH_E(ChallengeGroup,{title:"COMMITMENT"},
+      CH_E(ChallengeHead,{title:"COMMITMENT",done:cnt>=cfg.movementRequired,right:"ANY "+cfg.movementRequired+" OF "+cfg.movement.length,first:true}),
+      cfg.movement.map(m=>CH_E(ChallengeTick,{key:m.id,id:m.id,on:c[m.id]===true,label:m.label,note:m.note,labelW:chLabelW(cfg.movement),stack:chLabelStack(cfg.movement),onClick:()=>setC(p=>({...p,[m.id]:!p[m.id]}))}))),
+    CH_E(ChallengeGroup,{title:"FOLLOW THROUGH"},
+      CH_E(ChallengeHead,{title:"FOLLOW THROUGH",done:!!cs,first:true}),
+      CH_E("div",{style:q},cfg.qConsistency),
+      CH_E(ChallengeChoice,{name:"cs",options:CH_CONSISTENCY,value:cs,onChange:setCs}),
+      CH_E(ChallengeHead,{title:"DRIVE",done:!!d,tight:true}),
+      CH_E("div",{style:q},cfg.qDetermination),
+      CH_E(ChallengeChoice,{name:"d",options:CH_DETERMINATION,value:d,onChange:setD})),
+    CH_E(ChallengeGroup,{title:"BIGGEST WIN"},
+      CH_E(ChallengeHead,{title:"BIGGEST WIN",done:!!win.trim(),first:true}),
+      CH_E("div",{style:q},cfg.qWin),
+      CH_E("input",{className:"fi","data-field":"win",style:{borderRadius:CH_RAD},value:win,maxLength:280,placeholder:cfg.winExamples[day-1]||"One line is enough",onChange:ev=>setWin(ev.target.value)}),
+      CH_E(ChallengeHead,{title:"REFLECTION",done:!!ref.trim(),tight:true}),
+      CH_E("div",{"data-rq":"1",style:{fontSize:13,color:"#fff",letterSpacing:"0.02em",lineHeight:1.6,marginBottom:9}},rq),
+      CH_E("input",{className:"fi","data-field":"ref",style:{borderRadius:CH_RAD},value:ref,maxLength:280,placeholder:cfg.refExamples[day-1]||"A few words will do",onChange:ev=>setRef(ev.target.value)})),
+    CH_E("button",{"data-chsave":day,className:"ch-btn",disabled:saving||!any,onClick:()=>onSave({c,n,h,cs,d,win,ref,rq}),
+      style:{width:"100%",background:saving||!any?"#222":"#fff",color:saving||!any?"#555":"#000",border:"none",...chRaised,fontFamily:"'Bebas Neue',sans-serif",fontSize:17,letterSpacing:"0.18em",padding:"17px",cursor:saving||!any?"default":"pointer",marginTop:12}},
+      saving?"SAVING...":entry?"SAVE CHANGES":"COMPLETE DAY "+day),
+    CH_E("button",{"data-chcancel":day,className:"ch-btn",onClick:onCancel,style:{...chBtnAcc,background:"#1a1a1a",color:"#999",border:"1px solid #444",marginTop:10}},"CANCEL"));
+}
+// The panel for one day, opened under the grid: a saved day reads back; a blank one opens straight into the form.
+// Its heading is the TODAY'S JOURNAL button itself — same green, same words — so tapping it changes nothing but
+// what is open underneath; tapping it again closes the day.
+function ChallengeDayPanel({cfg,day,entry,isToday,saving,onSave,onClose,panelRef}){
+  const [editing,setEditing]=useState(!entry);
+  useEffect(()=>{setEditing(!entry);},[day,!!entry]);
+  return CH_E("div",{ref:panelRef,"data-chpanel":day,style:{marginTop:20}},
+    CH_E("div",{"data-chdayhdr":day,role:"button",onClick:onClose,style:{...chBtnJournal,marginBottom:4}},
+      isToday?"TODAY'S JOURNAL":"DAY "+day+" JOURNAL",
+      CH_E("span",{"data-chclose":"1",style:{position:"absolute",right:12,top:"50%",transform:"translateY(-50%)",fontFamily:"inherit",fontSize:11,letterSpacing:"0.14em",color:"#0a0a0a",opacity:0.8}},"CLOSE")),
+    editing?CH_E(ChallengeDayForm,{key:day+(entry?"e":"n"),cfg,day,entry,saving,onSave:async data=>{const ok=await onSave(day,data);if(ok)setEditing(false);},onCancel:()=>{if(entry)setEditing(false);else onClose();}})
+    :CH_E(React.Fragment,null,
+      CH_E(ChallengeDayRead,{cfg,day,entry}),
+      CH_E("button",{"data-chedit":day,className:"ch-btn",onClick:()=>setEditing(true),style:{...chBtnJournal,marginTop:18}},isToday?"EDIT TODAY":"EDIT DAY "+day)));
+}
+// coach: the coach's read-only copy — only ticked days open, to be read.
+function ChallengeGrid({entries,st,openDay,onOpen,readOnly,coach}){
+  return CH_E("div",{"data-chgrid":"1",style:{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(42px,1fr))",gap:5}},
+    Array.from({length:st.N},(_,i)=>{const d=i+1;const done=!!entries[d];const isToday=st.phase==="running"&&d===st.day;const future=d>st.lastOpen||st.phase==="upcoming";
+      const canOpen=readOnly||coach?done:(st.canEdit&&!future);const missed=coach?(!done&&!isToday&&!future):(!readOnly&&canOpen&&!done&&!isToday);const open=openDay===d;
+      return CH_E("div",{key:d,"data-grid-day":d,"data-state":done?"done":!canOpen?"locked":isToday?"today":"blank",title:"Day "+d,onClick:()=>{if(canOpen)onOpen(d);},
+        className:canOpen?"ch-btn":undefined,style:{borderRadius:8,background:done?CH_C.accF:"#141414",borderWidth:1,borderStyle:(missed||(readOnly&&!done))&&!open?"dashed":"solid",borderColor:open?"#fff":done?CH_C.acc:isToday?"#888":missed?"#2e2e2e":"#222",padding:"6px 2px",textAlign:"center",opacity:future&&!readOnly?0.45:1,cursor:canOpen?"pointer":"default"}},
+        CH_E("div",{style:{fontSize:8,letterSpacing:"0.06em",color:done?CH_C.accL:"#555",fontWeight:600}},"DAY "+d),
+        CH_E("div",{style:{fontSize:12,lineHeight:1.3,color:done?CH_C.acc:missed||readOnly?"#555":"#333",marginTop:1}},done?"✓":missed||readOnly?"–":"○"));}));
+}
+// The completion screen, built from nothing but a config and a set of entries: the member who has just finished
+// sees it (with the catch-up grid during the grace window); the same member next year sees the same screen.
+function ChallengeComplete({cfg,entries,showRecord,onToggleRecord,grid,note,below,weeklyDone}){
+  const N=cfg.days;const met=chMetDays(entries,cfg,N);const done=Object.keys(entries).filter(k=>+k>=1&&+k<=N).length;
+  const pct=N?Math.round(done/N*100):0;
+  const csC=chCountBy(entries,N,"cs",CH_CONSISTENCY);const dC=chCountBy(entries,N,"d",CH_DETERMINATION);
+  const lbl={fontSize:9,letterSpacing:"0.18em",color:"#777",fontWeight:600};
+  const wk=chWeeklyOf(cfg);
+  const spread=(title,opts,counts,top)=>CH_E("div",{style:top?{paddingBottom:9,borderBottom:"1px solid #1e1e1e"}:{paddingTop:9}},
+    CH_E("div",{style:{...lbl,marginBottom:7}},title),
+    opts.map(o=>CH_E("div",{key:o.id,style:{display:"flex",justifyContent:"space-between",alignItems:"baseline",gap:10,padding:"3px 0"}},
+      CH_E("span",{style:{fontSize:11,color:"#bbb",letterSpacing:"0.04em"}},o.label),
+      CH_E("span",{style:{fontFamily:"'Bebas Neue',sans-serif",fontSize:15,color:CH_C.acc,flexShrink:0}},counts[o.id]||0))));
+  return CH_E("div",{"data-chcomplete":"1"},
+    CH_E("div",{style:{textAlign:"center",padding:"18px 0 6px"}},
+      CH_E("div",{style:{fontFamily:"'Bebas Neue',sans-serif",fontSize:34,letterSpacing:"0.12em",color:"#fff",lineHeight:1.1}},N+" DAYS"),
+      CH_E("div",{style:{fontFamily:"'Bebas Neue',sans-serif",fontSize:34,letterSpacing:"0.12em",color:CH_C.acc,lineHeight:1.1}},"COMPLETE"),
+      CH_E("div",{style:{fontSize:9,letterSpacing:"0.22em",color:"#777",fontWeight:600,marginTop:12,lineHeight:1.8}},"WITH SOUL FITNESS")),
+    CH_E("div",{style:{marginTop:20,marginBottom:6}},CH_E(ChallengeBar,{pct})),
+    CH_E("div",{style:{...chCard,padding:"14px 15px",marginTop:16}},
+      CH_E("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"baseline",paddingBottom:9,borderBottom:"1px solid #1e1e1e"}},
+        CH_E("span",{style:lbl},"COMMITMENT"),
+        CH_E("span",{"data-chmet":met,style:{fontFamily:"'Bebas Neue',sans-serif",fontSize:17,color:"#fff"}},met+" OF "+N+" DAYS")),
+      CH_E("div",{style:{paddingTop:4}},CH_E(ChallengeMoveRows,{cfg,entries,upto:N})),
+      // The weekly challenge, counted back like the movements.
+      wk.on&&weeklyDone!=null&&CH_E("div",{"data-chweekly-total":"1",style:{display:"flex",justifyContent:"space-between",alignItems:"baseline",paddingTop:10,marginTop:4,borderTop:"1px solid #1e1e1e"}},
+        CH_E("span",{style:lbl},wk.title),
+        CH_E("span",{style:{fontFamily:"'Bebas Neue',sans-serif",fontSize:17,color:"#fff"}},weeklyDone+" OF "+chWeekCount(cfg)+" WEEKS"))),
+    CH_E("div",{style:{...chCard,padding:"14px 15px",marginTop:12}},
+      spread("FOLLOW THROUGH",CH_CONSISTENCY,csC,true),
+      spread("DRIVE",CH_DETERMINATION,dC,false)),
+    CH_E("div",{style:{marginTop:22}},
+      CH_E(ChallengeIntakeStrip,{title:chIntakeOf(cfg,"n").label+" OVER "+N+" DAYS",k:"n",entries,N,cfg}),
+      CH_E(ChallengeIntakeStrip,{title:chIntakeOf(cfg,"h").label+" OVER "+N+" DAYS",k:"h",entries,N,cfg})),
+    CH_E("div",{"data-chclosing":"1",style:{textAlign:"center",padding:"30px 0 26px",borderTop:"1px solid #141414",borderBottom:"1px solid #141414",marginTop:24}},
+      CH_E("div",{style:{fontFamily:"'Bebas Neue',sans-serif",fontSize:30,letterSpacing:"0.16em",color:"#fff",lineHeight:1.2}},String(cfg.closing).replace(/\{N\}/g,N)),
+      CH_E("div",{style:{fontFamily:"'Bebas Neue',sans-serif",fontSize:17,letterSpacing:"0.16em",color:CH_C.acc,marginTop:6}},String(cfg.closingSub).replace(/\{N\}/g,N))),
+    CH_E("div",{"data-chrecord":"1",onClick:onToggleRecord,style:{width:"100%",boxSizing:"border-box",display:"flex",alignItems:"center",justifyContent:"space-between",background:"#fff",color:"#000",padding:"9px 14px",fontFamily:"'Bebas Neue',sans-serif",fontSize:14,letterSpacing:"0.14em",cursor:"pointer",userSelect:"none",marginTop:20,marginBottom:showRecord?12:0}},
+      CH_E("span",null,"YOUR "+N+" DAYS"),
+      CH_E("span",{style:{fontSize:11,transform:showRecord?"none":"rotate(-90deg)",transition:"transform .15s"}},"▾")),
+    showRecord&&CH_E("div",{"data-chfullrecord":"1"},grid,note||null,below||null));
+}
+// What the challenge is about: a button above YOUR PROGRESS that starts closed. Set like the boxes under it
+// (dark box, grey border, Soul's rounded corners), the name in green Bebas on the left with the subtitle after
+// it, the arrow on the right. Opening it continues the same box downwards.
+function ChallengeAbout({cfg}){
+  const [open,setOpen]=useState(false);
+  const N=cfg.days;
+  const title=chShowN(chAboutTitleOf(cfg),N).trim();
+  const a=chAboutOf(cfg);
+  if(!title||chAboutEmpty(a))return null;
+  const sh=t=>chShowN(t,N).trim();
+  const tl=a.title.map(sh),cl=[a.closing[0]||"",a.closing[1]||"",a.closing.slice(2).join(" ")].map(sh);
+  const bebas={fontFamily:"'Bebas Neue',sans-serif",lineHeight:1,color:"#fff"};
+  const rule={borderTop:"1px solid #242424"};
+  const body={fontSize:12.5,color:"#bbb",letterSpacing:"0.01em",lineHeight:1.6};
+  const hd={fontFamily:"'Bebas Neue',sans-serif",fontSize:15,letterSpacing:"0.12em",color:CH_C.acc,lineHeight:1.1,marginBottom:5};
+  const secs=a.sections.filter(x=>sh(x.h)||sh(x.t)||x.move);
+  // The weekly challenge, from its own settings, straight after CHALLENGE JOURNEY: its name and the how-it-works
+  // line only (WHAT TO DO belongs on the member's weekly card). With that line blank, or weekly off, it's left out.
+  const wk=chWeeklyOf(cfg);
+  const weeklySec=wk.on&&sh(wk.how)?CH_E("div",{key:"weekly","data-chabout-section":wk.title,"data-chabout-weekly":"1",style:{...rule,padding:"13px 0 14px"}},
+    CH_E("div",{style:hd},wk.title),
+    CH_E("div",{"data-chabout-weekly-how":"1",style:body},sh(wk.how))):null;
+  const moveAt=secs.findIndex(x=>x.move);
+  const sub=String(cfg.subtitle||"").trim();
+  return CH_E("div",{"data-chabout":"1",style:{marginBottom:2}},
+    CH_E("button",{type:"button","data-chabout-btn":"1",onClick:()=>setOpen(v=>!v),
+      style:{width:"100%",boxSizing:"border-box",display:"flex",alignItems:"center",justifyContent:"space-between",gap:10,background:"#141414",color:CH_C.acc,border:"1px solid #888",borderRadius:open?CH_RAD+"px "+CH_RAD+"px 0 0":CH_RAD,padding:"11px 15px",cursor:"pointer",userSelect:"none",textAlign:"left",fontFamily:"'Bebas Neue',sans-serif",fontSize:14,letterSpacing:"0.14em",lineHeight:1.1}},
+      CH_E("span",{"data-chabout-name-row":"1",style:{minWidth:0,display:"flex",flexWrap:"wrap",alignItems:"baseline",columnGap:8,rowGap:2}},
+        CH_E("span",{"data-chabout-name":"1"},title.toUpperCase()),
+        sub?CH_E("span",{"data-chsubtitle":"1",style:{fontFamily:"'DM Sans',sans-serif",fontSize:9,letterSpacing:"0.1em",color:"#999",fontWeight:600,lineHeight:1.2}},sub.toUpperCase()):null),
+      CH_E("span",{"data-chabout-arrow":"1",style:{fontSize:11,letterSpacing:0,color:CH_C.acc,flexShrink:0,transform:open?"none":"rotate(-90deg)",transition:"transform .15s"}},"▾")),
+    // One column, each part divided by a hairline: title, details, each section, closing.
+    open&&CH_E("div",{"data-chabout-body":"1",style:{background:"#141414",borderLeft:"1px solid #888",borderRight:"1px solid #888",borderBottom:"1px solid #888",borderTop:"none",borderRadius:"0 0 "+CH_RAD+"px "+CH_RAD+"px",padding:"0 16px"}},
+      tl.some(Boolean)&&CH_E("div",{"data-chabout-title":"1",style:{textAlign:"center",padding:"18px 0 16px"}},
+        tl[0]&&CH_E("div",{"data-chabout-big":"1",style:{...bebas,fontSize:26,letterSpacing:"0.14em"}},tl[0]),
+        // The line under the big line: not bold, a touch smaller (Sam, 27 Sep 2026).
+        tl[1]&&CH_E("div",{"data-chabout-title-name":"1",style:{fontFamily:"'DM Sans',sans-serif",fontSize:11,fontWeight:400,letterSpacing:"0.14em",color:"#fff",lineHeight:1.3,marginTop:6}},tl[1]),
+        tl[2]&&CH_E("div",{"data-chabout-sub":"1",style:{fontSize:8,letterSpacing:"0.2em",color:CH_C.acc,fontWeight:600,marginTop:7,lineHeight:1.5}},tl[2])),
+      sh(a.details)&&CH_E("div",{"data-chabout-details":"1",style:{...rule,...body,color:"#ddd",padding:"14px 0"}},sh(a.details)),
+      secs.map((x,i)=>CH_E(React.Fragment,{key:i},CH_E("div",{"data-chabout-section":sh(x.h),style:{...rule,padding:"13px 0 14px"}},
+        sh(x.h)&&CH_E("div",{style:hd},sh(x.h)),
+        sh(x.t)&&CH_E("div",{style:body},sh(x.t)),
+        // CHALLENGE JOURNEY lists each movement the member can tick, with what counts as it.
+        x.move&&(cfg.movement||[]).length>0&&CH_E("div",{"data-chabout-moves":"1",style:{marginTop:10}},
+          cfg.movement.map((m,j)=>CH_E("div",{key:m.id,"data-chabout-move":m.id,style:{borderLeft:"2px solid "+CH_C.accB,padding:"1px 0 1px 10px",marginTop:j?9:0}},
+            CH_E("div",{style:{fontFamily:"'Bebas Neue',sans-serif",fontSize:13,letterSpacing:"0.12em",color:"#fff",lineHeight:1.2}},m.label),
+            sh(m.desc)&&CH_E("div",{style:{...body,fontSize:11.5,color:"#999",marginTop:2,lineHeight:1.5}},sh(m.desc)))))),
+        (i===moveAt||(moveAt<0&&i===secs.length-1))?weeklySec:null)),
+      !secs.length&&weeklySec,
+      // The closing is set exactly like the title, the last line in green.
+      cl.some(Boolean)&&CH_E("div",{"data-chabout-closing":"1",style:{...rule,textAlign:"center",padding:"18px 0 18px"}},
+        cl.map((l,j)=>!l?null:j===0
+          ?CH_E("div",{key:j,style:{...bebas,fontSize:26,letterSpacing:"0.14em"}},l)
+          :j===1
+          ?CH_E("div",{key:j,style:{...bebas,fontSize:15,letterSpacing:"0.18em",marginTop:3}},l)
+          :CH_E("div",{key:j,"data-chabout-last":"1",style:{fontSize:8,letterSpacing:"0.2em",color:CH_C.acc,fontWeight:600,marginTop:7,lineHeight:1.5}},l)))));
+}
+// The weekly challenge card: one column per week, WEEK n above its box; in the box, what they did, the tick
+// and their time. Future weeks are dimmed and locked; it still works during the 7-day catch-up.
+// What they did is typed in a small box.
+function ChallengeWeekly({cfg,bucket,st,viewOnly,saving,acc,onSaveWeek}){
+  const [wkTime,setWkTime]=useState({});
+  const [wkText,setWkText]=useState({});
+  const wk=chWeeklyOf(cfg);
+  if(!wk.on)return null;
+  const n=chWeekCount(cfg);
+  const now=chWeekOfDay(cfg,Math.min(Math.max(st.day,1),st.N));
+  const log=chWeeklyLog(bucket);
+  const canWrite=!viewOnly&&st.canEdit&&!saving;
+  const drop=(set,w)=>set(p=>{const x={...p};delete x[w];return x;});
+  async function saveTime(w){
+    const e=log[String(w)]||{};const raw=wkTime[w];if(raw==null)return;
+    const v=chMinsFmt(raw);
+    if(v===(e.time||"")){drop(setWkTime,w);return;}
+    if(await onSaveWeek(w,v?{done:true,time:v}:{time:""},v?"WEEK "+w+" TIME SAVED":"WEEK "+w+" TIME CLEARED"))drop(setWkTime,w);
+  }
+  // Their own weekly challenge, typed in. Kept as the week's `ex`; saving it ticks the week.
+  async function saveOwn(w){
+    const e=log[String(w)]||{};const raw=wkText[w];if(raw==null)return;
+    const v=String(raw).replace(/\s+/g," ").trim();
+    if(v===(e.ex||"")){drop(setWkText,w);return;}
+    if(await onSaveWeek(w,v?{done:true,ex:v}:{ex:""},v?"WEEK "+w+" SAVED":"WEEK "+w+" CLEARED"))drop(setWkText,w);
+  }
+  const text=chShowN(wk.text,cfg.days).trim();
+  const small={fontFamily:"'DM Sans',sans-serif",fontSize:9,letterSpacing:"0.04em"};
+  return CH_E(React.Fragment,null,
+    chAccHdr(wk.title,false,acc),
+    CH_E("div",{"data-chweekly":"1","data-chbox":"weekly",style:{...chBox(acc),padding:"13px 13px 14px"}},
+      text?CH_E("div",{"data-chweekly-text":"1",style:{fontSize:12.5,color:"#6e6e6e",letterSpacing:"0.01em",lineHeight:1.6,marginBottom:12,padding:"0 2px"}},text):null,
+      CH_E("div",{"data-chweekly-weeks":"1",style:{display:"grid",gridTemplateColumns:"repeat("+n+",minmax(0,1fr))",gap:6}},
+        Array.from({length:n},(_,i)=>{
+          const w=i+1,e=log[String(w)]||null,done=!!(e&&e.done),open=w<=now,can=canWrite&&open;
+          const tv=wkTime[w]!=null?wkTime[w]:((e&&e.time)||"");
+          return CH_E("div",{key:w,"data-chweekly-col":w,style:{minWidth:0,opacity:open?1:0.4}},
+            CH_E("div",{"data-chweekly-label":w,style:{...small,fontSize:8,letterSpacing:"0.08em",fontWeight:600,textAlign:"center",color:done?CH_C.acc:w===now?"#fff":"#777",marginBottom:4}},"WEEK "+w),
+            CH_E("div",{"data-chweekly-pill":w,"data-done":done?"1":"0",style:{background:done?CH_C.accF:"#141414",border:"1px solid "+(done?CH_C.acc:w===now?"#888":"#333"),borderRadius:8,padding:"5px 4px 6px",textAlign:"center"}},
+              // A small text box for what they did; grows to fit, keeps spaces, saves on leaving or Enter.
+              CH_E("textarea",{"data-f":"weekly-own-"+w,rows:2,maxLength:80,disabled:!can,
+                    ref:el=>{if(el){el.style.height="auto";el.style.height=Math.max(el.scrollHeight+2,32)+"px";}},
+                    value:wkText[w]!=null?wkText[w]:((e&&e.ex)||""),placeholder:viewOnly||!open?"—":"WHAT DID YOU DO?",
+                    onChange:ev=>{const v=ev.target.value.replace(/\n/g," ");setWkText(p=>({...p,[w]:v}));},
+                    onBlur:()=>saveOwn(w),onKeyDown:ev=>{if(ev.key==="Enter"){ev.preventDefault();ev.target.blur();}},
+                    style:{...small,display:"block",width:"100%",boxSizing:"border-box",minWidth:0,background:"#0e0e0e",color:"#fff",border:"1px solid #2a2a2a",borderRadius:6,
+                      padding:"3px 3px",textAlign:"center",lineHeight:1.35,resize:"none",overflow:"hidden",outline:"none",margin:0}}),
+              // The tick. Unticking keeps what was entered.
+              CH_E("div",{"data-chweekly-tick":w,role:"button",onClick:()=>{if(can)onSaveWeek(w,{done:!done},done?"WEEK "+w+" UNTICKED":"WEEK "+w+" CHALLENGE COMPLETE");},
+                style:{width:20,height:20,margin:"7px auto 6px",borderRadius:6,border:"1px solid "+(done?CH_C.acc:"#555"),background:done?CH_C.acc:"transparent",color:"#0a0a0a",fontSize:12,lineHeight:"20px",textAlign:"center",cursor:can?"pointer":"default"}},done?"✓":""),
+              // Their time: 00:00 until they type, then "min" after it. Saves when they leave the box.
+              CH_E("div",{"data-chweekly-timebox":w,style:{display:"flex",alignItems:"center",justifyContent:"center",gap:3,background:"#0e0e0e",border:"1px solid #2a2a2a",borderRadius:6,padding:"3px 3px"}},
+                CH_E("input",{"data-f":"weekly-time-"+w,value:tv,placeholder:"00:00",maxLength:5,disabled:!can,inputMode:"numeric",
+                  onChange:ev=>{const v=chMinsTyping(ev.target.value);setWkTime(p=>({...p,[w]:v}));},
+                  onBlur:()=>saveTime(w),onKeyDown:ev=>{if(ev.key==="Enter"){ev.preventDefault();ev.target.blur();}},
+                  style:{...small,fontSize:10,width:"3.6em",minWidth:0,background:"transparent",color:"#fff",border:"none",borderRadius:0,padding:"1px 0",textAlign:"right",outline:"none"}}),
+                CH_E("span",{"data-chweekly-min":w,style:{...small,fontSize:9,color:tv?"#bbb":"#555",flexShrink:0}},"min"))));
+        }))));
+}
+// The white home button for one challenge: the name with the catchphrase after it, centred; if both don't fit on
+// one line the catchphrase drops under the name, still centred, and steps its type down only if it can't fit a
+// line on its own (never below 6px). The arrow sits on the right. No subtitle and no date on the button: the date
+// is the first line inside once it's opened — grey while it runs, green once it's finished.
+function chFitLine(el){
+  if(!el)return;
+  let size=9;el.style.fontSize=size+"px";el.style.letterSpacing="0.1em";
+  if(el.scrollWidth<=el.clientWidth+0.5)return;
+  el.style.letterSpacing="0.05em";
+  while(el.scrollWidth>el.clientWidth+0.5&&size>6){size=Math.round((size-0.25)*100)/100;el.style.fontSize=size+"px";}
+}
+function ChallengeBlock({cfg,sub,done,open,onToggle,children}){
+  const tag=String(cfg.tagline||"").trim();
+  const tagRef=useRef(null);
+  useEffect(()=>{
+    const fit=()=>chFitLine(tagRef.current);
+    fit();
+    // Fonts arriving late change the width, as does turning the phone.
+    const t=setTimeout(fit,300);
+    try{if(document.fonts&&document.fonts.ready)document.fonts.ready.then(fit).catch(()=>{});}catch(e){}
+    window.addEventListener("resize",fit);
+    return ()=>{clearTimeout(t);window.removeEventListener("resize",fit);};
+  },[tag]);
+  return CH_E("div",{"data-chblock":cfg.start,style:{marginBottom:12,width:"100%",boxSizing:"border-box"}},
+    CH_E("div",{"data-chbar":cfg.start,role:"button",className:"ch-btn",onClick:onToggle,style:{position:"relative",width:"100%",boxSizing:"border-box",background:"#fff",color:"#000",border:"1px solid #fff",borderRadius:6,boxShadow:"none",padding:"12px 20px",cursor:"pointer",userSelect:"none"}},
+      CH_E("div",{"data-chtop":"1",style:{display:"flex",flexWrap:"wrap",justifyContent:"center",alignItems:"baseline",columnGap:8,rowGap:2,textAlign:"center"}},
+        CH_E("span",{"data-chname":"1",style:{fontFamily:"'Bebas Neue',sans-serif",fontSize:14,letterSpacing:"0.12em",lineHeight:1.15,whiteSpace:"nowrap"}},String(cfg.name).toUpperCase()),
+        tag&&CH_E("span",{"data-chtagline":"1",ref:tagRef,style:{fontSize:9,letterSpacing:"0.1em",color:"#555",fontWeight:600,lineHeight:1.3,whiteSpace:"nowrap",overflow:"hidden",minWidth:0,maxWidth:"100%"}},tag.toUpperCase())),
+      CH_E("span",{"data-chbar-arrow":"1",style:{position:"absolute",right:7,top:"50%",fontSize:11,lineHeight:1,transform:open?"translateY(-50%)":"translateY(-50%) rotate(-90deg)",transition:"transform .15s"}},"▾")),
+    open&&CH_E("div",{style:{paddingTop:12}},
+      sub?CH_E("div",{"data-chdate":"1",style:{fontSize:10,letterSpacing:"0.22em",color:done?CH_C.acc:"#999",fontWeight:600,margin:"2px 0 10px"}},sub):null,
+      children));
+}
+// viewOnly: the coach's copy on a member's profile — exactly what the member sees, from their own record, with
+// nothing that can write to it. embedded: no CHALLENGE title and no page padding, to sit inside the profile.
+function ChallengeView({session,isAdmin,showToast,viewOnly,embedded}){
+  const email=session.email;
+  const [loading,setLoading]=useState(true);
+  const [err,setErr]=useState(false);
+  const [list,setList]=useState([]);
+  const [archive,setArchive]=useState([]);
+  const [log,setLog]=useState({});
+  const [openStart,setOpenStart]=useState("");
+  const [openDay,setOpenDay]=useState(null);
+  const [saving,setSaving]=useState(false);
+  const [showRecord,setShowRecord]=useState(null); // null = not touched: the record opens itself during catch-up
+  const panelRef=useRef(null);
+  useEffect(()=>{load();},[email]);
+  useEffect(()=>{if(openDay!==null&&panelRef.current){try{panelRef.current.scrollIntoView({behavior:"smooth",block:"start"});}catch(e){}}},[openDay]);
+  async function load(){
+    setLoading(true);setErr(false);
+    const [L,A,r]=await Promise.all([chLoadList(),chLoadArchive(),chRead("__CHLOG__"+email)]);
+    if(!L.ok||!r.ok){setErr(true);setLoading(false);return;}
+    setList(L.list);setArchive(A.ok?A.list:[]);setLog(chParseLog(r.content));setLoading(false);
+  }
+  const today=chToday();
+  const byStart={};const archived={};
+  archive.forEach(c=>{byStart[c.start]=c;archived[c.start]=true;});
+  list.forEach(c=>{byStart[c.start]=c;archived[c.start]=false;});
+  const starts=chMemberStarts(list,log,email,today,archive);
+  async function saveDay(cfg,day,data,wasSaved){
+    if(saving||viewOnly)return false;
+    setSaving(true);
+    const res=await chSaveDay(email,cfg,day,data);
+    setSaving(false);
+    if(!res.ok){showToast&&showToast("COULDN'T SAVE — TRY AGAIN");return false;}
+    setLog(res.log);showToast&&showToast("DAY "+day+(wasSaved?" UPDATED":" COMPLETE"));return true;
+  }
+  async function saveWeek(cfg,w,patch,okMsg){
+    if(saving||viewOnly)return false;
+    setSaving(true);
+    const res=await chSaveWeek(email,cfg,w,patch);
+    setSaving(false);
+    if(!res.ok){showToast&&showToast("COULDN'T SAVE — TRY AGAIN");return false;}
+    setLog(res.log);okMsg&&showToast&&showToast(okMsg);return true;
+  }
+  const wrap=(...kids)=>CH_E("div",{className:"well-wrap","data-chview":"1","data-chview-only":viewOnly?"1":undefined,style:embedded?{padding:"4px 0 6px",width:"100%",boxSizing:"border-box"}:{padding:"14px 16px 80px",width:"100%",boxSizing:"border-box"}},
+    embedded?null:CH_E("div",{className:"well-hdr",style:{marginBottom:16,padding:0}},CH_E("div",{className:"well-title"},"CHALLENGE")),...kids);
+  const msg=t=>CH_E("div",{style:{fontSize:12,color:"#555",letterSpacing:"0.04em",lineHeight:1.9,textAlign:"center",padding:embedded?"14px 10px":"40px 20px",whiteSpace:"pre-line"}},t);
+  const hint=(t,acc)=>CH_E("div",{"data-chhint":"1",style:{fontSize:9,letterSpacing:"0.1em",color:acc?CH_C.acc:"#555",fontWeight:acc?600:undefined,textAlign:"center",marginTop:12,lineHeight:1.7}},t);
+  if(loading)return wrap(CH_E("div",{style:{fontSize:11,color:"#555",letterSpacing:"0.1em",padding:"30px 0",textAlign:"center"}},"LOADING..."));
+  if(err)return wrap(msg("Couldn't load the challenge."),CH_E("button",{onClick:load,style:{...chBtnWhite,marginTop:4}},"TRY AGAIN"));
+  if(!starts.length)return wrap(msg(viewOnly?"Not in a challenge.":isAdmin?"You're not in a challenge right now.\nTick yourself in under Admin → CHALLENGE to take part.":"Soul Fitness isn't running a challenge for you right now."));
+  return wrap(...starts.map(start=>{
+    const bucket=log[start]||null;
+    const cfg=chCfgOfBucket(byStart[start],bucket);
+    const entries=chEntriesOf(bucket);
+    const st0=chState(cfg,bucket,today);
+    // A removed-but-kept challenge is history: read-only, shown as finished. The coach's copy never edits.
+    const st1=archived[start]&&st0.phase!=="finished"?{...st0,phase:"finished",canEdit:false}:st0;
+    const st=viewOnly?{...st1,canEdit:false}:st1;
+    const open=openStart===start;
+    const toggle=()=>{setOpenDay(null);setShowRecord(null);setOpenStart(open?"":start);};
+    const onOpen=d=>setOpenDay(openDay===d?null:d);
+    const anySaved=Object.keys(entries).length>0;
+    const upto=Math.max(0,Math.min(st.day,st.N));
+    const panel=open&&openDay!==null&&st.canEdit&&CH_E(ChallengeDayPanel,{key:start+":"+openDay,cfg,day:openDay,entry:entries[openDay]||null,isToday:st.phase==="running"&&openDay===st.day,saving,panelRef,
+      onClose:()=>setOpenDay(null),onSave:(d,data)=>saveDay(cfg,d,data,!!entries[d])});
+    // A ticked day read back with no way to change it: the coach's copy, or a challenge that's closed.
+    const readCard=openDay!==null&&entries[openDay]?CH_E("div",{ref:panelRef,"data-chreadcard":openDay,style:{marginTop:14}},CH_E(ChallengeDayCard,{cfg,day:openDay,entry:entries[openDay]})):null;
+    const finished=st.phase==="grace"||st.phase==="finished";
+    const sub=st.phase==="upcoming"?"STARTS "+chFmtDay(st.memberStart):st.phase==="running"?"STARTED "+chFmtDay(st.memberStart):chFmtRange(st.memberStart,st.end);
+    const weekly=acc=>CH_E(ChallengeWeekly,{key:"wk"+start,cfg,bucket,st,viewOnly,saving,acc,onSaveWeek:(w,patch,m)=>saveWeek(cfg,w,patch,m)});
+    let body=null;
+    if(open&&(st.phase==="upcoming"||st.phase==="running")){
+      const streak=chStreak(entries,st);const pending=st.phase==="upcoming";
+      const dayPct=Math.round(Math.min(Math.max(st.day,0),st.N)/st.N*100);
+      body=CH_E(React.Fragment,null,
+        // The coach's read-only copy leaves the details button out.
+        viewOnly?null:CH_E(ChallengeAbout,{key:"about"+start,cfg}),
+        chAccHdr("YOUR PROGRESS",true,false),
+        CH_E("div",{"data-chdaybox":"1","data-chbox":"progress",style:{...chBox(false),padding:"14px 15px"}},
+          CH_E("div",{style:{display:"flex",alignItems:"baseline",justifyContent:"space-between",gap:10,marginBottom:9}},
+            CH_E("div",{style:{display:"flex",alignItems:"baseline",gap:10,minWidth:0,flexWrap:"wrap"}},
+              CH_E("span",{style:{fontFamily:"'Bebas Neue',sans-serif",fontSize:20,letterSpacing:"0.08em",color:"#fff",lineHeight:1}},pending?"STARTS SOON":"DAY "+st.day+" OF "+st.N),
+              !pending&&streak>0&&CH_E("span",{"data-chstreak":streak,style:{fontFamily:"'Bebas Neue',sans-serif",fontSize:15,letterSpacing:"0.1em",color:CH_C.acc,lineHeight:1}},streak+" DAY STREAK")),
+            CH_E("div",{"data-chpctlabel":"1",style:{fontSize:10,letterSpacing:"0.12em",color:CH_C.acc,fontWeight:600,flexShrink:0}},dayPct+"% COMPLETED")),
+          CH_E(ChallengeBar,{pct:dayPct}),
+          !pending&&CH_E("div",{"data-chtheme":"1",style:{fontSize:9,letterSpacing:"0.2em",color:CH_C.accL,fontWeight:600,marginTop:10}},chThemeOf(cfg,st.day)),
+          !pending&&CH_E("div",{"data-chline":"1",style:{fontSize:9,letterSpacing:"0.1em",color:"#6e6e6e",fontWeight:600,marginTop:5,lineHeight:1.5}},chLineOf(cfg,st.day)),
+          pending&&CH_E("div",{style:{fontSize:10,letterSpacing:"0.12em",color:"#777",marginTop:10}},"STARTS "+chFmtLong(st.memberStart))),
+        anySaved&&CH_E("div",{"data-chsection":"NOURISHMENT JOURNEY"},
+          chAccHdr("NOURISHMENT JOURNEY",false,false),
+          CH_E("div",{"data-chbox":"nourishment",style:{...chBox(false),padding:"14px 15px 2px"}},
+            CH_E(ChallengeIntakeStrip,{title:chIntakeOf(cfg,"n").label,k:"n",entries,N:st.N,cfg}),
+            CH_E(ChallengeIntakeStrip,{title:chIntakeOf(cfg,"h").label,k:"h",entries,N:st.N,cfg}))),
+        anySaved&&CH_E("div",{"data-chsection":"CHALLENGE JOURNEY"},
+          chAccHdr("CHALLENGE JOURNEY",false,false),
+          CH_E("div",{"data-chbox":"journey",style:{...chBox(false),padding:"2px 15px"}},CH_E(ChallengeMoveRows,{cfg,entries,upto,of:Math.max(1,upto)}))),
+        // The weekly challenge sits directly under CHALLENGE JOURNEY (under YOUR PROGRESS before anything is logged).
+        !pending&&CH_E("div",{"data-chsection":"WEEKLY CHALLENGE"},weekly(false)),
+        !pending&&CH_E("div",{"data-chsection":"DAILY REFLECTION"},
+          chAccHdr("DAILY REFLECTION",false,false),
+          CH_E("div",{"data-chbox":"reflection",style:{...chBox(false),padding:"14px 13px"}},
+            CH_E(ChallengeGrid,{entries,st,openDay,onOpen,coach:viewOnly}),
+            hint(viewOnly?"TAP A TICKED DAY TO READ IT":"TAP ANY DAY UP TO TODAY TO FILL IT IN OR CHANGE IT"))),
+        viewOnly?readCard:panel,
+        // The way into today, kept at the foot of the screen.
+        !pending&&!viewOnly&&openDay!==st.day&&CH_E("button",{"data-chtoday":"1",className:"ch-btn",onClick:()=>setOpenDay(st.day),style:{...chBtnJournal,marginTop:22}},"TODAY'S JOURNAL"));
+    }else if(open){
+      const grace=st.phase==="grace"&&!archived[start];
+      const recOpen=showRecord===null?grace:showRecord;
+      // During the catch-up week the note says until when, and the weekly card is still there (in green).
+      const note=grace?CH_E(React.Fragment,null,
+        CH_E("div",{"data-chdeadline":"1",style:{fontSize:9,letterSpacing:"0.1em",color:CH_C.acc,fontWeight:600,textAlign:"center",marginTop:12,lineHeight:1.7}},viewOnly?"CATCH-UP WEEK UNTIL "+chFmtLong(st.graceEnd):"YOU CAN STILL FILL IN A DAY YOU MISSED UNTIL "+chFmtLong(st.graceEnd)),
+        weekly(true)):null;
+      const below=grace&&!viewOnly?panel:readCard;
+      body=CH_E(ChallengeComplete,{cfg,entries,weeklyDone:chWeeklyDone(bucket),showRecord:recOpen,onToggleRecord:()=>{setShowRecord(!recOpen);if(recOpen)setOpenDay(null);},
+        grid:CH_E(ChallengeGrid,{entries,st,openDay,onOpen,readOnly:!(grace&&!viewOnly)}),note,below});
+    }
+    return CH_E(ChallengeBlock,{key:start,cfg,sub,done:finished,open,onToggle:toggle},body);
+  }));
+}
+
+function chNewId(list){let id;do{id="ch_"+Date.now().toString(36)+Math.random().toString(36).slice(2,7);}while((list||[]).some(c=>c.id===id));return id;}
+// Closing wording: stored with "{N}" for the length, shown and typed with the real number.
+function chShowN(t,days){const n=parseInt(days,10);return String(t||"").replace(/\{N\}/g,n>=1?String(n):"30");}
+function chKeepN(v,days){const n=parseInt(days,10);v=String(v||"").replace(/\n/g," ").toUpperCase();return n>=1?v.replace(new RegExp("(^|[^0-9])"+n+"(?=[ -]?DAY)","g"),"$1{N}"):v;}
+function chStatusOf(c,today){return c.start>today?"UPCOMING":chEndDS(c)<today?"FINISHED":"RUNNING";}
+// Why a draft can't be saved, or "" when it can. Two challenges cannot run at once, and a challenge
+// can never be saved without its question bank.
+function chDraftProblem(draft,list,floor,archive){
+  if(!draft.name||!String(draft.name).trim())return "Give the challenge a name.";
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(draft.start||""))return "Choose a start date.";
+  const days=parseInt(draft.days,10);if(!(days>=1&&days<=366))return "Length must be between 1 and 366 days.";
+  const end=chAddDays(draft.start,days-1);
+  const hit=(list||[]).find(o=>o.id!==draft.id&&!(end<o.start||draft.start>chEndDS(o)));
+  if(hit)return "These dates run over "+hit.name+" ("+chFmtRange(hit.start,chEndDS(hit))+").";
+  const arc=(archive||[]).find(o=>o.id!==draft.id&&o.start===draft.start);
+  if(arc)return "Members still have \""+arc.name+"\", which started on this date. Pick another start date, or delete that one under REMOVED.";
+  if(draft._isNew&&floor&&draft.start<floor)return "A new challenge can't start before "+chFmtDay(floor)+".";
+  if(!Array.isArray(draft.reflections)||!draft.reflections.length||!Array.isArray(draft.themes)||!draft.themes.length)return "This challenge has no questions or themes — it can't be saved empty.";
+  // The challenge's own three movements need a name; an extra one left without a name simply isn't kept.
+  if(!draft.movement.every(m=>CH_MOVE_DESC[String(m.id)]===undefined||String(m.label||"").trim()))return "Every movement needs a name.";
+  if(!draft.themes.every(t=>String(t||"").trim()))return "Every week in the JOURNEY needs a theme.";
+  return "";
+}
+function ChallengeAdminPanel({showToast}){
+  const [loading,setLoading]=useState(true);
+  const [loadErr,setLoadErr]=useState("");
+  const [list,setList]=useState([]);
+  const [roster,setRoster]=useState([]);
+  const [openId,setOpenId]=useState(null);
+  const [draft,setDraft]=useState(null);
+  const [pickOpen,setPickOpen]=useState(false);
+  const [journeyOpen,setJourneyOpen]=useState(false);
+  const [confirmRm,setConfirmRm]=useState(false);
+  const [confirmDel,setConfirmDel]=useState(false);
+  const [archive,setArchive]=useState([]);
+  const [confirmArc,setConfirmArc]=useState("");
+  const [qOpen,setQOpen]=useState(false);
+  // The setup's parts, each behind its own button, and inside JOURNEY each week and the two question lists.
+  const [showAbout,setShowAbout]=useState(false);
+  const [showIntake,setShowIntake]=useState(false);
+  const [showWeekly,setShowWeekly]=useState(false);
+  const [openWeeks,setOpenWeeks]=useState({});
+  const [showQWin,setShowQWin]=useState(false);
+  const [showQRefl,setShowQRefl]=useState(false);
+  const shut=()=>{setPickOpen(false);setJourneyOpen(false);setConfirmRm(false);setConfirmDel(false);setQOpen(false);setShowAbout(false);setShowIntake(false);setShowWeekly(false);setOpenWeeks({});setShowQWin(false);setShowQRefl(false);};
+  const [saving,setSaving]=useState(false);
+  useEffect(()=>{load();},[]);
+  async function load(){
+    setLoading(true);setLoadErr("");
+    const [L,A,m]=await Promise.all([chLoadList(),chLoadArchive(),sbGet("members_public","select=email,name&order=name.asc")]);
+    if(!L.ok||!A.ok){setLoadErr(L.corrupt?"The saved challenge list couldn't be read, so nothing can be changed here until it's fixed.":"Couldn't load challenges — check your connection.");setLoading(false);return;}
+    setList(L.list);setArchive(A.list);setRoster((m||[]).filter(x=>x&&x.email).map(x=>({email:String(x.email).toLowerCase(),name:x.name||x.email})));setLoading(false);
+  }
+  const today=chToday();
+  const floor=chNextDS(list);
+  function close(){setOpenId(null);setDraft(null);shut();}
+  function openRow(c){
+    if(openId===c.id){close();return;}
+    const d=JSON.parse(JSON.stringify(c));
+    if(d.members===null)d.members=roster.map(r=>r.email);
+    setDraft({...d,_isNew:false});setOpenId(c.id);shut();
+  }
+  // A new challenge carries over the content of the last one (or the code defaults) — never the dates or the people.
+  function startNew(){
+    const newest=list.length?list[list.length-1]:null;
+    const base=chCfgFrom(newest||CH_DEFAULT_CFG);
+    // The start date is Sam's to choose each time: the box starts empty (28 Sep 2026).
+    const start="";
+    // The name, catchphrase and button subtitle carry over too, ready to edit over (Sam, 28 Sep 2026).
+    setDraft({...JSON.parse(JSON.stringify(base)),id:chNewId(list.concat(archive)),start,members:[],_isNew:true});
+    setOpenId("__new__");shut();
+  }
+  const upd=patch=>setDraft(p=>({...p,...patch}));
+  async function save(){
+    if(!draft||saving)return;
+    setSaving(true);
+    const L=await chLoadList();
+    if(!L.ok){setSaving(false);showToast&&showToast("Couldn't save — check your connection");return;}
+    const d=chCfgFrom({...draft,name:String(draft.name).trim()});
+    // Words are kept exactly as typed while editing; the ends are tidied here.
+    const tr=v=>String(v==null?"":v).trim();
+    if(d.intake)["n","h"].forEach(k=>{const x=d.intake[k];if(!x||typeof x!=="object")return;d.intake={...d.intake,[k]:{...x,label:tr(x.label),note:tr(x.note),opts:(Array.isArray(x.opts)?x.opts:[]).map(tr)}};});
+    if(d.weekly)d.weekly={...d.weekly,title:tr(d.weekly.title)};
+    d.subtitle=tr(d.subtitle);d.tagline=tr(d.tagline);
+    d.id=draft._isNew&&L.list.some(c=>c.id===draft.id)?chNewId(L.list):draft.id;d.members=Array.from(new Set((draft.members||[]).map(e=>String(e).toLowerCase())));
+    const fresh=L.list.filter(c=>c.id!==d.id);
+    const orig=L.list.find(c=>c.id===d.id);
+    const A=await chLoadArchive();
+    if(!A.ok){setSaving(false);showToast&&showToast("Couldn't save — check your connection");return;}
+    const problem=chDraftProblem({...draft,...d,_isNew:!orig},fresh,chNextDS(fresh),A.list);
+    if(problem){setSaving(false);showToast&&showToast(problem);return;}
+    const next=[...fresh,d].sort((a,b)=>a.start<b.start?-1:1);
+    const ok=await chWrite("__CHALLENGES__",JSON.stringify(next.map(chCfgStore)),L.exists);
+    setSaving(false);
+    if(!ok){showToast&&showToast("Couldn't save — try again");return;}
+    setList(next);close();showToast&&showToast("Challenge saved ✓");
+  }
+  // REMOVE — KEEP ENTRIES: the challenge leaves this list but moves to REMOVED, and members who logged
+  // anything keep it in their history (Sam, 25 Sep 2026). Archive first, then the list, so it's never lost.
+  async function remove(){
+    if(!draft||draft._isNew||saving)return;
+    if(!confirmRm){setConfirmRm(true);setConfirmDel(false);return;}
+    setSaving(true);
+    const [L,A]=await Promise.all([chLoadList(),chLoadArchive()]);
+    if(!L.ok||!A.ok){setSaving(false);showToast&&showToast("Couldn't remove — check your connection");return;}
+    const orig=L.list.find(c=>c.id===draft.id);
+    if(!orig){setSaving(false);close();load();return;}
+    const arc=[...A.list.filter(c=>c.id!==orig.id),orig].sort((x,y)=>x.start<y.start?-1:1);
+    if(!(await chWrite("__CHALLENGES_ARCHIVE__",JSON.stringify(arc.map(chCfgStore)),A.exists))){setSaving(false);showToast&&showToast("Couldn't remove — try again");return;}
+    const next=L.list.filter(c=>c.id!==draft.id);
+    const ok=await chWrite("__CHALLENGES__",JSON.stringify(next.map(chCfgStore)),L.exists);
+    setSaving(false);
+    if(!ok){showToast&&showToast("Couldn't remove — try again");return;}
+    setList(next);setArchive(arc);close();showToast&&showToast("Challenge removed — members keep it in their history");
+  }
+  // DELETE — removes a challenge from everywhere: every member's entries first, then the challenge from the
+  // list and from REMOVED. Nothing comes off the list until every member's entries are gone, so a failure can be retried.
+  async function deleteEverywhere(id,start){
+    setSaving(true);
+    const res=await chDeleteEntries(start);
+    if(!res.ok){setSaving(false);setConfirmDel(false);setConfirmArc("");showToast&&showToast(res.failed?"Couldn't delete entries for "+res.failed+" member"+(res.failed===1?"":"s")+" — the challenge is still here, try again":"Couldn't delete — check your connection");return false;}
+    const [L,A]=await Promise.all([chLoadList(),chLoadArchive()]);
+    if(!L.ok||!A.ok){setSaving(false);showToast&&showToast("Entries deleted, but the challenge couldn't be removed — try again");return false;}
+    let ok=true;
+    if(L.list.some(c=>c.id===id)){const next=L.list.filter(c=>c.id!==id);ok=await chWrite("__CHALLENGES__",JSON.stringify(next.map(chCfgStore)),L.exists);if(ok)setList(next);}
+    if(ok&&A.list.some(c=>c.id===id)){const arc=A.list.filter(c=>c.id!==id);ok=await chWrite("__CHALLENGES_ARCHIVE__",JSON.stringify(arc.map(chCfgStore)),A.exists);if(ok)setArchive(arc);}
+    setSaving(false);setConfirmArc("");
+    if(!ok){showToast&&showToast("Entries deleted, but the challenge couldn't be removed — try again");return false;}
+    showToast&&showToast("Challenge and "+res.members+" member"+(res.members===1?"'s":"s'")+" entries deleted");
+    return true;
+  }
+  async function removeAll(){
+    if(!draft||draft._isNew||saving)return;
+    if(!confirmDel){setConfirmDel(true);setConfirmRm(false);return;}
+    const L=await chLoadList();
+    const orig=L.ok?L.list.find(c=>c.id===draft.id):null;
+    if(await deleteEverywhere(draft.id,orig?orig.start:draft.start))close();
+  }
+  async function deleteArchived(c){
+    if(saving)return;
+    if(confirmArc!==c.id){setConfirmArc(c.id);return;}
+    await deleteEverywhere(c.id,c.start);
+  }
+  const inp={width:"100%",boxSizing:"border-box",background:"#0a0a0a",border:"1px solid "+CH_C.line2,borderRadius:0,color:"#fff",fontFamily:"'DM Sans',sans-serif",fontSize:12,padding:"8px 10px"};
+  // Every Journey box is the same size: two lines tall, same padding, same type size.
+  const jbox={...inp,display:"block",height:54,lineHeight:1.5,fontSize:12,letterSpacing:"0.06em",resize:"none",overflow:"hidden"};
+  const jlbl={fontSize:9,color:CH_C.faint,letterSpacing:"0.12em",marginBottom:5};
+  const fl=t=>CH_E("div",{style:{...chLbl,margin:"12px 0 5px"}},t);
+  const help=t=>CH_E("div",{style:{fontSize:9,letterSpacing:"0.06em",color:CH_C.faint,marginTop:8,lineHeight:1.7}},t);
+  // New lines never belong in these one-line words.
+  const one=v=>String(v==null?"":v).replace(/\s*\n\s*/g," ");
+  // A button that opens and closes the part of the setup under it: a bordered green bar, the title in Bebas on the
+  // left, a short summary and the arrow on the right.
+  const subTog=(t,openNow,onTog,right,extra)=>CH_E("button",{type:"button",onClick:onTog,"data-chsubtog":t,...(extra||{}),
+    style:{width:"100%",display:"flex",alignItems:"center",justifyContent:"space-between",gap:10,background:openNow?CH_C.accF:CH_C.deep,color:CH_C.acc,border:"1px solid "+CH_C.accB,borderRadius:6,padding:"11px 13px",marginTop:10,cursor:"pointer",userSelect:"none",textAlign:"left"}},
+    CH_E("span",{style:{fontFamily:"'Bebas Neue',sans-serif",fontSize:14,letterSpacing:"0.14em",lineHeight:1.1,whiteSpace:"nowrap",flexShrink:0}},t),
+    CH_E("span",{style:{display:"flex",alignItems:"center",justifyContent:"flex-end",gap:8,minWidth:0,flex:1}},
+      right?CH_E("span",{"data-chsubtog-right":t,style:{fontFamily:"'DM Sans',sans-serif",fontSize:9,letterSpacing:"0.1em",color:CH_C.accL,fontWeight:600,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}},right):null,
+      CH_E("span",{style:{fontSize:11,letterSpacing:0,color:CH_C.acc,flexShrink:0,transform:openNow?"none":"rotate(-90deg)",transition:"transform .15s"}},"▾")));
+  // A smaller bar inside a part (each JOURNEY week, BIGGEST WIN, REFLECTION). Red when something inside still needs filling in.
+  const miniTog=(key,t,openNow,onTog,right,warn)=>CH_E("button",{type:"button",onClick:onTog,"data-chmini":key,
+    style:{width:"100%",display:"flex",alignItems:"center",justifyContent:"space-between",gap:10,background:openNow?CH_C.accF:"#0e0e0e",border:"1px solid "+(warn?"#5a1d1d":openNow?CH_C.accB:"#2a2a2a"),borderRadius:6,padding:"9px 11px",marginTop:6,cursor:"pointer",userSelect:"none",textAlign:"left"}},
+    CH_E("span",{style:{fontFamily:"'Bebas Neue',sans-serif",fontSize:13,letterSpacing:"0.14em",lineHeight:1.1,color:warn?CH_C.err:"#ddd",whiteSpace:"nowrap",flexShrink:0}},t),
+    CH_E("span",{style:{display:"flex",alignItems:"center",justifyContent:"flex-end",gap:8,minWidth:0,flex:1}},
+      right?CH_E("span",{style:{fontFamily:"'DM Sans',sans-serif",fontSize:9,letterSpacing:"0.1em",color:warn?CH_C.err:CH_C.accL,fontWeight:600,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}},right):null,
+      CH_E("span",{style:{fontSize:11,letterSpacing:0,color:CH_C.acc,flexShrink:0,transform:openNow?"none":"rotate(-90deg)",transition:"transform .15s"}},"▾")));
+  // A boxed part with a small green title.
+  const part=(label,kids,extra,attrs)=>CH_E("div",{...(attrs||{}),style:{border:"1px solid "+CH_C.line2,background:"#0b0b0b",borderRadius:6,padding:"10px 11px 12px",marginTop:10}},
+    CH_E("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",gap:10,marginBottom:8}},
+      CH_E("span",{style:{fontSize:9,letterSpacing:"0.2em",color:CH_C.acc,fontWeight:600}},label),extra||null),
+    kids);
+  const small=t=>CH_E("div",{style:{fontSize:9,letterSpacing:"0.12em",color:CH_C.faint,fontWeight:600,margin:"8px 0 4px"}},t);
+  // Both writers of `weekly` (WEEKLY CHALLENGE and the how-line in ABOUT) carry every field, so neither resets the other.
+  const putWeekly=patch=>setDraft(p=>{const c=chWeeklyRaw(p);return {...p,weekly:{on:c.on,pick:c.pick,title:c.title,text:c.text,how:c.how,...patch}};});
+  const setMoves=fn=>setDraft(p=>({...p,movement:fn((p.movement||CH_DEFAULT_MOVEMENT).map(x=>({...x})))}));
+  // ABOUT THIS CHALLENGE: edited in the parts members see. Every text box grows to show all its text and can be
+  // dragged taller; it never shrinks under a size it was dragged to.
+  function aboutEditor(d,days){
+    const a=chAboutOf(d);
+    const tbox={...jbox,height:"auto",minHeight:54,resize:"vertical",overflow:"auto"};
+    const grow=el=>{if(!el)return;const need=el.scrollHeight+2;if(el.offsetHeight<need)el.style.height=need+"px";};
+    const put=next=>setDraft(p=>({...p,about:next}));
+    const cur=()=>a;
+    const setTitle=(i,v)=>{const x=cur();const t=x.title.slice();t[i]=one(v).toUpperCase();put({...x,title:t});};
+    const setClose=(i,v)=>{const x=cur();const c=[x.closing[0]||"",x.closing[1]||"",x.closing.slice(2).join(" ")];c[i]=one(v).toUpperCase();put({...x,closing:c});};
+    const setSec=(i,k,v)=>{const x=cur();put({...x,sections:x.sections.map((y,j)=>j===i?{...y,[k]:k==="h"?one(v).toUpperCase():one(v)}:y)});};
+    // CHALLENGE JOURNEY's sub-sections ARE the movements members tick: the title is the tick's name and the text
+    // says what counts. Giving the empty one a title adds another movement.
+    const moves=(d.movement||CH_DEFAULT_MOVEMENT).map(m=>({...m,desc:m.desc!=null?m.desc:(CH_MOVE_DESC[m.id]||"")}));
+    const setMoveTitle=(k,v)=>{const t=one(v).toUpperCase();setMoves(m=>{if(k<m.length)m[k].label=t;else if(t.trim())m.push({id:chNewMoveId(m),label:t,note:"Minimum 30 minutes",desc:""});return m;});};
+    const setMoveDesc=(k,v)=>setMoves(m=>{if(k<m.length)m[k].desc=one(v);return m;});
+    const w=chWeeklyRaw(d);
+    const weeklyPart=()=>part(chWeeklyOf(d).title,CH_E(React.Fragment,null,
+      CH_E("div",{style:{fontSize:9,letterSpacing:"0.06em",color:CH_C.faint,lineHeight:1.7,marginBottom:6}},"The name and what to do come from WEEKLY CHALLENGE below. This is the line under the name here:"),
+      small("HOW IT WORKS"),
+      CH_E("textarea",{ref:grow,"data-f":"weekly-how",rows:2,value:w.how,placeholder:"Leave blank to leave this line out",onChange:e=>putWeekly({how:one(e.target.value)}),style:{...tbox,color:"#ddd",letterSpacing:"0.02em"}})),null,{"data-chabout-part":"WEEKLY CHALLENGE"});
+    const moveSubs=()=>CH_E("div",{"data-chabout-subs":"1",style:{marginTop:12,paddingTop:4,borderTop:"1px solid "+CH_C.rule}},
+      Array.from({length:Math.max(3,chMoveRows(moves))},(_,k)=>{const mv=moves[k]||null;
+        return CH_E("div",{key:k,"data-chmove-slot":k+1,style:{borderLeft:"2px solid "+CH_C.accB,padding:"0 0 2px 10px",marginTop:10}},
+          small("SUB-SECTION "+(k+1)+(k>=3?" — OPTIONAL":"")),
+          CH_E("input",{"data-f":"move-title-"+(k+1),value:mv?mv.label:"",placeholder:k>=3?"ADD ANOTHER (OPTIONAL)":"TITLE",onChange:e=>setMoveTitle(k,e.target.value),style:{...jbox,height:"auto",fontWeight:600}}),
+          CH_E("textarea",{ref:grow,"data-f":"move-desc-"+(k+1),rows:2,value:mv?mv.desc:"",disabled:!mv,placeholder:mv?"What counts as this":"Give it a title first",
+            onChange:e=>setMoveDesc(k,e.target.value),style:{...tbox,color:"#ddd",letterSpacing:"0.02em",marginTop:6,opacity:mv?1:0.5}}));}),
+      help("The titles are what members tick each day (the same list as MOVEMENT above). If you add or remove one, check the text above still says the right “any "+(d.movementRequired||2)+" of…”."));
+    return CH_E("div",{"data-chabout-edit":"1",style:{marginTop:4}},
+      part("BUTTON NAME",CH_E("input",{"data-f":"aboutTitle",value:chShowN(chAboutTitleOf(d),days),placeholder:chShowN(CH_ABOUT_TITLE,days),
+        onChange:e=>{const v=chKeepN(e.target.value,days);setDraft(p=>({...p,aboutTitle:v}));},style:{...jbox,height:"auto",fontWeight:600}}),null,{"data-chabout-part":"BUTTON NAME"}),
+      // Shown after the button name on the members' details button, in smaller type.
+      part("BUTTON SUBTITLE",CH_E("input",{"data-f":"subtitle",value:d.subtitle||"",placeholder:"After the button name, in smaller type",
+        onChange:e=>{const v=one(e.target.value).toUpperCase();setDraft(p=>({...p,subtitle:v}));},style:{...jbox,height:"auto"}}),null,{"data-chabout-part":"BUTTON SUBTITLE"}),
+      part("TITLE",CH_E(React.Fragment,null,
+        small("BIG LINE"),
+        CH_E("input",{"data-f":"about-title-1",value:a.title[0],placeholder:"SOUL FOR {N}",onChange:e=>setTitle(0,e.target.value),style:{...jbox,height:"auto"}}),
+        small("NAME"),
+        CH_E("input",{"data-f":"about-title-2",value:a.title[1],placeholder:"THE {N}-DAY CHALLENGE",onChange:e=>setTitle(1,e.target.value),style:{...jbox,height:"auto"}}),
+        small("SUBTITLE"),
+        CH_E("textarea",{ref:grow,"data-f":"about-title-3",rows:2,value:a.title[2],placeholder:"{N} DAYS. ONE COMMITMENT. MAKE THEM COUNT.",onChange:e=>setTitle(2,e.target.value),style:tbox})),null,{"data-chabout-part":"TITLE"}),
+      part("DETAILS",CH_E("textarea",{ref:grow,"data-f":"about-details",rows:3,value:a.details,onChange:e=>put({...cur(),details:one(e.target.value)}),style:{...tbox,minHeight:100,color:"#ddd",letterSpacing:"0.02em"}}),null,{"data-chabout-part":"DETAILS"}),
+      ...a.sections.flatMap((x,i)=>[part("SECTION "+(i+1),CH_E(React.Fragment,null,
+        small("HEADING"),
+        CH_E("input",{"data-f":"about-h-"+(i+1),value:x.h,placeholder:"HEADING",onChange:e=>setSec(i,"h",e.target.value),style:{...jbox,height:"auto",fontWeight:600}}),
+        small("TEXT"),
+        CH_E("textarea",{ref:grow,"data-f":"about-t-"+(i+1),rows:2,value:x.t,onChange:e=>setSec(i,"t",e.target.value),style:{...tbox,color:"#ddd",letterSpacing:"0.02em"}}),
+        x.move?moveSubs():null),
+        CH_E("span",{"data-chabout-rm":i+1,role:"button",onClick:()=>put({...cur(),sections:cur().sections.filter((_,j)=>j!==i)}),style:{fontSize:9,letterSpacing:"0.14em",color:"#777",fontWeight:600,cursor:"pointer"}},"REMOVE"),
+        {key:"sec"+i,"data-chabout-part":"SECTION "+(i+1)}),
+        // The weekly challenge's part of the details sits straight after CHALLENGE JOURNEY.
+        x.move&&chWeeklyOf(d).on?CH_E(React.Fragment,{key:"wk"+i},weeklyPart()):null]),
+      CH_E("button",{type:"button","data-chabout-add":"1",onClick:()=>put({...cur(),sections:cur().sections.concat([{h:"",t:""}])}),
+        style:{width:"100%",background:"transparent",color:CH_C.acc,border:"1px solid "+CH_C.accB,borderRadius:6,fontFamily:"'Bebas Neue',sans-serif",fontSize:12,letterSpacing:"0.14em",padding:"9px",cursor:"pointer",marginTop:10}},"+ ADD SECTION"),
+      // Set like the TITLE, so the three boxes match what members see.
+      part("CLOSING",CH_E(React.Fragment,null,
+        small("BIG LINE"),
+        CH_E("input",{"data-f":"about-close-1",value:a.closing[0]||"",placeholder:"SOUL FOR {N}",onChange:e=>setClose(0,e.target.value),style:{...jbox,height:"auto"}}),
+        small("LINE UNDER IT"),
+        CH_E("input",{"data-f":"about-close-2",value:a.closing[1]||"",placeholder:"SHOW UP. PUT IN THE WORK. KEEP MOVING.",onChange:e=>setClose(1,e.target.value),style:{...jbox,height:"auto"}}),
+        small("LAST LINE (SMALL, GREEN)"),
+        CH_E("input",{"data-f":"about-close-3",value:a.closing.slice(2).join(" "),placeholder:"WITH SOUL FITNESS.",onChange:e=>setClose(2,e.target.value),style:{...jbox,height:"auto"}})),null,{"data-chabout-part":"CLOSING"}),
+      help("{N} is the number of days, so the wording follows the length. A section left empty isn't shown. Clear the button name to hide the whole thing."));
+  }
+  // INTAKE: each of nutrition and hydration has a heading, the note beside it and three options, each marked with
+  // its square's colour. The boxes hold exactly what was typed; a cleared box stays empty with the original wording
+  // as its placeholder, and members get the original for a blank.
+  function intakeEditor(d){
+    const cur={n:chIntakeRaw(d,"n"),h:chIntakeRaw(d,"h")};
+    const put=(k,fn)=>setDraft(p=>{const next={n:chIntakeRaw(p,"n"),h:chIntakeRaw(p,"h")};next[k]={...next[k],...fn(next[k])};return {...p,intake:next};});
+    const box=(k,title)=>part(title,CH_E(React.Fragment,null,
+      small("HEADING"),
+      CH_E("input",{"data-f":"intake-"+k+"-label",value:cur[k].label,placeholder:CH_DEFAULT_INTAKE[k].label,onChange:e=>{const v=one(e.target.value).toUpperCase();put(k,()=>({label:v}));},style:{...jbox,height:"auto",fontWeight:600}}),
+      small("SMALL TEXT BESIDE IT"),
+      CH_E("input",{"data-f":"intake-"+k+"-note",value:cur[k].note,placeholder:CH_DEFAULT_INTAKE[k].note,onChange:e=>{const v=one(e.target.value);put(k,()=>({note:v}));},style:{...jbox,height:"auto"}}),
+      ...cur[k].opts.map((o,i)=>CH_E("div",{key:i},
+        small("OPTION "+(i+1)+(i===0?" — DARKEST SQUARE":i===2?" — BRIGHTEST SQUARE":"")),
+        CH_E("input",{"data-f":"intake-"+k+"-opt-"+(i+1),value:o,placeholder:CH_DEFAULT_INTAKE[k].opts[i],
+          onChange:e=>{const v=one(e.target.value);put(k,x=>({opts:x.opts.map((y,j)=>j===i?v:y)}));},
+          style:{...jbox,height:"auto",borderLeft:"4px solid "+CH_TONES[i]}})))),null,{"data-chintake-edit":k});
+    return CH_E("div",{"data-chintake-editor":"1",style:{marginTop:4}},
+      box("n","NUTRITION"),box("h","HYDRATION"),
+      help("Each option keeps its colour in the NOURISHMENT JOURNEY squares. Days already logged read back in the new words. A blank option uses the original wording."));
+  }
+  // WEEKLY CHALLENGE: ON/OFF, NAME, WHAT TO DO. The line in the details is under ABOUT.
+  function weeklyEditor(d){
+    const w=chWeeklyRaw(d);
+    const pair=(attr,val,set)=>CH_E("div",{style:{display:"flex",gap:6,marginBottom:4}},
+      [[true,"ON"],[false,"OFF"]].map(([v,t])=>CH_E("button",{key:t,type:"button",[attr]:v?"1":"0",onClick:()=>set(v),
+        style:{flex:1,background:val===v?CH_C.acc:"transparent",color:val===v?"#0a0a0a":"#777",border:"1px solid "+(val===v?CH_C.acc:"#2a2a2a"),borderRadius:6,fontFamily:"'Bebas Neue',sans-serif",fontSize:13,letterSpacing:"0.14em",padding:"9px",cursor:"pointer"}},t)));
+    return CH_E("div",{"data-chweekly-editor":"1",style:{border:"1px solid "+CH_C.line2,background:"#0b0b0b",borderRadius:6,padding:"10px 11px 12px",marginTop:8}},
+      pair("data-chweekly-on",w.on,v=>putWeekly({on:v})),
+      small("NAME"),
+      CH_E("input",{"data-f":"weekly-title",value:w.title,placeholder:CH_WEEKLY_TITLE,onChange:e=>putWeekly({title:one(e.target.value).toUpperCase()}),style:{...jbox,height:"auto",fontWeight:600,marginBottom:4}}),
+      small("WHAT TO DO — EVERY WEEK"),
+      CH_E("textarea",{"data-f":"weekly-text",rows:2,value:w.text,placeholder:"Leave blank to show nothing",onChange:e=>putWeekly({text:one(e.target.value)}),style:{...jbox,color:"#ddd",letterSpacing:"0.02em",marginBottom:4}}),
+      help("Members type what they did, tick the week and enter their time. WHAT TO DO shows only on the WEEKLY CHALLENGE box on their challenge (under CHALLENGE JOURNEY), not in the challenge details; leave it blank to show nothing. The weeks ticked also show on the completion screen and on their profile in Admin. The line about it in the challenge details is edited under ABOUT THIS CHALLENGE."));
+  }
+  function editor(){
+    const d=draft;const started=!d._isNew&&d.start<=today;
+    const days=parseInt(d.days,10)||0;
+    const problem=chDraftProblem(d,list.filter(c=>c.id!==d.id),floor,archive);
+    const sel=new Set(d.members||[]);
+    const rosterSet=new Set(roster.map(r=>r.email));
+    const inCount=(d.members||[]).filter(e=>rosterSet.has(e)).length;
+    const mvAll=d.movement||CH_DEFAULT_MOVEMENT;
+    // "Any n of m" counts only movements with a name.
+    const named=mvAll.filter(chMoveNamed);
+    const setAt=(i,k,v)=>setMoves(a=>{if(i<a.length)a[i]={...a[i],[k]:v};else if(String(v).trim())a.push({id:chNewMoveId(a),label:k==="label"?v:"",note:k==="note"?v:"Minimum 30 minutes",desc:""});return a;});
+    const themesN=(d.themes||[]).length;
+    return CH_E("div",{"data-cheditor":d._isNew?"new":d.id,style:{border:"1px solid "+CH_C.line,borderTop:"none",background:CH_C.panel,padding:"4px 14px 14px",marginBottom:10}},
+      fl("CHALLENGE NAME"),CH_E("input",{"data-f":"name",value:d.name,placeholder:"e.g. 30 DAY CHALLENGE",onChange:e=>upd({name:e.target.value}),style:inp}),
+      fl("CATCHPHRASE"),CH_E("input",{"data-f":"tagline",value:d.tagline||"",placeholder:"After the name on the members' challenge button",onChange:e=>upd({tagline:e.target.value.toUpperCase()}),style:inp}),
+      CH_E("div",{style:{display:"flex",gap:8}},
+        CH_E("div",{style:{flex:2}},fl("START DATE"),CH_E("input",{"data-f":"start",type:"date",value:d.start,min:d._isNew&&floor?floor:undefined,disabled:started,onChange:e=>upd({start:e.target.value}),style:{...inp,colorScheme:"dark",opacity:started?0.5:1}})),
+        CH_E("div",{style:{flex:1}},fl("DAYS"),CH_E("input",{"data-f":"days",type:"number",min:1,max:366,value:d.days,onChange:e=>upd({days:e.target.value}),style:inp}))),
+      d._isNew&&CH_E("div",{"data-chstart-help":"1",style:{fontSize:10,color:CH_C.dim,marginTop:5,lineHeight:1.5}},floor?"Pick any date from "+chFmtLong(floor)+" (the day after "+String((list[list.length-1]||{}).name||"the last challenge").toUpperCase()+" ends).":"Pick the date it starts."),
+      started&&CH_E("div",{style:{fontSize:10,color:CH_C.dim,marginTop:5,lineHeight:1.5}},"The start date is locked once a challenge has started — members' days are filed under it."),
+      /^\d{4}-\d{2}-\d{2}$/.test(d.start||"")&&days>=1&&CH_E("div",{"data-chrange":"1",style:{fontSize:10,color:CH_C.mid,letterSpacing:"0.08em",marginTop:6}},chFmtRange(d.start,chAddDays(d.start,days-1))),
+      fl("MOVEMENT"),
+      // Every movement, then an empty row to add another (up to six). A row left without a name isn't kept.
+      Array.from({length:chMoveRows(mvAll)},(_,i)=>{const m=mvAll[i]||null;
+        return CH_E("div",{key:"mv"+i,"data-chmove-row":i+1,style:{display:"flex",gap:6,marginBottom:5,alignItems:"stretch"}},
+          CH_E("input",{"data-f":"move-label-"+(i+1),"data-mv":m?m.id:"",value:m?m.label:"",placeholder:i>=3?"ADD ANOTHER":"NAME",onChange:e=>setAt(i,"label",e.target.value.toUpperCase()),style:{...inp,flex:1,minWidth:0}}),
+          CH_E("input",{"data-f":"move-note-"+(i+1),value:m?m.note||"":"",placeholder:"Note",onChange:e=>setAt(i,"note",e.target.value),style:{...inp,flex:1.4,minWidth:0}}),
+          i>=3&&m&&CH_E("button",{type:"button","data-chmove-rm":m.id,onClick:()=>setMoves(a=>a.filter((_,j)=>j!==i)),
+            style:{...chBtnGhost,flexShrink:0,color:CH_C.err,borderColor:"#5a2018"}},"REMOVE"));}),
+      help("Type a name in the empty row to add another movement members can tick (up to six). A row left empty isn't shown."),
+      CH_E("div",{style:{display:"flex",alignItems:"center",gap:6,marginTop:8,flexWrap:"wrap"}},
+        CH_E("div",{style:{fontSize:10,color:CH_C.mid,letterSpacing:"0.06em",marginRight:4}},"DAY EARNED WITH ANY"),
+        named.map((_,i)=>CH_E("button",{key:i,"data-req":i+1,onClick:()=>upd({movementRequired:i+1}),style:{background:d.movementRequired===i+1?"#fff":"#222",color:d.movementRequired===i+1?"#000":"#555",border:"1px solid "+(d.movementRequired===i+1?"#fff":"#333"),borderRadius:0,padding:"5px 11px",fontSize:10,fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}},i+1)),
+        CH_E("div",{style:{fontSize:10,color:CH_C.mid,letterSpacing:"0.06em",marginLeft:4}},"OF "+named.length)),
+      // The setup's parts, in order: who, about, intake, weekly, journey.
+      subTog("WHO IS IN THIS CHALLENGE",pickOpen,()=>setPickOpen(p=>!p),inCount+" OF "+roster.length,{"data-chpicker":"1"}),
+      pickOpen&&CH_E("div",{"data-chroster":"1",style:{border:"1px solid "+CH_C.line2,borderTop:"none",padding:"8px 12px"}},
+        CH_E("div",{style:{display:"flex",gap:6,marginBottom:6}},
+          CH_E("button",{"data-chall":"1",onClick:()=>upd({members:roster.map(r=>r.email)}),style:chBtnGhost},"SELECT ALL"),
+          CH_E("button",{"data-chnone":"1",onClick:()=>upd({members:[]}),style:chBtnGhost},"CLEAR ALL")),
+        roster.map(r=>CH_E("label",{key:r.email,style:{display:"flex",alignItems:"center",gap:10,padding:"6px 0",borderBottom:"1px solid "+CH_C.rule,cursor:"pointer"}},
+          CH_E("input",{type:"checkbox","data-member":r.email,checked:sel.has(r.email),onChange:e=>{const s=new Set(d.members||[]);e.target.checked?s.add(r.email):s.delete(r.email);upd({members:Array.from(s)});},style:{accentColor:CH_C.acc,margin:0}}),
+          CH_E("div",{style:{minWidth:0}},CH_E("div",{style:{fontSize:12,color:"#fff"}},r.name),CH_E("div",{style:{fontSize:9,color:CH_C.faint}},r.email))))),
+      subTog("ABOUT THIS CHALLENGE",showAbout,()=>setShowAbout(v=>!v),chShowN(chAboutTitleOf(d),days).trim()||"HIDDEN"),
+      showAbout&&aboutEditor(d,days),
+      subTog("INTAKE",showIntake,()=>setShowIntake(v=>!v),chIntakeOf(d,"n").label+" · "+chIntakeOf(d,"h").label),
+      showIntake&&intakeEditor(d),
+      subTog("WEEKLY CHALLENGE",showWeekly,()=>setShowWeekly(v=>!v),chWeeklyOf(d).on?"ON":"OFF"),
+      showWeekly&&weeklyEditor(d),
+      subTog("JOURNEY",journeyOpen,()=>setJourneyOpen(p=>!p),themesN+" WEEKS · "+Math.max(1,days)+" QUESTIONS",{"data-chjourney":"1"}),
+      journeyOpen&&CH_E("div",{"data-chjourney-edit":"1",style:{padding:"4px 0 0"}},
+        // Each week's theme and the line under it, each week behind its own bar, closed to start. A blank theme
+        // turns its bar red. They carry over to the next challenge.
+        d.themes.map((t,i)=>{const a=i*7+1;const b=i===d.themes.length-1?days:Math.min(days,i*7+7);if(a>days)return null;
+          const setTheme=v=>setDraft(p=>({...p,themes:p.themes.map((x,j)=>j===i?v.toUpperCase():x)}));
+          const setLine=v=>setDraft(p=>{const L=p.themes.map((_,j)=>(p.lines||[])[j]||"");L[i]=v.toUpperCase();return {...p,lines:L};});
+          const wOpen=!!openWeeks[i+1],blank=!String(t||"").trim();
+          return CH_E("div",{key:i,"data-chweek":i+1},
+            miniTog("week-"+(i+1),"WEEK "+(i+1)+" · DAYS "+a+"–"+b,wOpen,()=>setOpenWeeks(o=>({...o,[i+1]:!o[i+1]})),blank?"NEEDS A THEME":String(t),blank),
+            wOpen&&CH_E("div",{"data-chweek-body":i+1,style:{padding:"8px 0 10px"}},
+              CH_E("textarea",{"data-f":"theme-"+(i+1),rows:2,value:t,placeholder:"THEME",onChange:e=>setTheme(e.target.value.replace(/\n/g," ")),style:{...jbox,fontWeight:600,color:"#fff",marginBottom:6,borderColor:blank?"#5a1d1d":CH_C.line2}}),
+              CH_E("textarea",{"data-f":"line-"+(i+1),rows:2,value:(d.lines||[])[i]||"",placeholder:"LINE UNDER THE THEME",onChange:e=>setLine(e.target.value.replace(/\n/g," ")),style:{...jbox,color:"#bbb"}})));}),
+        // Biggest Win and Reflection, each a drop-down of its own. Past answers keep the question they were answered
+        // under, so rewording one never changes what a member already wrote.
+        CH_E("div",{"data-chq-toggle":"1",role:"button",onClick:()=>setQOpen(p=>!p),style:{display:"flex",justifyContent:"space-between",alignItems:"center",background:CH_C.acc,color:"#0a0a0a",borderRadius:6,padding:"11px 14px",margin:"10px 0",cursor:"pointer",userSelect:"none"}},
+          CH_E("div",{style:{fontFamily:"'Bebas Neue',sans-serif",fontSize:14,letterSpacing:"0.12em"}},"BIGGEST WIN & REFLECTION QUESTIONS"),
+          CH_E("span",{style:{fontSize:11,transform:qOpen?"none":"rotate(-90deg)"}},"▾")),
+        qOpen&&CH_E("div",{"data-chq":"1",style:{padding:"0 0 10px",borderBottom:"1px solid "+CH_C.rule}},
+          miniTog("qwin","BIGGEST WIN",showQWin,()=>setShowQWin(v=>!v),"QUESTION · "+Math.max(1,days)+" EXAMPLES"),
+          showQWin&&CH_E("div",{"data-chq-win":"1",style:{padding:"8px 0 4px"}},
+            CH_E("div",{style:jlbl},"THE QUESTION"),
+            CH_E("textarea",{"data-f":"qWin",rows:2,value:d.qWin,placeholder:CH_Q.win,onChange:e=>upd({qWin:e.target.value.replace(/\n/g," ")}),style:{...jbox,color:"#fff",marginBottom:14}}),
+            // The example shown in grey in that day's Biggest Win box. Only an example: never saved as an answer.
+            CH_E("div",{style:jlbl},"ANSWER EXAMPLES — ONE A DAY"),
+            Array.from({length:Math.max(1,days)},(_,i)=>CH_E("div",{key:i,style:{marginBottom:6}},
+              CH_E("div",{style:{...jlbl,marginBottom:3}},"DAY "+(i+1)),
+              CH_E("textarea",{"data-f":"winEg-"+(i+1),rows:2,value:(d.winExamples||[])[i]||"",placeholder:"One line is enough",
+                onChange:e=>{const v=e.target.value.replace(/\n/g," ");setDraft(p=>{const r=p.winExamples||[];const n=Math.max(days,r.length);const a=Array.from({length:n},(_,j)=>r[j]||"");a[i]=v;return {...p,winExamples:a};});},style:{...jbox,color:"#ddd"}}))),
+            help("Each day's example shows in grey in the Biggest Win box on that day. It is only an example, never saved as a member's answer. A blank day shows “One line is enough”.")),
+          miniTog("qrefl","REFLECTION",showQRefl,()=>setShowQRefl(v=>!v),"ONE QUESTION A DAY · "+Math.max(1,days)+" DAYS"),
+          showQRefl&&CH_E("div",{"data-chq-refl":"1",style:{padding:"8px 0 0"}},
+            Array.from({length:Math.max(1,days)},(_,i)=>CH_E("div",{key:i,style:{marginBottom:6}},
+              CH_E("div",{style:{...jlbl,marginBottom:3}},"DAY "+(i+1)),
+              CH_E("textarea",{"data-f":"refl-"+(i+1),rows:2,value:d.reflections[i]||"",placeholder:CH_FALLBACK_Q,onChange:e=>{const v=e.target.value.replace(/\n/g," ");setDraft(p=>{const n=Math.max(days,p.reflections.length);const a=Array.from({length:n},(_,j)=>p.reflections[j]||"");a[i]=v;return {...p,reflections:a};});},style:{...jbox,color:"#ddd"}}))),
+            help("A blank day uses \""+CH_FALLBACK_Q+"\". Days members have already answered keep the question they answered."))),
+        // The words on the completion screen. "{N}" is the challenge length, shown here as the number.
+        CH_E("div",{"data-chclosing-edit":"1",style:{padding:"8px 0 10px",borderBottom:"1px solid "+CH_C.rule}},
+          CH_E("div",{style:jlbl},"WHEN THE CHALLENGE IS COMPLETE"),
+          CH_E("textarea",{"data-f":"closing",rows:2,value:chShowN(d.closing,days),placeholder:"e.g. "+(days||30)+" DAYS COMPLETE",onChange:e=>upd({closing:chKeepN(e.target.value,days)}),style:{...jbox,fontWeight:600,color:"#fff",marginBottom:6}}),
+          CH_E("textarea",{"data-f":"closingSub",rows:2,value:chShowN(d.closingSub,days),placeholder:"e.g. THIS IS JUST THE BEGINNING.",onChange:e=>upd({closingSub:chKeepN(e.target.value,days)}),style:{...jbox,color:"#bbb"}}),
+          CH_E("div",{style:{fontSize:9,color:CH_C.faint,marginTop:5,lineHeight:1.5}},"If the wording includes the number of days, it updates itself when you change the length.")),
+        CH_E("div",{style:{fontSize:10,color:CH_C.faint,marginTop:8,lineHeight:1.6}},(d._isNew?"":"Changes show to members as soon as you save. ")+"The journey, questions and completion wording carry over to your next challenge.")),
+      problem&&CH_E("div",{"data-chproblem":"1",style:{fontSize:11,color:CH_C.err,marginTop:12,lineHeight:1.5}},problem),
+      CH_E("div",{style:{display:"flex",gap:6,marginTop:14}},
+        CH_E("button",{"data-chsavecfg":"1",disabled:!!problem||saving,onClick:save,style:{flex:2,background:problem?"#1a1a1a":CH_C.acc,color:problem?"#555":"#0a0a0a",border:"none",borderRadius:0,fontFamily:"'Bebas Neue',sans-serif",fontSize:14,letterSpacing:"0.1em",padding:"10px",cursor:problem||saving?"default":"pointer"}},saving?"SAVING...":"SAVE CHALLENGE"),
+        CH_E("button",{onClick:close,style:{...chBtnGhost,flex:1}},"CANCEL")),
+      !d._isNew&&CH_E(React.Fragment,null,
+        CH_E("button",{"data-chremove":"1",onClick:remove,disabled:saving,style:{...chBtnGhost,width:"100%",marginTop:14,padding:"9px",color:confirmRm?"#fff":"#bbb",background:confirmRm?"#333":"none",borderColor:confirmRm?"#666":"#444"}},confirmRm?"TAP AGAIN TO REMOVE — KEEP ENTRIES":"REMOVE CHALLENGE — KEEP ENTRIES"),
+        CH_E("div",{style:{fontSize:10,color:CH_C.faint,marginTop:5,lineHeight:1.6}},"Takes it off this list and moves it to REMOVED below. Members who took part keep it in their history to look back on."),
+        CH_E("button",{"data-chdelete":"1",onClick:removeAll,disabled:saving,style:{...chBtnGhost,width:"100%",marginTop:12,padding:"9px",color:confirmDel?"#fff":CH_C.err,background:confirmDel?"#8a2515":"none",borderColor:confirmDel?"#8a2515":"#5a2018"}},saving&&confirmDel?"DELETING...":confirmDel?"TAP AGAIN TO DELETE EVERYTHING":"DELETE CHALLENGE AND ALL ENTRIES"),
+        CH_E("div",{style:{fontSize:10,color:CH_C.faint,marginTop:5,lineHeight:1.6}},"Deletes the challenge and every member's entries for it, from everywhere. This can't be undone."))
+    );
+  }
+  const rowBar=(c,isNew)=>{const status=isNew?"NEW":chStatusOf(c,today);const col=status==="RUNNING"?CH_C.acc:status==="UPCOMING"?"#aaa":status==="NEW"?"#fff":CH_C.faint;const isOpen=isNew?openId==="__new__":openId===c.id;
+    return CH_E("div",{key:isNew?"__new__":c.id,"data-chrow":isNew?"new":c.id},
+      CH_E("div",{onClick:()=>isNew?close():openRow(c),style:{display:"flex",justifyContent:"space-between",alignItems:"center",background:CH_C.card,border:"1px solid "+CH_C.line,padding:"11px 14px",marginBottom:isOpen?0:8,cursor:"pointer"}},
+        CH_E("div",{style:{minWidth:0}},
+          CH_E("div",{style:{fontSize:12,fontWeight:600,letterSpacing:"0.1em",color:"#fff"}},isNew?(String(draft.name||"").trim()||"NEW CHALLENGE").toUpperCase():String(c.name).toUpperCase()),
+          CH_E("div",{style:{fontSize:10,color:CH_C.dim,marginTop:3,letterSpacing:"0.06em"}},isNew?(draft.start?chFmtRange(draft.start,chAddDays(draft.start,Math.max(1,parseInt(draft.days,10)||1)-1)):""):chFmtRange(c.start,chEndDS(c)))),
+        CH_E("div",{style:{display:"flex",alignItems:"center",gap:10,flexShrink:0}},
+          CH_E("span",{"data-chstatus":status,style:{fontSize:9,letterSpacing:"0.14em",fontWeight:700,color:col}},status),
+          CH_E("span",{style:{fontSize:11,color:"#888",transform:isOpen?"none":"rotate(-90deg)"}},"▾"))),
+      isOpen&&draft&&editor());};
+  return CH_E("div",{"data-chadmin":"1"},
+    CH_E("div",{style:{fontSize:10,letterSpacing:"0.18em",color:"#555",fontWeight:600,margin:"16px 0 10px"}},"CHALLENGE SETUP"),
+    CH_E("div",{style:{fontSize:11,color:"#666",letterSpacing:"0.04em",lineHeight:1.7,marginBottom:16}},"Every challenge you've set up, newest first. Members only see a challenge once you've ticked them into it, and only while Challenge is switched on under SECTIONS."),
+    loading?CH_E("div",{style:{fontSize:11,color:CH_C.faint,letterSpacing:"0.1em",padding:"20px 0",textAlign:"center"}},"LOADING...")
+    :loadErr?CH_E(React.Fragment,null,CH_E("div",{style:{fontSize:12,color:CH_C.err,lineHeight:1.6,marginBottom:10}},loadErr),CH_E("button",{onClick:load,style:chBtnGhost},"TRY AGAIN"))
+    :CH_E(React.Fragment,null,
+      openId==="__new__"&&draft&&rowBar(null,true),
+      ...[...list].reverse().map(c=>rowBar(c,false)),
+      !list.length&&openId!=="__new__"&&CH_E("div",{style:{fontSize:12,color:CH_C.faint,padding:"10px 0 16px"}},"No challenges yet."),
+      openId!=="__new__"&&CH_E("button",{"data-chnew":"1",onClick:startNew,style:{...chBtnWhite,marginTop:6}},"+ NEW CHALLENGE"),
+      archive.length>0&&CH_E("div",{"data-charchive":"1",style:{marginTop:26}},
+        CH_E("div",{style:{fontSize:10,letterSpacing:"0.18em",color:"#555",fontWeight:600,marginBottom:6}},"REMOVED — KEPT FOR MEMBERS"),
+        CH_E("div",{style:{fontSize:10,color:CH_C.faint,lineHeight:1.6,marginBottom:10}},"Members who took part still see these in their history. Delete one to remove it and every member's entries for it, from everywhere."),
+        [...archive].reverse().map(c=>CH_E("div",{key:c.id,"data-charc":c.id,style:{display:"flex",justifyContent:"space-between",alignItems:"center",gap:10,background:CH_C.card,border:"1px solid "+CH_C.line,padding:"10px 14px",marginBottom:8}},
+          CH_E("div",{style:{minWidth:0}},
+            CH_E("div",{style:{fontSize:12,fontWeight:600,letterSpacing:"0.1em",color:"#bbb"}},String(c.name).toUpperCase()),
+            CH_E("div",{style:{fontSize:10,color:CH_C.dim,marginTop:3,letterSpacing:"0.06em"}},chFmtRange(c.start,chEndDS(c)))),
+          CH_E("button",{"data-charcdel":c.id,disabled:saving,onClick:()=>deleteArchived(c),style:{...chBtnGhost,flexShrink:0,color:confirmArc===c.id?"#fff":CH_C.err,background:confirmArc===c.id?"#8a2515":"none",borderColor:confirmArc===c.id?"#8a2515":"#5a2018"}},saving&&confirmArc===c.id?"DELETING...":confirmArc===c.id?"TAP AGAIN TO DELETE":"DELETE"))))
+    )
+  );
+}
+// The coach's view of one member, on their profile: exactly the member's own CHALLENGE screen, read from their
+// record and unable to change it (no details button, no journal, weekly boxes locked). Under it, the one thing only
+// a coach sets — a later personal Day 1 for someone who joined late.
+function MemberChallengeAdmin({member}){
+  const email=String(member&&member.email||"");
+  const [data,setData]=useState(null);
+  const [startEdit,setStartEdit]=useState("");
+  const [busy,setBusy]=useState(false);
+  const [msg,setMsg]=useState("");
+  // Bumped after a start date is saved, so the member's view reloads.
+  const [viewKey,setViewKey]=useState(0);
+  // A white CHALLENGE bar like the profile's other sections (PERSONAL BESTS…), closed to start; the member's
+  // challenges live inside it, each one its own drop-down title button (Sam, 28 Sep 2026).
+  const [col,setCol]=useState(true);
+  async function loadData(){
+    const [L,A,r]=await Promise.all([chLoadList(),chLoadArchive(),chRead("__CHLOG__"+email)]);
+    if(!L.ok||!r.ok)return {err:true};
+    return {list:L.list,archive:A.ok?A.list:[],log:chParseLog(r.content)};
+  }
+  useEffect(()=>{if(col)return;let live=true;setData(null);loadData().then(d=>{if(live){setData(d);setStartEdit("");}});return()=>{live=false;};},[email,col]);
+  const hdr=CH_E("div",{"data-chcoach-bar":"1",onClick:()=>setCol(c=>!c),
+    style:{width:"100%",display:"flex",alignItems:"center",justifyContent:"space-between",background:"#fff",color:"#000",borderRadius:0,padding:"9px 14px",fontFamily:"'Bebas Neue',sans-serif",fontSize:14,letterSpacing:"0.14em",cursor:"pointer",userSelect:"none",marginTop:16,marginBottom:col?0:10}},
+    CH_E("span",null,"CHALLENGE"),
+    CH_E("span",{style:{fontSize:11,transform:col?"rotate(-90deg)":"none",transition:"transform .15s"}},"▾"));
+  if(col)return hdr;
+  if(!data)return CH_E(React.Fragment,null,hdr,CH_E("div",{style:{fontSize:10,color:"#444",letterSpacing:"0.1em",padding:"8px 0"}},"LOADING..."));
+  if(data.err)return CH_E(React.Fragment,null,hdr,CH_E("div",{style:{fontSize:10,color:CH_C.faint,padding:"4px 0 8px"}},"Couldn't load challenge data."));
+  const today=chToday();
+  const starts=chMemberStarts(data.list,data.log,email,today,data.archive);
+  if(!starts.length)return CH_E(React.Fragment,null,hdr,CH_E("div",{"data-chcoach-none":"1",style:{fontSize:11,color:"#555",padding:"6px 0 8px"}},"Not in a challenge."));
+  // The personal start belongs to the challenge they are in now (the first one shown), while it hasn't finished.
+  const live=data.list.find(c=>c.start===starts[0]&&chEnrolled(c,email))||null;
+  const b=live?data.log[live.start]||null:null;
+  const liveSt=live?chState(live,b,today):null;
+  const own=b&&typeof b.start==="string"&&live&&b.start>live.start?b.start:"";
+  async function saveStart(ds){
+    if(!live||busy)return;
+    setBusy(true);setMsg("");
+    const res=await chSaveMemberStart(email,live,ds);
+    setBusy(false);
+    if(!res.ok){setMsg("COULDN'T SAVE — TRY AGAIN");return;}
+    const d=await loadData();setData(d);setStartEdit("");setViewKey(k=>k+1);
+  }
+  return CH_E(React.Fragment,null,
+    hdr,
+    CH_E("div",{"data-chcoach-note":"1",style:{fontSize:9,letterSpacing:"0.12em",color:"#555",fontWeight:600,marginBottom:10,lineHeight:1.6}},
+      "WHAT "+String(member.name||member.email).toUpperCase()+" SEES — VIEW ONLY"),
+    CH_E(ChallengeView,{key:viewKey,session:{email},viewOnly:true,embedded:true}),
+    live&&liveSt&&liveSt.phase!=="finished"&&CH_E("div",{"data-chcoach-start":"1",style:{borderTop:"1px solid #1a1a1a",marginTop:14,paddingTop:12,marginBottom:8}},
+      CH_E("div",{style:{display:"flex",justifyContent:"space-between",gap:10,alignItems:"baseline"}},
+        CH_E("span",{style:{fontSize:9,letterSpacing:"0.14em",color:"#666",fontWeight:600}},"START DATE"),
+        CH_E("span",{"data-chcoach-startval":"1",style:{fontSize:11,color:"#ddd",letterSpacing:"0.04em"}},own?chFmtLong(own)+" (their own)":chFmtLong(live.start)+" (everyone)")),
+      CH_E("div",{style:{display:"flex",gap:6,alignItems:"center",padding:"8px 0 2px"}},
+        CH_E("input",{type:"date","data-f":"member-start",min:chAddDays(live.start,1),max:chEndDS(live),value:startEdit||own||"",onChange:e=>setStartEdit(e.target.value),
+          style:{flex:1,background:"#0a0a0a",border:"1px solid #2a2a2a",color:"#fff",borderRadius:0,padding:"7px 8px",fontSize:12,colorScheme:"dark"}}),
+        CH_E("button",{"data-chcoach-set":"1",onClick:()=>saveStart(startEdit),disabled:busy||!startEdit,style:{...chBtnGhost,color:"#000",background:"#fff",borderColor:"#fff",padding:"7px 12px",opacity:busy||!startEdit?0.5:1}},busy?"...":"SET"),
+        own&&CH_E("button",{"data-chcoach-clear":"1",onClick:()=>saveStart(""),disabled:busy,style:{...chBtnGhost,padding:"7px 10px"}},"CLEAR")),
+      CH_E("div",{style:{fontSize:9,color:CH_C.faint,letterSpacing:"0.04em",lineHeight:1.6,marginTop:4}},"SET gives them their own Day 1: their day count, streak, %, weekly boxes and end date run from it. Their entries stay filed under the challenge. CLEAR puts them back on everyone's date."),
+      msg&&CH_E("div",{style:{fontSize:9,letterSpacing:"0.08em",color:CH_C.err,fontWeight:600,marginTop:4}},msg)));
+}
+// ── end Challenge ──────────────────────────────────────────────────────────
 function RoutinesView({session,ttl}){
   const [routines,setRoutines]=useState([]);
   const [logs,setLogs]=useState({});
@@ -5200,7 +6708,7 @@ function App(){
       });
     }catch(e){}
   },[tab]);
-  const ADMIN_SEG_ORDER=["members","classes","wellness","sections","onboarding","coaching"];
+  const ADMIN_SEG_ORDER=["members","classes","wellness","sections","onboarding","challenge","coaching"];
   const [admSeg,setAdmSeg]=useState(()=>lsGet("t365-admseg","members"));
   useEffect(()=>{lsSet("t365-admseg",admSeg);},[admSeg]);
   // Keep the active admin sub-section scrolled into view when it changes
@@ -5246,6 +6754,8 @@ function App(){
   const [classesEnabled,setClassesEnabled]=useState(true);
   const [strengthEnabled,setStrengthEnabled]=useState(true);
   const [calendarEnabled,setCalendarEnabled]=useState(true);
+  const [challengeEnabled,setChallengeEnabled]=useState(false);const [chTab,setChTab]=useState("loading");
+  useEffect(()=>{const em=session&&session.email;if(!challengeEnabled||!em){setChTab("loading");return;}let live=true;chMemberHasTab(em).then(v=>{if(live)setChTab(v);}).catch(()=>{if(live)setChTab(null);});return()=>{live=false;};},[challengeEnabled,session&&session.email]);
   const [dowNames,setDowNames]=useState({});
   const [wellSlots,setWellSlots]=useState({});
   const [classDow,setClassDow]=useState({});
@@ -5333,6 +6843,7 @@ function App(){
         setClassesEnabled(ffData[0].classes_enabled!==false);
         setStrengthEnabled(ffData[0].strength_enabled!==false);
         setCalendarEnabled(ffData[0].calendar_enabled!==false);
+        setChallengeEnabled(ffData[0].challenge_enabled===true);
       }
       const dnData=await sbGet("coaching_notes","class_name=eq.__DOW_NAMES__&select=content");
       if(dnData&&dnData.length){try{const dn=JSON.parse(dnData[0].content);setDowNames(p=>({...p,...dn}));}catch{}}
@@ -5425,6 +6936,7 @@ function App(){
     ...((showClasses||showWellness)?[{id:"book",label:"BOOKINGS"}]:[]),
     ...(acc("progress")?[{id:"progress",label:"PROGRESS"}]:[]),
     ...((showPT||showStrength||showRoutines)?[{id:"workouts",label:"WORKOUTS"}]:[]),
+    ...((challengeEnabled&&(chTab===true||chTab===null))?[{id:"challenge",label:"CHALLENGE"}]:[]),
     ...(isAdmin?[{id:"admin",label:"ADMIN"}]:[])
   ];
   const TAB_ORDER=NAV_TABS.map(t=>t.id);
@@ -5434,7 +6946,7 @@ function App(){
   const effWkSub=wkOpts.some(o=>o.id===wkSub)?wkSub:(wkOpts[0]&&wkOpts[0].id);
   const renderSeg=(opts,cur,set)=>opts.length<=1?null:React.createElement("div",{className:"sp-toggle",style:{marginTop:16,marginBottom:16,paddingLeft:20,paddingRight:20}},opts.map(o=>React.createElement("button",{key:o.id,className:`sp-toggle-btn${cur===o.id?" spta":""}`,style:{border:"1px solid #fff"},onClick:()=>set(o.id)},o.label)));
   // If the current tab isn't available to this member, snap to the first available one.
-  useEffect(()=>{if(ready&&TAB_ORDER.length&&!TAB_ORDER.includes(tab))setTab(TAB_ORDER[0]);},[memberAccess,classesEnabled,strengthEnabled,wellnessEnabled,workoutsEnabled,ready]);
+  useEffect(()=>{if(ready&&TAB_ORDER.length&&!TAB_ORDER.includes(tab)&&!(tab==="challenge"&&challengeEnabled&&chTab==="loading"))setTab(TAB_ORDER[0]);},[memberAccess,classesEnabled,strengthEnabled,wellnessEnabled,workoutsEnabled,ready,challengeEnabled,chTab]);
   function handleTouchStart(e){touchStartX.current=e.touches[0].clientX;touchStartY.current=e.touches[0].clientY;}
   function handleTouchEnd(e){
     if(touchStartX.current===null)return;
@@ -5653,6 +7165,12 @@ function App(){
     await sbPatch("feature_flags","id=eq.1",{strength_enabled:enabled});
     setStrengthEnabled(enabled);
     if(!enabled&&tab==="strength")setTab("community");
+  }
+  async function saveChallengeSetting(enabled){
+    const ok=await chSaveFlag(enabled);
+    if(!ok){showToast("COULDN'T SAVE — TRY AGAIN");return;}
+    setChallengeEnabled(enabled);
+    if(!enabled&&tab==="challenge")setTab("community");
   }
   function getDayClassName(dateKey){
     const dow=new Date(dateKey+"T00:00:00").getDay();
@@ -6047,8 +7565,9 @@ React.createElement("div",{style:{display:"flex",flexDirection:"column",alignIte
       effWkSub==="strength"&&showStrength&&React.createElement("div",{className:"sp-main-wrap"},React.createElement(StrengthTab,{session,isAdmin,showToast,bookings,memberData})),
       effWkSub==="routines"&&showRoutines&&React.createElement(RoutinesView,{session,ttl:wkTitles.rt})
     ),
+    effTab==="challenge"&&challengeEnabled&&(chTab===true||chTab===null)&&React.createElement(ChallengeView,{session,isAdmin,showToast}),
     effTab==="progress"&&acc("progress")&&React.createElement(ProgressTab,{session,isAdmin,showToast,milestoneConfig,bookings,saveMilestoneConfig,memberData,dowNames}),
-    effTab==="admin"&&React.createElement(AdminView,{bookings,setBookings,showToast,isAdmin,isMaster,selfEmail:session?.email,mFlags,saveMFlag,getMaxSpots,saveClassLimit,deleteClass,cancelClass,restoreClass,classLimits,wellnessEnabled,saveWellnessSetting,classesEnabled,strengthEnabled,saveClassesSetting,saveStrengthSetting,calendarEnabled,saveCalendarSetting,dowNames,saveDowName,slotNames,saveSlotName,wellSlots,saveWellSlots,classDow,saveClassDow,milestoneConfig,saveMilestoneConfig,admSeg,setAdmSeg}),
+    effTab==="admin"&&React.createElement(AdminView,{bookings,setBookings,showToast,isAdmin,isMaster,selfEmail:session?.email,mFlags,saveMFlag,getMaxSpots,saveClassLimit,deleteClass,cancelClass,restoreClass,classLimits,wellnessEnabled,saveWellnessSetting,classesEnabled,strengthEnabled,saveClassesSetting,saveStrengthSetting,calendarEnabled,saveCalendarSetting,dowNames,saveDowName,slotNames,saveSlotName,wellSlots,saveWellSlots,classDow,saveClassDow,milestoneConfig,saveMilestoneConfig,admSeg,setAdmSeg,challengeEnabled,saveChallengeSetting}),
     ),
     React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"center",gap:8,padding:"5px 0 4px",background:"#080808",marginTop:0}},
       React.createElement("span",{onClick:e=>{const n=e.currentTarget.parentElement.nextElementSibling;if(n&&n.scrollBy)n.scrollBy({left:-160,behavior:"smooth"});},style:{color:"#8cc63e",fontSize:12,lineHeight:1,cursor:"pointer",padding:"3px 8px"}},"‹"),
