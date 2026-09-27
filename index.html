@@ -654,7 +654,7 @@ function ImageCropper({imageSrc,onSave,onCancel}){
   );
 }
 // ── Member Profile Overlay (Admin) ────────────────────────────────────────────
-function MemberProfileOverlay({member,bookings,onClose,currentUserIsAdmin,mfWk,isMaster,mfPasteAI,canManageWk,wkMemHidden}){
+function MemberProfileOverlay({member,bookings,onClose,currentUserIsAdmin,mfWk,isMaster,mfPasteAI,canManageWk,wkMemHidden,mfChAdm}){
   const upcomingBks=bookings.filter(b=>b.email===member.email&&b.date_key>=toDS(new Date())).length;
   const attendedBks=bookings.filter(b=>b.email===member.email&&b.date_key<toDS(new Date())).length;
   const joinDate=fmtJoinDate(member.joined_at);
@@ -1237,7 +1237,7 @@ function MemberProfileOverlay({member,bookings,onClose,currentUserIsAdmin,mfWk,i
       currentUserIsAdmin&&canManageWk&&React.createElement(MemberWorkoutAdmin,{member,memberView:wkMemberView,setMemberView:setWkMemberView,isMaster,mfPasteAI}),
       currentUserIsAdmin&&React.createElement(RoutinesAdmin,{member}),
       currentUserIsAdmin&&React.createElement(MemberPBAdmin,{member}),
-      currentUserIsAdmin&&React.createElement(MemberChallengeAdmin,{member}),
+      currentUserIsAdmin&&(isMaster||mfChAdm!==false)&&React.createElement(MemberChallengeAdmin,{member}),
       currentUserIsAdmin&&React.createElement(React.Fragment,null,
         React.createElement("div",{className:"mp-section"},"ADMIN CONTROLS"),
         React.createElement("div",{style:{background:"#0e0e0e",border:"1px solid #222",borderRadius:0,padding:"12px 14px",marginBottom:8}},
@@ -1940,7 +1940,7 @@ function AdminView({bookings,setBookings,showToast,isAdmin,isMaster,selfEmail,mF
   }
   const admDateLabel=`${["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][admDOW]} ${admDate.getDate()} ${MONTHS[admDate.getMonth()]} ${admDate.getFullYear()}`;
   return React.createElement("div",{className:"adm-wrap"},
-    selectedMember&&React.createElement(MemberProfileOverlay,{member:selectedMember,bookings,onClose:()=>setSelectedMember(null),currentUserIsAdmin:isAdmin,mfWk:mFlags.wk,isMaster,mfPasteAI:mFlags.pasteAI,canManageWk:(isMaster||(mFlags.wk!==false&&!(mFlags.wkAdminHide||[]).includes(selfEmail))),wkMemHidden:mFlags.wkMemHide===true}),
+    selectedMember&&React.createElement(MemberProfileOverlay,{member:selectedMember,bookings,onClose:()=>setSelectedMember(null),currentUserIsAdmin:isAdmin,mfWk:mFlags.wk,isMaster,mfPasteAI:mFlags.pasteAI,canManageWk:(isMaster||(mFlags.wk!==false&&!(mFlags.wkAdminHide||[]).includes(selfEmail))),wkMemHidden:mFlags.wkMemHide===true,mfChAdm:mFlags.chadm!==false}),
     React.createElement("div",{className:"adm-title"},"ADMIN"),
     React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"center",gap:8,padding:"0 0 6px"}},
       React.createElement("span",{onClick:e=>{const n=e.currentTarget.parentElement.nextElementSibling;if(n&&n.scrollBy)n.scrollBy({left:-160,behavior:"smooth"});},style:{color:"#8cc63e",fontSize:12,lineHeight:1,cursor:"pointer",padding:"3px 8px"}},"‹"),
@@ -1953,7 +1953,7 @@ function AdminView({bookings,setBookings,showToast,isAdmin,isMaster,selfEmail,mF
       (isMaster||mFlags.welladm)&&React.createElement("button",{"data-adm":"wellness",className:`adm-seg-btn${admSeg==="wellness"?" aas":""}`,onClick:()=>setAdmSeg("wellness")},"WELLNESS"),
       React.createElement("button",{"data-adm":"sections",className:`adm-seg-btn${admSeg==="sections"?" aas":""}`,onClick:()=>setAdmSeg("sections")},"SECTIONS"),
       React.createElement("button",{"data-adm":"onboarding",className:`adm-seg-btn${admSeg==="onboarding"?" aas":""}`,onClick:()=>setAdmSeg("onboarding")},"ONBOARDING"),
-      React.createElement("button",{"data-adm":"challenge",className:`adm-seg-btn${admSeg==="challenge"?" aas":""}`,onClick:()=>setAdmSeg("challenge")},"CHALLENGE"),
+      (isMaster||mFlags.chadm!==false)&&React.createElement("button",{"data-adm":"challenge",className:`adm-seg-btn${admSeg==="challenge"?" aas":""}`,onClick:()=>setAdmSeg("challenge")},"CHALLENGE"),
       isMaster&&React.createElement("button",{"data-adm":"functions",className:`adm-seg-btn${admSeg==="functions"?" aas":""}`,onClick:()=>setAdmSeg("functions")},"FUNCTIONS")
     ),
     admSeg==="functions"&&isMaster&&React.createElement(React.Fragment,null,
@@ -2009,6 +2009,13 @@ function AdminView({bookings,setBookings,showToast,isAdmin,isMaster,selfEmail,mF
           React.createElement("div",{style:{fontSize:9,color:"#555",marginTop:2,letterSpacing:"0.04em"}},"HIDE = ON hides it from admins")
         ),
         React.createElement("button",{onClick:()=>saveMFlag("welladm",!mFlags.welladm),style:{background:!mFlags.welladm?"#fff":"#222",color:!mFlags.welladm?"#000":"#555",border:"1px solid "+(!mFlags.welladm?"#fff":"#333"),padding:"6px 18px",fontSize:10,letterSpacing:"0.12em",fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}},!mFlags.welladm?"HIDE":"VISIBLE")
+      ),
+      React.createElement("div",{"data-mf":"chadm",style:{display:"flex",alignItems:"center",justifyContent:"space-between",background:"#0e0e0e",border:"1px solid "+(mFlags.chadm===false?"#8cc63e":"#222"),padding:"11px 14px",marginBottom:10}},
+        React.createElement("div",null,
+          React.createElement("div",{style:{fontSize:11,fontWeight:600,letterSpacing:"0.08em",color:"#fff"}},"CHALLENGE"),
+          React.createElement("div",{style:{fontSize:9,color:"#555",marginTop:2,letterSpacing:"0.04em"}},"HIDE = ON hides it from admins")
+        ),
+        React.createElement("button",{"data-mf-btn":"chadm",onClick:()=>saveMFlag("chadm",mFlags.chadm===false),style:{background:mFlags.chadm===false?"#fff":"#222",color:mFlags.chadm===false?"#000":"#555",border:"1px solid "+(mFlags.chadm===false?"#fff":"#333"),padding:"6px 18px",fontSize:10,letterSpacing:"0.12em",fontWeight:700,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}},mFlags.chadm===false?"HIDE":"VISIBLE")
       ),
       React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",background:"#0e0e0e",border:"1px solid "+(mFlags.maint?"#c98a1e":"#222"),padding:"11px 14px",marginBottom:10}},
         React.createElement("div",null,
@@ -2379,14 +2386,14 @@ function AdminView({bookings,setBookings,showToast,isAdmin,isMaster,selfEmail,mF
         );
       })()
     ),
-    admSeg==="challenge"&&React.createElement(ChallengeAdminPanel,{showToast}),
+    admSeg==="challenge"&&(isMaster||mFlags.chadm!==false)&&React.createElement(ChallengeAdminPanel,{showToast}),
     admSeg==="sections"&&React.createElement(React.Fragment,null,
       React.createElement("div",{style:{fontSize:10,letterSpacing:"0.18em",color:"#555",fontWeight:600,margin:"16px 0 10px"}},"SECTION VISIBILITY"),
       React.createElement("div",{style:{fontSize:11,color:"#666",letterSpacing:"0.04em",lineHeight:1.7,marginBottom:16}},"Turn a section on or off. When a section is off, its tab is hidden from members throughout the app. Admin management for each section stays available here."),
       [
         {key:"classes",title:"HIIT CLASSES",enabled:classesEnabled,save:saveClassesSetting},
         {key:"strength",title:"STRENGTH CLASSES",enabled:strengthEnabled,save:saveStrengthSetting},
-        {key:"challenge",title:"CHALLENGE",enabled:challengeEnabled,save:saveChallengeSetting},
+        ...((isMaster||mFlags.chadm!==false)?[{key:"challenge",title:"CHALLENGE",enabled:challengeEnabled,save:saveChallengeSetting}]:[]),
         ...((isMaster||mFlags.welladm)?[{key:"wellness",title:"WELLNESS CLASSES",enabled:wellnessEnabled,save:saveWellnessSetting}]:[])
       ].map(s=>React.createElement("div",{key:s.key,style:{background:"#141414",border:"1px solid #222",borderRadius:0,padding:"12px 16px",marginBottom:8}},
         React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between"}},
