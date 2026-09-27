@@ -5276,8 +5276,8 @@ const CH_INTAKE_H=[
   {id:"strong",label:"Hydrated and feeling strong"}
 ];
 const CH_INTAKE=CH_INTAKE_N;
-// {N} is replaced with the challenge's length when shown.
-const CH_CLOSING="{N} DAYS COMPLETE";
+// Plain words: Sam types the number himself (28 Sep 2026). Any "{N}" saved by an older build still shows as the length.
+const CH_CLOSING="30 DAYS COMPLETE";
 const CH_CLOSING_SUB="THIS IS JUST THE BEGINNING.";
 // The target each intake is measured against, in small type beside its heading (Sam, 27 Sep 2026: same as Team 365).
 const CH_INTAKE_N_NOTE="Your daily nutrition target";
@@ -5306,11 +5306,11 @@ function chIntakeRaw(cfg,k){
 }
 
 // ── The challenge details: a button above the day box that starts closed (Sam, 27 Sep 2026: Soul's own words).
-// "{N}" is the challenge length. Clearing the button name hides it.
-const CH_ABOUT_TITLE="THE {N} DAY CHALLENGE DETAILS";
+// Plain words, typed as they should read. Clearing the button name hides it.
+const CH_ABOUT_TITLE="THE 30 DAY CHALLENGE DETAILS";
 const CH_DEFAULT_ABOUT={
-  title:["SOUL FOR {N}","THE {N}-DAY CHALLENGE","{N} DAYS. ONE COMMITMENT. MAKE THEM COUNT."],
-  details:"For the next {N} days, the focus is on you. Your choices. Your commitment. Your consistency. Your determination.",
+  title:["SOUL FOR 30","THE 30-DAY CHALLENGE","30 DAYS. ONE COMMITMENT. MAKE THEM COUNT."],
+  details:"For the next 30 days, the focus is on you. Your choices. Your commitment. Your consistency. Your determination.",
   sections:[
     {h:"NOURISHMENT JOURNEY",t:"Record how your nutrition and hydration went each day. No scores, just an honest look at your day."},
     {h:"CHALLENGE JOURNEY",t:"Complete any 2 of 3: cardio, strength and recovery. At least 30 minutes each.",move:true},
@@ -5318,9 +5318,9 @@ const CH_DEFAULT_ABOUT={
     {h:"BIGGEST WIN & REFLECTION",t:"Write down your biggest win and answer the day's reflection question. One line is enough."},
     {h:"EACH WEEK",t:"A new theme and a line to carry with you through the week."},
     {h:"MISSED A DAY?",t:"Tap the day on your grid and fill it in. You can go back to any day up to today, plus one week after the challenge ends."},
-    {h:"THIS IS JUST THE BEGINNING",t:"Look back at what you chose to do with your {N} days. Your commitment. Your consistency. Your determination. Your wins. Your words."}
+    {h:"THIS IS JUST THE BEGINNING",t:"Look back at what you chose to do with your 30 days. Your commitment. Your consistency. Your determination. Your wins. Your words."}
   ],
-  closing:["SOUL FOR {N}","SHOW UP. PUT IN THE WORK. KEEP MOVING.","WITH SOUL FITNESS."]
+  closing:["SOUL FOR 30","SHOW UP. PUT IN THE WORK. KEEP MOVING.","WITH SOUL FITNESS."]
 };
 function chAboutTitleOf(cfg){return cfg&&typeof cfg.aboutTitle==="string"?cfg.aboutTitle:CH_ABOUT_TITLE;}
 // The details in parts, whatever shape they were saved in. A plain string (an older build) is split back into
@@ -5611,6 +5611,19 @@ async function chDeleteEntries(start){
     if(ok)members++;else failed++;
   }
   return {ok:failed===0,members,failed};
+}
+// The words of the challenge saved most recently — name, catchphrase, details, intake, weekly, journey, questions,
+// examples, completion wording, movements — without its dates or people. + NEW CHALLENGE starts from it, so the
+// words carry over even after every challenge has been deleted (Sam, 28 Sep 2026). Deleting never touches it.
+const CH_TEMPLATE_KEY="__CHALLENGE_TEMPLATE__";
+function chTemplateOf(c){const t=chCfgStore(c);delete t.id;delete t.start;delete t.members;return t;}
+async function chSaveTemplate(c){
+  const r=await chRead(CH_TEMPLATE_KEY);if(!r.ok)return false;
+  return chWrite(CH_TEMPLATE_KEY,JSON.stringify(chTemplateOf(c)),r.exists);
+}
+async function chLoadTemplate(){
+  const r=await chRead(CH_TEMPLATE_KEY);if(!r.ok||!r.exists||!r.content)return null;
+  try{const o=JSON.parse(r.content);return o&&typeof o==="object"&&!Array.isArray(o)?o:null;}catch{return null;}
 }
 async function chSaveFlag(enabled){
   try{
@@ -6148,6 +6161,8 @@ function ChallengeView({session,isAdmin,showToast,viewOnly,embedded}){
 function chNewId(list){let id;do{id="ch_"+Date.now().toString(36)+Math.random().toString(36).slice(2,7);}while((list||[]).some(c=>c.id===id));return id;}
 // Closing wording: stored with "{N}" for the length, shown and typed with the real number.
 function chShowN(t,days){const n=parseInt(days,10);return String(t||"").replace(/\{N\}/g,n>=1?String(n):"30");}
+// Admin boxes store exactly what is typed (no "{N}"); only new lines are taken out and the words put in capitals.
+function chPlainCaps(v){return String(v||"").replace(/\n/g," ").toUpperCase();}
 function chKeepN(v,days){const n=parseInt(days,10);v=String(v||"").replace(/\n/g," ").toUpperCase();return n>=1?v.replace(new RegExp("(^|[^0-9])"+n+"(?=[ -]?DAY)","g"),"$1{N}"):v;}
 function chStatusOf(c,today){return c.start>today?"UPCOMING":chEndDS(c)<today?"FINISHED":"RUNNING";}
 // Why a draft can't be saved, or "" when it can. Two challenges cannot run at once, and a challenge
@@ -6189,12 +6204,14 @@ function ChallengeAdminPanel({showToast}){
   const [openWeeks,setOpenWeeks]=useState({});
   const [showQWin,setShowQWin]=useState(false);
   const [showQRefl,setShowQRefl]=useState(false);
+  const [template,setTemplate]=useState(null);
   const shut=()=>{setPickOpen(false);setJourneyOpen(false);setConfirmRm(false);setConfirmDel(false);setQOpen(false);setShowAbout(false);setShowIntake(false);setShowWeekly(false);setOpenWeeks({});setShowQWin(false);setShowQRefl(false);};
   const [saving,setSaving]=useState(false);
   useEffect(()=>{load();},[]);
   async function load(){
     setLoading(true);setLoadErr("");
-    const [L,A,m]=await Promise.all([chLoadList(),chLoadArchive(),sbGet("members_public","select=email,name&order=name.asc")]);
+    const [L,A,m,tp]=await Promise.all([chLoadList(),chLoadArchive(),sbGet("members_public","select=email,name&order=name.asc"),chLoadTemplate()]);
+    setTemplate(tp);
     if(!L.ok||!A.ok){setLoadErr(L.corrupt?"The saved challenge list couldn't be read, so nothing can be changed here until it's fixed.":"Couldn't load challenges — check your connection.");setLoading(false);return;}
     setList(L.list);setArchive(A.list);setRoster((m||[]).filter(x=>x&&x.email).map(x=>({email:String(x.email).toLowerCase(),name:x.name||x.email})));setLoading(false);
   }
@@ -6209,8 +6226,10 @@ function ChallengeAdminPanel({showToast}){
   }
   // A new challenge carries over the content of the last one (or the code defaults) — never the dates or the people.
   function startNew(){
-    const newest=list.length?list[list.length-1]:null;
-    const base=chCfgFrom(newest||CH_DEFAULT_CFG);
+    // From the challenge saved most recently (kept even when it's been deleted); else the newest on the list;
+    // else the removed-but-kept one; else Soul's defaults.
+    const newest=list.length?list[list.length-1]:archive.length?archive[archive.length-1]:null;
+    const base=chCfgFrom(template||newest||CH_DEFAULT_CFG);
     // The start date is Sam's to choose each time: the box starts empty (28 Sep 2026).
     const start="";
     // The name, catchphrase and button subtitle carry over too, ready to edit over (Sam, 28 Sep 2026).
@@ -6240,6 +6259,8 @@ function ChallengeAdminPanel({showToast}){
     const ok=await chWrite("__CHALLENGES__",JSON.stringify(next.map(chCfgStore)),L.exists);
     setSaving(false);
     if(!ok){showToast&&showToast("Couldn't save — try again");return;}
+    // Keep its words as the starting point for the next challenge. A failure here doesn't undo the save.
+    const tp=chTemplateOf(d);await chSaveTemplate(d);setTemplate(tp);
     setList(next);close();showToast&&showToast("Challenge saved ✓");
   }
   // REMOVE — KEEP ENTRIES: the challenge leaves this list but moves to REMOVED, and members who logged
@@ -6323,7 +6344,9 @@ function ChallengeAdminPanel({showToast}){
   // ABOUT THIS CHALLENGE: edited in the parts members see. Every text box grows to show all its text and can be
   // dragged taller; it never shrinks under a size it was dragged to.
   function aboutEditor(d,days){
-    const a=chAboutOf(d);
+    // Anything an older build saved with "{N}" shows as the number, and is stored as typed from then on.
+    const a0=chAboutOf(d);const nn=t=>chShowN(t,days);
+    const a={title:a0.title.map(nn),details:nn(a0.details),sections:a0.sections.map(x=>({...x,h:nn(x.h),t:nn(x.t)})),closing:a0.closing.map(nn)};
     const tbox={...jbox,height:"auto",minHeight:54,resize:"vertical",overflow:"auto"};
     const grow=el=>{if(!el)return;const need=el.scrollHeight+2;if(el.offsetHeight<need)el.style.height=need+"px";};
     const put=next=>setDraft(p=>({...p,about:next}));
@@ -6351,17 +6374,17 @@ function ChallengeAdminPanel({showToast}){
       help("The titles are what members tick each day (the same list as MOVEMENT above). If you add or remove one, check the text above still says the right “any "+(d.movementRequired||2)+" of…”."));
     return CH_E("div",{"data-chabout-edit":"1",style:{marginTop:4}},
       part("BUTTON NAME",CH_E("input",{"data-f":"aboutTitle",value:chShowN(chAboutTitleOf(d),days),placeholder:chShowN(CH_ABOUT_TITLE,days),
-        onChange:e=>{const v=chKeepN(e.target.value,days);setDraft(p=>({...p,aboutTitle:v}));},style:{...jbox,height:"auto",fontWeight:600}}),null,{"data-chabout-part":"BUTTON NAME"}),
+        onChange:e=>{const v=chPlainCaps(e.target.value);setDraft(p=>({...p,aboutTitle:v}));},style:{...jbox,height:"auto",fontWeight:600}}),null,{"data-chabout-part":"BUTTON NAME"}),
       // Shown after the button name on the members' details button, in smaller type.
       part("BUTTON SUBTITLE",CH_E("input",{"data-f":"subtitle",value:d.subtitle||"",placeholder:"After the button name, in smaller type",
         onChange:e=>{const v=one(e.target.value).toUpperCase();setDraft(p=>({...p,subtitle:v}));},style:{...jbox,height:"auto"}}),null,{"data-chabout-part":"BUTTON SUBTITLE"}),
       part("TITLE",CH_E(React.Fragment,null,
         small("BIG LINE"),
-        CH_E("input",{"data-f":"about-title-1",value:a.title[0],placeholder:"SOUL FOR {N}",onChange:e=>setTitle(0,e.target.value),style:{...jbox,height:"auto"}}),
+        CH_E("input",{"data-f":"about-title-1",value:a.title[0],placeholder:"SOUL FOR 30",onChange:e=>setTitle(0,e.target.value),style:{...jbox,height:"auto"}}),
         small("NAME"),
-        CH_E("input",{"data-f":"about-title-2",value:a.title[1],placeholder:"THE {N}-DAY CHALLENGE",onChange:e=>setTitle(1,e.target.value),style:{...jbox,height:"auto"}}),
+        CH_E("input",{"data-f":"about-title-2",value:a.title[1],placeholder:"THE 30-DAY CHALLENGE",onChange:e=>setTitle(1,e.target.value),style:{...jbox,height:"auto"}}),
         small("SUBTITLE"),
-        CH_E("textarea",{ref:grow,"data-f":"about-title-3",rows:2,value:a.title[2],placeholder:"{N} DAYS. ONE COMMITMENT. MAKE THEM COUNT.",onChange:e=>setTitle(2,e.target.value),style:tbox})),null,{"data-chabout-part":"TITLE"}),
+        CH_E("textarea",{ref:grow,"data-f":"about-title-3",rows:2,value:a.title[2],placeholder:"30 DAYS. ONE COMMITMENT. MAKE THEM COUNT.",onChange:e=>setTitle(2,e.target.value),style:tbox})),null,{"data-chabout-part":"TITLE"}),
       part("DETAILS",CH_E("textarea",{ref:grow,"data-f":"about-details",rows:3,value:a.details,onChange:e=>put({...cur(),details:one(e.target.value)}),style:{...tbox,minHeight:100,color:"#ddd",letterSpacing:"0.02em"}}),null,{"data-chabout-part":"DETAILS"}),
       ...a.sections.flatMap((x,i)=>[part("SECTION "+(i+1),CH_E(React.Fragment,null,
         small("HEADING"),
@@ -6378,12 +6401,12 @@ function ChallengeAdminPanel({showToast}){
       // Set like the TITLE, so the three boxes match what members see.
       part("CLOSING",CH_E(React.Fragment,null,
         small("BIG LINE"),
-        CH_E("input",{"data-f":"about-close-1",value:a.closing[0]||"",placeholder:"SOUL FOR {N}",onChange:e=>setClose(0,e.target.value),style:{...jbox,height:"auto"}}),
+        CH_E("input",{"data-f":"about-close-1",value:a.closing[0]||"",placeholder:"SOUL FOR 30",onChange:e=>setClose(0,e.target.value),style:{...jbox,height:"auto"}}),
         small("LINE UNDER IT"),
         CH_E("input",{"data-f":"about-close-2",value:a.closing[1]||"",placeholder:"SHOW UP. PUT IN THE WORK. KEEP MOVING.",onChange:e=>setClose(1,e.target.value),style:{...jbox,height:"auto"}}),
         small("LAST LINE (SMALL, GREEN)"),
         CH_E("input",{"data-f":"about-close-3",value:a.closing.slice(2).join(" "),placeholder:"WITH SOUL FITNESS.",onChange:e=>setClose(2,e.target.value),style:{...jbox,height:"auto"}})),null,{"data-chabout-part":"CLOSING"}),
-      help("{N} is the number of days, so the wording follows the length. A section left empty isn't shown. Clear the button name to hide the whole thing."));
+      help("Shown to members exactly as typed. A section left empty isn't shown. Clear the button name to hide the whole thing."));
   }
   // INTAKE: each of nutrition and hydration has a heading, the note beside it and three options, each marked with
   // its square's colour. The boxes hold exactly what was typed; a cleared box stays empty with the original wording
@@ -6504,12 +6527,12 @@ function ChallengeAdminPanel({showToast}){
               CH_E("div",{style:{...jlbl,marginBottom:3}},"DAY "+(i+1)),
               CH_E("textarea",{"data-f":"refl-"+(i+1),rows:2,value:d.reflections[i]||"",placeholder:CH_FALLBACK_Q,onChange:e=>{const v=e.target.value.replace(/\n/g," ");setDraft(p=>{const n=Math.max(days,p.reflections.length);const a=Array.from({length:n},(_,j)=>p.reflections[j]||"");a[i]=v;return {...p,reflections:a};});},style:{...jbox,color:"#ddd"}}))),
             help("A blank day uses \""+CH_FALLBACK_Q+"\". Days members have already answered keep the question they answered."))),
-        // The words on the completion screen. "{N}" is the challenge length, shown here as the number.
+        // The words on the completion screen, exactly as typed.
         CH_E("div",{"data-chclosing-edit":"1",style:{padding:"8px 0 10px",borderBottom:"1px solid "+CH_C.rule}},
           CH_E("div",{style:jlbl},"WHEN THE CHALLENGE IS COMPLETE"),
-          CH_E("textarea",{"data-f":"closing",rows:2,value:chShowN(d.closing,days),placeholder:"e.g. "+(days||30)+" DAYS COMPLETE",onChange:e=>upd({closing:chKeepN(e.target.value,days)}),style:{...jbox,fontWeight:600,color:"#fff",marginBottom:6}}),
-          CH_E("textarea",{"data-f":"closingSub",rows:2,value:chShowN(d.closingSub,days),placeholder:"e.g. THIS IS JUST THE BEGINNING.",onChange:e=>upd({closingSub:chKeepN(e.target.value,days)}),style:{...jbox,color:"#bbb"}}),
-          CH_E("div",{style:{fontSize:9,color:CH_C.faint,marginTop:5,lineHeight:1.5}},"If the wording includes the number of days, it updates itself when you change the length.")),
+          CH_E("textarea",{"data-f":"closing",rows:2,value:chShowN(d.closing,days),placeholder:"e.g. "+(days||30)+" DAYS COMPLETE",onChange:e=>upd({closing:chPlainCaps(e.target.value)}),style:{...jbox,fontWeight:600,color:"#fff",marginBottom:6}}),
+          CH_E("textarea",{"data-f":"closingSub",rows:2,value:chShowN(d.closingSub,days),placeholder:"e.g. THIS IS JUST THE BEGINNING.",onChange:e=>upd({closingSub:chPlainCaps(e.target.value)}),style:{...jbox,color:"#bbb"}}),
+          CH_E("div",{style:{fontSize:9,color:CH_C.faint,marginTop:5,lineHeight:1.5}},"Shown exactly as typed. If you change the length, change any number of days here too.")),
         CH_E("div",{style:{fontSize:10,color:CH_C.faint,marginTop:8,lineHeight:1.6}},(d._isNew?"":"Changes show to members as soon as you save. ")+"The journey, questions and completion wording carry over to your next challenge.")),
       problem&&CH_E("div",{"data-chproblem":"1",style:{fontSize:11,color:CH_C.err,marginTop:12,lineHeight:1.5}},problem),
       CH_E("div",{style:{display:"flex",gap:6,marginTop:14}},
