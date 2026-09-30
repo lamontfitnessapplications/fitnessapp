@@ -5376,9 +5376,11 @@ function chWeeklyOf(cfg){
 // "TIMED CHALLENGE"). Every writer carries every field, so editing one part never resets another.
 function chWeeklyRaw(cfg){const x=chWeeklyOf(cfg);const w=cfg&&cfg.weekly&&typeof cfg.weekly==="object"&&!Array.isArray(cfg.weekly)?cfg.weekly:{};return {...x,title:w.title!=null?String(w.title):x.title};}
 // The weeks follow the themes: four weeks for 30 days, the last one running to the end (days 22–30).
-function chWeekCount(cfg){const n=Math.max(1,(cfg.themes||[]).length);return Math.max(1,Math.min(n,Math.ceil((cfg.days||1)/7)));}
-function chWeekOfDay(cfg,day){return Math.min(chWeekCount(cfg),Math.max(1,Math.ceil(day/7)));}
-function chWeekRange(cfg,w){const n=chWeekCount(cfg);const a=(w-1)*7+1;return [a,w===n?cfg.days:Math.min(cfg.days,w*7)];}
+// Days in a week: 7 unless the challenge says otherwise (Sam, 30 Sep 2026: e.g. a 20-day challenge in four 5-day weeks).
+function chWeekLen(cfg){const n=parseInt(cfg&&cfg.weekDays,10);return n>=1?n:7;}
+function chWeekCount(cfg){const n=Math.max(1,(cfg.themes||[]).length);return Math.max(1,Math.min(n,Math.ceil((cfg.days||1)/chWeekLen(cfg))));}
+function chWeekOfDay(cfg,day){return Math.min(chWeekCount(cfg),Math.max(1,Math.ceil(day/chWeekLen(cfg))));}
+function chWeekRange(cfg,w){const n=chWeekCount(cfg);const L=chWeekLen(cfg);const a=(w-1)*L+1;return [a,w===n?cfg.days:Math.min(cfg.days,w*L)];}
 // Times are minutes and seconds, "MM:SS". Digits are typed and the ":" goes in by itself: 842 -> 8:42, then 08:42 once saved.
 function chMinsTyping(v){const d=String(v||"").replace(/\D/g,"").slice(0,4);return d.length>2?d.slice(0,-2)+":"+d.slice(-2):d;}
 function chMinsFmt(v){
@@ -5425,6 +5427,7 @@ function chCfgFrom(raw){
   const movement=mv.length?mv:CH_DEFAULT_MOVEMENT.map(m=>({...m}));
   let req=parseInt(o.movementRequired,10);if(!(req>=1))req=Math.min(2,movement.length);if(req>movement.length)req=movement.length;
   let days=parseInt(o.days,10);if(!(days>=1))days=30;if(days>366)days=366;
+  let weekDays=parseInt(o.weekDays,10);if(!(weekDays>=1&&weekDays<=366&&weekDays!==7))weekDays=undefined;
   return {id:o.id?String(o.id):"",name:str(o.name,CH_DEFAULT_CFG.name),start:typeof o.start==="string"&&/^\d{4}-\d{2}-\d{2}$/.test(o.start)?o.start:"",days,movement,movementRequired:req,
     themes:list(o.themes,CH_DEFAULT_THEMES),lines:list(o.lines,CH_DEFAULT_LINES),reflections:list(o.reflections,CH_DEFAULT_REFLECTIONS),winExamples:list(o.winExamples,CH_DEFAULT_WIN_EG),refExamples:list(o.refExamples,CH_DEFAULT_REF_EG),
     qConsistency:str(o.qConsistency,CH_Q.consistency),qDetermination:str(o.qDetermination,CH_Q.determination),qWin:str(o.qWin,CH_Q.win),closing:str(o.closing,CH_CLOSING),closingSub:str(o.closingSub,CH_CLOSING_SUB),
@@ -5435,11 +5438,12 @@ function chCfgFrom(raw){
     about:o.about!=null&&(typeof o.about==="string"||(typeof o.about==="object"&&!Array.isArray(o.about)))?o.about:undefined,
     intake:o.intake&&typeof o.intake==="object"&&!Array.isArray(o.intake)?o.intake:undefined,
     weekly:o.weekly&&typeof o.weekly==="object"&&!Array.isArray(o.weekly)?o.weekly:undefined,
+    weekDays,
     members:Array.isArray(o.members)?o.members.map(e=>String(e).toLowerCase()):null};
 }
 function chCfgStore(c){return {id:c.id,name:c.name,start:c.start,days:c.days,movement:c.movement,movementRequired:c.movementRequired,themes:c.themes,lines:c.lines,reflections:c.reflections,winExamples:c.winExamples,refExamples:c.refExamples,qConsistency:c.qConsistency,qDetermination:c.qDetermination,qWin:c.qWin,closing:c.closing,closingSub:c.closingSub,tagline:c.tagline||"",members:c.members,
   ...(c.subtitle?{subtitle:c.subtitle}:{}),...(c.aboutTitle!==undefined?{aboutTitle:c.aboutTitle}:{}),...(c.about!==undefined?{about:c.about}:{}),
-  ...(c.intake!==undefined?{intake:c.intake}:{}),...(c.weekly!==undefined?{weekly:c.weekly}:{})};}
+  ...(c.intake!==undefined?{intake:c.intake}:{}),...(c.weekly!==undefined?{weekly:c.weekly}:{}),...(c.weekDays?{weekDays:c.weekDays}:{})};}
 // A list that exists is the answer, even when it is empty. Returns null when the stored value is not a list at all.
 function chListFrom(content){
   let a=[];
@@ -5454,9 +5458,9 @@ function chActive(list,today){
   const up=L.filter(c=>c.start>today).sort((a,b)=>a.start<b.start?-1:1);if(up.length)return up[0];
   const done=L.filter(c=>chEndDS(c)<today).sort((a,b)=>chEndDS(a)<chEndDS(b)?1:-1);return done[0]||null;
 }
-function chThemeIdx(day,n){if(!n)return 0;return Math.max(0,Math.min(n-1,Math.floor((day-1)/7)));}
-function chThemeOf(cfg,day){return cfg.themes[chThemeIdx(day,cfg.themes.length)]||"";}
-function chLineOf(cfg,day){const l=cfg.lines&&cfg.lines.length?cfg.lines:CH_DEFAULT_LINES;return l[chThemeIdx(day,l.length)]||"";}
+function chThemeIdx(day,n,len){if(!n)return 0;return Math.max(0,Math.min(n-1,Math.floor((day-1)/(len||7))));}
+function chThemeOf(cfg,day){return cfg.themes[chThemeIdx(day,cfg.themes.length,chWeekLen(cfg))]||"";}
+function chLineOf(cfg,day){const l=cfg.lines&&cfg.lines.length?cfg.lines:CH_DEFAULT_LINES;return l[chThemeIdx(day,l.length,chWeekLen(cfg))]||"";}
 function chQuestionOf(cfg,day){return cfg.reflections[day-1]||CH_FALLBACK_Q;}
 
 // ── member record: one per member, bucketed by challenge start date
@@ -6174,6 +6178,8 @@ function chKeepN(v,days){const n=parseInt(days,10);v=String(v||"").replace(/\n/g
 function chStatusOf(c,today){return c.start>today?"UPCOMING":chEndDS(c)<today?"FINISHED":"RUNNING";}
 // Why a draft can't be saved, or "" when it can. Two challenges cannot run at once, and a challenge
 // can never be saved without its question bank.
+// A challenge named MOCK CHALLENGE is Sam's practice run: it may start on any date, even in the past (30 Sep 2026).
+function chIsMock(c){return String(c&&c.name||"").trim().toUpperCase()==="MOCK CHALLENGE";}
 function chDraftProblem(draft,list,floor,archive){
   if(!draft.name||!String(draft.name).trim())return "Give the challenge a name.";
   if(!/^\d{4}-\d{2}-\d{2}$/.test(draft.start||""))return "Choose a start date.";
@@ -6183,7 +6189,7 @@ function chDraftProblem(draft,list,floor,archive){
   if(hit)return "These dates run over "+hit.name+" ("+chFmtRange(hit.start,chEndDS(hit))+").";
   const arc=(archive||[]).find(o=>o.id!==draft.id&&o.start===draft.start);
   if(arc)return "Members still have \""+arc.name+"\", which started on this date. Pick another start date, or delete that one under REMOVED.";
-  if(draft._isNew&&floor&&draft.start<floor)return "A new challenge can't start before "+chFmtDay(floor)+".";
+  if(draft._isNew&&floor&&draft.start<floor&&!chIsMock(draft))return "A new challenge can't start before "+chFmtDay(floor)+".";
   if(!Array.isArray(draft.reflections)||!draft.reflections.length||!Array.isArray(draft.themes)||!draft.themes.length)return "This challenge has no questions or themes — it can't be saved empty.";
   // The challenge's own three movements need a name; an extra one left without a name simply isn't kept.
   if(!draft.movement.every(m=>CH_MOVE_DESC[String(m.id)]===undefined||String(m.label||"").trim()))return "Every movement needs a name.";
@@ -6267,7 +6273,7 @@ function ChallengeAdminPanel({showToast}){
     setSaving(false);
     if(!ok){showToast&&showToast("Couldn't save — try again");return;}
     // Keep its words as the starting point for the next challenge. A failure here doesn't undo the save.
-    const tp=chTemplateOf(d);await chSaveTemplate(d);setTemplate(tp);
+    if(!chIsMock(d)){const tp=chTemplateOf(d);await chSaveTemplate(d);setTemplate(tp);}
     setList(next);close();showToast&&showToast("Challenge saved ✓");
   }
   // REMOVE — KEEP ENTRIES: the challenge leaves this list but moves to REMOVED, and members who logged
@@ -6461,13 +6467,14 @@ function ChallengeAdminPanel({showToast}){
     const named=mvAll.filter(chMoveNamed);
     const setAt=(i,k,v)=>setMoves(a=>{if(i<a.length)a[i]={...a[i],[k]:v};else if(String(v).trim())a.push({id:chNewMoveId(a),label:k==="label"?v:"",note:k==="note"?v:"Minimum 30 minutes",desc:""});return a;});
     const themesN=(d.themes||[]).length;
+    const wl=chWeekLen(d);
     return CH_E("div",{"data-cheditor":d._isNew?"new":d.id,style:{border:"1px solid "+CH_C.line,borderTop:"none",background:CH_C.panel,padding:"4px 14px 14px",marginBottom:10}},
       fl("CHALLENGE NAME"),CH_E("input",{"data-f":"name",value:d.name,placeholder:"e.g. 30 DAY CHALLENGE",onChange:e=>upd({name:e.target.value}),style:inp}),
       fl("CATCHPHRASE"),CH_E("input",{"data-f":"tagline",value:d.tagline||"",placeholder:"After the name on the members' challenge button",onChange:e=>upd({tagline:e.target.value.toUpperCase()}),style:inp}),
       CH_E("div",{style:{display:"flex",gap:8}},
-        CH_E("div",{style:{flex:2}},fl("START DATE"),CH_E("input",{"data-f":"start",type:"date",value:d.start,min:d._isNew&&floor?floor:undefined,disabled:started,onChange:e=>upd({start:e.target.value}),style:{...inp,colorScheme:"dark",opacity:started?0.5:1}})),
+        CH_E("div",{style:{flex:2}},fl("START DATE"),CH_E("input",{"data-f":"start",type:"date",value:d.start,min:d._isNew&&floor&&!chIsMock(d)?floor:undefined,disabled:started,onChange:e=>upd({start:e.target.value}),style:{...inp,colorScheme:"dark",opacity:started?0.5:1}})),
         CH_E("div",{style:{flex:1}},fl("DAYS"),CH_E("input",{"data-f":"days",type:"number",min:1,max:366,value:d.days,onChange:e=>upd({days:e.target.value}),style:inp}))),
-      d._isNew&&CH_E("div",{"data-chstart-help":"1",style:{fontSize:10,color:CH_C.dim,marginTop:5,lineHeight:1.5}},floor?"Pick any date from "+chFmtLong(floor)+" (the day after "+String((list[list.length-1]||{}).name||"the last challenge").toUpperCase()+" ends).":"Pick the date it starts."),
+      d._isNew&&CH_E("div",{"data-chstart-help":"1",style:{fontSize:10,color:CH_C.dim,marginTop:5,lineHeight:1.5}},chIsMock(d)?"MOCK CHALLENGE can start on any date, including before today.":floor?"Pick any date from "+chFmtLong(floor)+" (the day after "+String((list[list.length-1]||{}).name||"the last challenge").toUpperCase()+" ends).":"Pick the date it starts."),
       started&&CH_E("div",{style:{fontSize:10,color:CH_C.dim,marginTop:5,lineHeight:1.5}},"The start date is locked once a challenge has started — members' days are filed under it."),
       /^\d{4}-\d{2}-\d{2}$/.test(d.start||"")&&days>=1&&CH_E("div",{"data-chrange":"1",style:{fontSize:10,color:CH_C.mid,letterSpacing:"0.08em",marginTop:6}},chFmtRange(d.start,chAddDays(d.start,days-1))),
       fl("MOVEMENT"),
@@ -6502,7 +6509,12 @@ function ChallengeAdminPanel({showToast}){
       journeyOpen&&CH_E("div",{"data-chjourney-edit":"1",style:{padding:"4px 0 0"}},
         // Each week's theme and the line under it, each week behind its own bar, closed to start. A blank theme
         // turns its bar red. They carry over to the next challenge.
-        d.themes.map((t,i)=>{const a=i*7+1;const b=i===d.themes.length-1?days:Math.min(days,i*7+7);if(a>days)return null;
+        // Days in a week, for the whole challenge: every week below, the weekly challenge and the completion screen follow it.
+        CH_E("div",{"data-chweekdays":"1",style:{display:"flex",alignItems:"center",gap:10,margin:"6px 0 2px"}},
+          CH_E("div",{style:{...chLbl,flex:1}},"DAYS IN A WEEK"),
+          CH_E("input",{"data-f":"weekDays",type:"number",min:1,max:366,value:d.weekDays==null?7:d.weekDays,onChange:e=>upd({weekDays:e.target.value}),style:{...inp,width:70,textAlign:"center"}})),
+        help("7 unless you change it. Week 1 is days 1–"+Math.min(days||1,wl)+(themesN>1&&days>wl?", week 2 starts on day "+(wl+1):"")+" and so on. Any days after the last week's theme join that last week. The weekly challenge and the completion screen count the same weeks."),
+        d.themes.map((t,i)=>{const a=i*wl+1;const b=i===d.themes.length-1?days:Math.min(days,i*wl+wl);if(a>days)return null;
           const setTheme=v=>setDraft(p=>({...p,themes:p.themes.map((x,j)=>j===i?v.toUpperCase():x)}));
           const setLine=v=>setDraft(p=>{const L=p.themes.map((_,j)=>(p.lines||[])[j]||"");L[i]=v.toUpperCase();return {...p,lines:L};});
           const wOpen=!!openWeeks[i+1],blank=!String(t||"").trim();
